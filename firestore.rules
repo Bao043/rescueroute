@@ -1,0 +1,72 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===== 管理者名單：可以進後台修改所有資料的帳號 Email =====
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email in [
+          'your-admin@example.com'
+        ];
+    }
+
+    // 醫院人員：在後台「醫院帳號」把 Email 綁定到醫院（hospitalUsers/{email} = { hid }）
+    function hasEmail() { return request.auth != null && request.auth.token.email != null; }
+    function myHid() {
+      return get(/databases/$(database)/documents/hospitalUsers/$(request.auth.token.email.lower())).data.hid;
+    }
+    function isHospital(hid) {
+      return hasEmail()
+        && exists(/databases/$(database)/documents/hospitalUsers/$(request.auth.token.email.lower()))
+        && myHid() == hid;
+    }
+
+    // ===== 主資料：救護員不用登入就能讀，只有管理者能改 =====
+    match /caps/{id}      { allow read: if true; allow write: if isAdmin(); }
+    match /hospitals/{id} { allow read: if true; allow write: if isAdmin(); }
+    match /rules/{id}     { allow read: if true; allow write: if isAdmin(); }
+    match /settings/{id}  { allow read: if true; allow write: if isAdmin(); }
+
+    // ===== 即時量能：大家都能讀，醫院只能改自己的 =====
+    match /status/{hid} {
+      allow read: if true;
+      allow write: if isAdmin() || isHospital(hid);
+    }
+
+    // ===== 到院前通知 =====
+    // 救護端用匿名登入建立通知；只有建立者、該醫院、管理者看得到
+    match /notices/{id} {
+      allow create: if request.auth != null
+        && request.resource.data.creatorUid == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.summary.size() <= 300
+        && request.resource.data.handover.size() <= 1200;
+      allow read: if request.auth != null
+        && (resource.data.creatorUid == request.auth.uid || isAdmin() || isHospital(resource.data.hid));
+      // 醫院回覆（可收治／請改送）
+      allow update: if (isAdmin() || isHospital(resource.data.hid))
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'reply', 'repliedAt'])
+        && request.resource.data.status in ['accepted', 'declined'];
+      // 救護端：回傳救護車位置／預計到院時間，或取消自己的通知
+      allow update: if request.auth != null && resource.data.creatorUid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'pos', 'posAt', 'etaAt', 'arrivedAt'])
+        && (request.resource.data.status == resource.data.status || request.resource.data.status == 'cancelled');
+      allow delete: if isAdmin();
+    }
+
+    // ===== 使用紀錄（儀表板）：救護端只能新增，只有管理者能讀 =====
+    match /logs/{id} {
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['type', 'at', 'uid', 'tab', 'ruleId', 'ruleName', 'caps', 'onset', 'hid', 'handover', 'total', 'hospitals']);
+      allow read: if isAdmin();
+      allow update, delete: if isAdmin();
+    }
+
+    // ===== 醫院帳號綁定：只有管理者能改 =====
+    match /hospitalUsers/{email} {
+      allow read: if isAdmin() || (hasEmail() && request.auth.token.email.lower() == email);
+      allow write: if isAdmin();
+    }
+  }
+}
