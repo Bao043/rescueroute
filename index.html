@@ -957,15 +957,16 @@ td.mx.off .dt{opacity:.35}
  *  1. FIREBASE_CONFIG：填入後全隊共用雲端資料；apiKey 留空 = 示範模式（資料只存在這台裝置）
  *  2. Gemini 金鑰「不要」寫在這裡（GitHub 公開會外洩），請在 App 的「本機設定」輸入
  * ========================================================= */
+// 這組設定可以公開（只用來指出是哪個 Firebase 專案）；誰能讀寫由 Firestore 規則決定
 const FIREBASE_CONFIG = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: ""
+  apiKey: "AIzaSyBdbVX5HoqeTME0oDnasr-5DxQshz-BVbk",
+  authDomain: "rescueroute-c0d6d.firebaseapp.com",
+  projectId: "rescueroute-c0d6d",
+  storageBucket: "rescueroute-c0d6d.firebasestorage.app",
+  messagingSenderId: "653252329719",
+  appId: "1:653252329719:web:c3c9ca0891de64c69b13f2"
 };
-const APP_VERSION = 'v3.11.0';
+const APP_VERSION = 'v3.12.0';
 // 醫院即時量能（急救室、候床、ICU、滿載）：目前沒有醫院即時回報的資料來源，先關閉；之後有資料來源再改成 true
 const SHOW_CAPACITY = false;
 const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
@@ -1541,7 +1542,7 @@ function applyData(d) {
 /* ========== 資料存取（示範模式 / Firebase） ========== */
 const Store = {
   mode: FIREBASE_CONFIG.apiKey ? 'firebase' : 'demo',
-  db: null, auth: null, user: null, authReady: null,
+  db: null, auth: null, user: null, authReady: null, cloudEmpty: false,
   bus: { status: new Set(), notices: new Set() },
   async init() {
     if (this.mode === 'demo') {
@@ -1618,6 +1619,9 @@ const Store = {
       this.db.collection('rules').get(), this.db.collection('settings').doc('main').get()
     ]);
     const docs = snap => snap.docs.map(x => ({ ...x.data(), id: x.id }));
+    // 雲端還沒寫入資料（剛建好資料庫）→ 先用內建能力表，救護員照樣能查；管理者到後台按「寫入內建資料到雲端」
+    this.cloudEmpty = !c.size && !h.size && !r.size;
+    if (this.cloudEmpty) return { ...seedData(), settings: s.exists ? s.data() : SEED_SETTINGS, source: 'seed' };
     const data = { caps: docs(c), hospitals: docs(h), rules: docs(r), settings: s.exists ? s.data() : SEED_SETTINGS };
     writeLS(CACHE_KEY, { ...data, cachedAt: Date.now() });
     return { ...data, source: 'firebase' };
@@ -1631,10 +1635,12 @@ const Store = {
     if (i >= 0) a[i] = item; else a.push(item);
     if (col === 'caps') sortCaps();
   },
-  _requireWrite() {
+  _requireWrite(full) {
     if (this.mode !== 'firebase') return;
     if (!this.db) throw new Error('Firebase 未連線，無法寫入');
     if (!this.email()) throw new Error('請先登入');
+    // 雲端是空的時候只存一筆，下次開啟就只剩那一筆 → 先整份寫入
+    if (this.cloudEmpty && !full) throw new Error('雲端還沒有資料：請先到「設定」分頁按「寫入內建資料到雲端」');
   },
   async save(col, item) {
     this._requireWrite();
@@ -1662,7 +1668,7 @@ const Store = {
     state.settings = s; this._persistLocal();
   },
   async replaceAll(data) {
-    this._requireWrite();
+    this._requireWrite(true);
     if (this.mode === 'firebase') {
       for (const col of ['caps', 'hospitals', 'rules']) {
         const snap = await this.db.collection(col).get();
@@ -1672,6 +1678,7 @@ const Store = {
         for (const ch of chunks(ops, 400)) { const b = this.db.batch(); ch.forEach(o => o.del ? b.delete(o.del) : b.set(o.ref, o.val)); await b.commit(); }
       }
       await this.db.collection('settings').doc('main').set(plain(data.settings));
+      this.cloudEmpty = false; state.dataSource = 'firebase';
     }
     applyData(data); this._persistLocal();
   },
@@ -1697,7 +1704,7 @@ const Store = {
     await this.db.collection('status').doc(hid).set(plain(st));
   },
   async clearLive() {
-    this._requireWrite();
+    this._requireWrite(true);
     if (this.mode === 'demo') {
       writeLS(DEMO_STATUS_KEY, {}); writeLS(DEMO_NOTICE_KEY, []);
       this.bus.status.forEach(f => f()); this.bus.notices.forEach(f => f()); return;
@@ -1747,14 +1754,14 @@ const Store = {
   },
   async loadLogs() {
     if (this.mode === 'demo') return readLS(DEMO_LOG_KEY) || [];
-    this._requireWrite();
+    this._requireWrite(true);
     const since = Date.now() - 90 * 864e5;
     const snap = await this.db.collection('logs').where('at', '>=', since).get();
     return snap.docs.map(d => d.data());
   },
   async loadAllNotices() {
     if (this.mode === 'demo') return (readLS(DEMO_NOTICE_KEY) || []).map(normNotice);
-    this._requireWrite();
+    this._requireWrite(true);
     const since = Date.now() - 90 * 864e5;
     const snap = await this.db.collection('notices').where('createdAt', '>=', since).get();
     return snap.docs.map(d => normNotice({ ...d.data(), id: d.id }));
@@ -1767,12 +1774,12 @@ const Store = {
   },
   async listHospitalUsers() {
     if (this.mode === 'demo') return [];
-    this._requireWrite();
+    this._requireWrite(true);
     const snap = await this.db.collection('hospitalUsers').get();
     return snap.docs.map(d => ({ email: d.id, hid: d.data().hid }));
   },
-  async setHospitalUser(email, hid) { this._requireWrite(); await this.db.collection('hospitalUsers').doc(email.toLowerCase()).set({ hid }); },
-  async removeHospitalUser(email) { this._requireWrite(); await this.db.collection('hospitalUsers').doc(email).delete(); },
+  async setHospitalUser(email, hid) { this._requireWrite(true); await this.db.collection('hospitalUsers').doc(email.toLowerCase()).set({ hid }); },
+  async removeHospitalUser(email) { this._requireWrite(true); await this.db.collection('hospitalUsers').doc(email).delete(); },
   async login(email, pw) { if (!this.auth) throw new Error('Firebase 未載入'); await this.auth.signInWithEmailAndPassword(email, pw); },
   async logout() { if (this.auth) await this.auth.signOut(); }
 };
@@ -2604,6 +2611,7 @@ function renderNet() {
   if (Store.mode === 'demo') { p.className = 'pill warn'; p.innerHTML = '<span class="dot"></span>示範模式'; }
   else if (state.dataSource === 'cache') { p.className = 'pill warn'; p.innerHTML = '<span class="dot"></span>離線資料'; }
   else if (state.dataSource === 'none') { p.className = 'pill bad'; p.innerHTML = '<span class="dot"></span>未連線'; }
+  else if (state.dataSource === 'seed') { p.className = 'pill warn'; p.innerHTML = '<span class="dot"></span>內建資料'; }
   else { p.className = 'pill ok'; p.innerHTML = '<span class="dot"></span>雲端同步'; }
 }
 function renderTabs() {
@@ -2811,7 +2819,7 @@ function renderResults() {
 }
 function renderDataInfo() {
   const unv = state.hospitals.filter(h => !h.verified).length;
-  const src = { demo: '示範模式（資料存在此裝置）', firebase: '雲端資料庫', cache: `離線快取（${fmtTime(state.cachedAt)} 同步）`, none: '無資料' }[state.dataSource] || '';
+  const src = { demo: '示範模式（資料存在此裝置）', firebase: '雲端資料庫', cache: `離線快取（${fmtTime(state.cachedAt)} 同步）`, none: '未連線，使用內建能力表', seed: '內建能力表（雲端尚未寫入資料）' }[state.dataSource] || '';
   $('#dataInfo').innerHTML = [
     unv ? `⚠ ${unv} 間醫院的能力資料尚未驗證，請以實際聯繫醫院為準` : '',
     `醫院能力：${esc(state.settings.tableSrc)}`,
@@ -4044,7 +4052,8 @@ function renderAdmin() {
 function renderAdminPanel() {
   $$('[data-act="atab"]').forEach(b => b.classList.toggle('on', b.dataset.tab === state.adminTab));
   const p = $('#adminPanel');
-  const demoNote = Store.mode === 'demo' ? '<div class="notice">目前是示範模式：修改只會存在這台裝置。要讓全隊共用，請依 README 設定 Firebase。</div>' : '';
+  const demoNote = Store.mode === 'demo' ? '<div class="notice">目前是示範模式：修改只會存在這台裝置。要讓全隊共用，請依 README 設定 Firebase。</div>'
+    : Store.cloudEmpty ? '<div class="notice">雲端資料庫還是空的，大家目前看到的是內建能力表。請先到「設定」分頁最下方按「寫入內建資料到雲端」，之後的修改才會存到雲端、全隊同步。</div>' : '';
   if (state.adminTab === 'match') {
     renderMatchPanel(p, demoNote);
   } else if (state.adminTab === 'hosp') {
@@ -4071,7 +4080,7 @@ function renderAdminPanel() {
     renderStats();
   } else {
     if (!state.presetDraft) state.presetDraft = plain(state.settings.presets);
-    const empty = !state.hospitals.length && !state.caps.length && !state.rules.length;
+    const empty = Store.cloudEmpty || (!state.hospitals.length && !state.caps.length && !state.rules.length);
     p.innerHTML = demoNote + `<section class="card form">
       <div class="sec-title">查詢設定</div>
       <label>列表顯示幾間醫院</label><input id="s_count" class="num" type="number" min="1" max="100" value="${state.settings.listCount}">
@@ -4126,7 +4135,7 @@ function renderAdminPanel() {
       <div class="sec-title">即時資料</div>
       <div class="btn-wrap">
         <button class="btn danger" data-act="clearLive">清除所有設備狀態與通知</button>
-        ${Store.mode === 'firebase' ? (empty ? '<button class="btn primary" data-act="seed">寫入預設測試資料</button>' : '')
+        ${Store.mode === 'firebase' ? (empty ? '<button class="btn primary" data-act="seed">寫入內建資料到雲端</button>' : '')
           : '<button class="btn danger" data-act="resetDemo">重設為預設測試資料</button>'}
       </div>
     </section>
@@ -4992,7 +5001,7 @@ const ACTIONS = {
       caps: state.caps, hospitals: state.hospitals, rules: state.rules, settings: state.settings }, null, 2), 'application/json'),
   importJson: async () => { const t = await pickFile('#fileJson'); if (t != null) await importJsonBackup(t); },
   clearLive: async () => { if (!confirm('清除所有醫院回報的設備狀態與到院前通知？')) return; await Store.clearLive(); toast('已清除'); },
-  seed: async () => { if (!confirm('寫入預設測試資料到雲端？')) return; await Store.replaceAll(seedData()); state.presetDraft = null; toast('已寫入'); renderAdminPanel(); },
+  seed: async () => { if (!confirm('把內建的醫院、能力、主訴與設定寫入雲端？\n寫入後全隊都會讀到雲端這份資料。')) return; await Store.replaceAll(seedData()); state.presetDraft = null; renderNet(); toast('已寫入雲端'); renderAdminPanel(); },
   resetDemo: async () => { if (!confirm('清除此裝置上的修改，恢復預設測試資料？')) return; await Store.replaceAll(seedData()); state.presetDraft = null; if (localCfg.sim) { Sim.stop(); Sim.start(); } toast('已重設'); renderAdminPanel(); },
   modalClose: () => closeModal(),
   modalBtn: el => { const b = state.modalBtns[Number(el.dataset.i)]; if (b) return b.onClick(); }
@@ -5083,7 +5092,7 @@ async function boot() {
     console.warn(e);
     const c = readLS(CACHE_KEY);
     if (c && Array.isArray(c.hospitals)) { applyData(c); state.dataSource = 'cache'; state.cachedAt = c.cachedAt; toast('無法連線資料庫，使用上次同步的離線資料', 4000); }
-    else { applyData({ caps: [], hospitals: [], rules: [], settings: SEED_SETTINGS }); state.dataSource = 'none'; toast('資料載入失敗：' + e.message, 5000); }
+    else { applyData(seedData()); state.dataSource = 'none'; toast('無法連線資料庫，先使用內建的醫院能力表', 5000); }
   }
   Store.watchStatus(m => {
     const out = {}; for (const [k, v] of Object.entries(m || {})) out[k] = normStatus(v);
