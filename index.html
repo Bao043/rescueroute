@@ -100,7 +100,9 @@ body{min-height:100vh;padding-bottom:calc(36px + env(safe-area-inset-bottom))}
 .menu hr{border:0;border-top:1px solid var(--line);margin:4px 6px}
 /* ---------- 主分頁：後送建議／醫院查詢 ---------- */
 .topbar{flex-wrap:wrap;row-gap:8px}
-.mtabs{order:9;flex:1 0 100%;max-width:560px;margin:0 auto;display:flex;gap:4px;padding:4px;background:var(--sunken);border-radius:14px}
+.tb-break{order:8;flex-basis:100%;height:0}
+.tb-break:has(+ .mtabs[hidden]){display:none}
+.mtabs{order:9;flex:1 1 auto;max-width:560px;margin:0 auto;display:flex;gap:4px;padding:4px;background:var(--sunken);border-radius:14px}
 .mtabs button{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;border:0;background:transparent;color:var(--muted);
   font:inherit;font-size:16px;font-weight:800;letter-spacing:1px;padding:9px 6px;border-radius:11px;cursor:pointer}
 .mtabs button.on{background:#D3302A;color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2)}
@@ -720,91 +722,27 @@ td.mx.off .dt{opacity:.35}
 @media (max-width:620px){.cap-ed{grid-template-columns:1fr auto;grid-template-areas:'c p' 'w w' 'n n';padding:8px 0;border-top:1px dashed var(--line)}
   .cap-ed .c-cap{grid-area:c}.cap-ed .c-pause{grid-area:p}.cap-ed .c-when{grid-area:w}.cap-ed .c-note{grid-area:n}}
 
-/* ---------- 開場介紹（固定深墨藍，與簡報同色） ---------- */
-body.intro{background:#0F1B28;overflow:hidden}
-body.intro .topbar,body.intro #jumpPill,body.intro #menu{display:none}
-#viewIntro{position:fixed;inset:0;z-index:40;background:#0F1B28;color:#F1EDE5;max-width:none;padding:0}
-.in-top{position:absolute;top:0;left:0;right:0;z-index:3;display:flex;align-items:center;justify-content:space-between;padding:calc(14px + env(safe-area-inset-top)) 20px 14px;background:linear-gradient(#0F1B28 60%,rgba(15,27,40,0))}
-.in-brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:16px;letter-spacing:.5px}
-.in-brand .logo{width:30px;height:30px;border-radius:8px}.in-brand .logo .ic{width:18px;height:18px}
-.in-skip{border:1px solid #30465E;background:none;color:#F1EDE5;border-radius:999px;padding:8px 16px;font:inherit;font-size:14px;font-weight:650;cursor:pointer}
-.in-track{position:absolute;inset:0;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-.in-track::-webkit-scrollbar{display:none}
-.in-s{flex:0 0 100%;height:100%;overflow-y:auto;scroll-snap-align:start;display:flex;padding:calc(84px + env(safe-area-inset-top)) 24px calc(110px + env(safe-area-inset-bottom))}
-.in-in{width:100%;max-width:980px;margin:auto}
-.in-eye{margin:0 0 14px;color:#F4B400;font-weight:800;letter-spacing:3px;font-size:14px}
-.in-s h1{margin:0;font-size:clamp(46px,9vw,108px);line-height:1.06;font-weight:900;letter-spacing:1px}
-.in-s h2{margin:0 0 28px;font-size:clamp(28px,4.6vw,56px);line-height:1.2;font-weight:900}
-.in-s h3{margin:30px 0 12px;font-size:18px;font-weight:800;color:#F4B400;letter-spacing:1px}
-.in-lead{margin:24px 0 0;font-size:clamp(17px,2vw,22px);line-height:1.7;color:#A9B6C3;max-width:36em}
-.in-stripe{height:12px;max-width:360px;margin-top:36px;border-radius:3px;background:repeating-linear-gradient(-45deg,#D3302A 0 12px,#F4B400 12px 24px)}
-.in-hint{margin-top:44px;color:#5F6C7A;font-size:14px}
-.in-tl{list-style:none;margin:0;padding:0 0 0 28px;position:relative}
-.in-tl::before{content:"";position:absolute;left:7px;top:10px;bottom:10px;width:3px;background:linear-gradient(#5F6C7A 0 45%,#D3302A 55%)}
-.in-tl li{position:relative;padding:0 0 28px 16px}
-.in-tl li::before{content:"";position:absolute;left:-28px;top:7px;width:17px;height:17px;border-radius:50%;background:#0F1B28;border:3px solid #8B98A6}
-.in-tl li.bad::before{border-color:#D3302A;background:#D3302A}
-.in-tl b{display:block;font-size:clamp(19px,2.4vw,28px);line-height:1.35}
-.in-tl li.bad b{color:#FF6A5E}
-.in-tl span{display:block;color:#A9B6C3;font-size:clamp(15px,1.7vw,18px);margin-top:4px}
-.in-big{display:flex;align-items:baseline;gap:12px}
-.in-big b{font-family:var(--num);font-size:clamp(96px,18vw,200px);line-height:.85;color:#F4B400}
-.in-big span{font-size:clamp(22px,3vw,32px);font-weight:800}
-.in-bars{margin-top:36px;display:flex;flex-direction:column;gap:20px}
-.in-bar .l{display:flex;justify-content:space-between;gap:12px;font-size:clamp(14px,1.8vw,18px);color:#C9CED3;margin-bottom:8px}
-.in-bar .l b{font-family:var(--num);font-size:clamp(22px,3vw,30px);color:#F1EDE5;white-space:nowrap}
-.in-track2{display:flex;height:32px;border-radius:8px;overflow:hidden;background:#172738}
-.in-track2 span{display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:750;white-space:nowrap;overflow:hidden}
-.in-track2 .go{background:#2FB873}.in-track2 .a{background:#5F6C7A}.in-track2 .t2{background:#8B98A6;color:#0F1B28}
-.in-track2 .wait{background:repeating-linear-gradient(-45deg,#D3302A 0 10px,#A8241F 10px 20px);color:#FFFDF9}
-.in-foot{margin-top:24px;color:#8B98A6;font-size:13px;line-height:1.6}
-.in-three,.in-steps,.in-list{display:grid;gap:18px}
-@media(min-width:820px){.in-three,.in-steps,.in-list{grid-template-columns:repeat(3,1fr)}}
-.in-three div,.in-steps div,.in-list div,.in-grid div{border-top:3px solid #22344A;padding-top:14px}
-.in-three b{display:block;font-size:clamp(30px,4vw,46px);font-weight:900;color:#FF6A5E}
-.in-three span,.in-steps span,.in-list span,.in-grid span{display:block;color:#A9B6C3;font-size:clamp(15px,1.6vw,18px);line-height:1.65;margin-top:6px}
-.in-steps i{display:inline-grid;place-items:center;width:44px;height:44px;border-radius:12px;background:#D3302A;font-style:normal;font-family:var(--num);font-size:24px;font-weight:700;margin-bottom:10px}
-.in-steps b,.in-list b,.in-grid b{display:block;font-size:clamp(19px,2.2vw,24px)}
-.in-nums{display:flex;gap:28px;flex-wrap:wrap;margin-bottom:28px}
-.in-nums div{display:flex;flex-direction:column}
-.in-nums b{font-family:var(--num);font-size:clamp(64px,10vw,110px);line-height:1;color:#F4B400}
-.in-nums span{color:#A9B6C3;font-size:15px}
-.in-list b{color:#F4B400}
-.in-grid{display:grid;gap:20px 26px}
-@media(min-width:720px){.in-grid{grid-template-columns:repeat(2,1fr)}}
-@media(min-width:1050px){.in-grid{grid-template-columns:repeat(3,1fr)}}
-.in-notice{margin:0;padding-left:20px;font-size:clamp(15px,1.8vw,18px);line-height:1.7;color:#E2E0DA}
-.in-notice li{margin-bottom:8px}
-.in-data{display:flex;flex-direction:column;gap:10px}
-.in-data div{display:grid;grid-template-columns:96px 1fr;gap:12px;padding:12px 14px;border-radius:12px;background:#172738;font-size:15px;line-height:1.6}
-.in-data b{font-weight:800}.in-data span{color:#C9CED3}
-.in-data .real b{color:#3DD68C}.in-data .est b{color:#F4B400}.in-data .sim b{color:#FF6A5E}
-.in-credit{margin-top:22px;color:#5F6C7A;font-size:12px;letter-spacing:.5px;line-height:1.7}
-.in-start{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;max-width:420px;margin:30px 0 0;border:0;border-radius:16px;padding:17px 24px;background:#D3302A;color:#FFFDF9;font:inherit;font-size:18px;font-weight:800;cursor:pointer}
-.in-start .ic{width:22px;height:22px}
-.in-disc{margin-top:14px;color:#8B98A6;font-size:13px}
-.in-nav{position:absolute;left:0;right:0;bottom:0;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px calc(16px + env(safe-area-inset-bottom));background:linear-gradient(rgba(15,27,40,0),#0F1B28 40%)}
-.in-prev{width:46px;height:46px;border-radius:50%;border:1px solid #30465E;background:none;color:#F1EDE5;font-size:26px;line-height:1;cursor:pointer}
-.in-prev:disabled{opacity:.3;cursor:default}
-.in-next{border:0;border-radius:999px;padding:13px 22px;background:#D3302A;color:#FFFDF9;font:inherit;font-size:16px;font-weight:800;cursor:pointer}
-.in-dots{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
-.in-dots button{width:9px;height:9px;border-radius:50%;border:0;padding:0;background:#30465E;cursor:pointer}
-.in-dots button.on{background:#F4B400;transform:scale(1.25)}
-@media (prefers-reduced-motion:reduce){.in-track{scroll-behavior:auto}}
+/* ---------- 使用須知：資料說明 ---------- */
+.ds-h{margin:18px 0 8px;font-size:13px;font-weight:800;color:var(--muted);letter-spacing:.5px}
+.ds-list{display:flex;flex-direction:column;gap:8px}
+.ds-list div{display:grid;grid-template-columns:70px 1fr;gap:10px;padding:10px 12px;border-radius:12px;background:var(--field);font-size:13px;line-height:1.6}
+.ds-list b{font-weight:800}.ds-list span{color:var(--ink2)}
+.ds-list .real b{color:var(--green)}.ds-list .est b{color:var(--amber)}.ds-list .sim b{color:var(--red)}
 /* ---------- 版面 ---------- */
-.empty-right{display:none}
 @media(max-width:380px){.clock{font-size:46px}.h-dist b{font-size:29px}}
 @media(min-width:1100px){
+  /* 寬螢幕：分頁放在頂欄正中間，不另佔一行 */
+  .tb-break{display:none}
+  .mtabs{position:absolute;left:50%;top:calc(9px + env(safe-area-inset-top));transform:translateX(-50%);width:440px;margin:0}
+  .mtabs[hidden]{display:none}
   #viewEms{max-width:1320px;display:grid;grid-template-columns:minmax(380px,450px) 1fr;gap:22px;align-items:start}
   .col-left{position:sticky;top:78px;max-height:calc(100vh - 92px);overflow:auto;padding:0 4px 8px 0;scrollbar-width:thin}
   .col-right{min-width:0;padding-top:4px}
   #mapBox{height:44vh}
   .res-head{margin-top:8px}
-  .empty-right{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;color:var(--muted);
-    padding:110px 30px;border:2px dashed var(--line2);border-radius:var(--r-sheet);margin-top:8px}
-  .empty-right .ic{width:44px;height:44px;color:var(--dim)}
-  .empty-right b{color:var(--ink);font-size:18px}
-  .empty-right.off{display:none}
+  /* 還沒查詢：一欄置中（跟手機一樣）；查詢後才分左右兩欄，右邊放結果與地圖 */
+  #viewEms:not(.split){display:block;max-width:760px}
+  #viewEms:not(.split) .col-left{position:static;max-height:none;overflow:visible;padding:0}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -849,6 +787,7 @@ body.intro .topbar,body.intro #jumpPill,body.intro #menu{display:none}
   </div>
   <span id="netPill" class="pill"></span>
   <button class="icon-btn" data-act="menu" aria-label="選單"><svg class="ic"><use href="#i-menu"/></svg></button>
+  <span class="tb-break" aria-hidden="true"></span>
   <nav class="mtabs" id="mtabs" aria-label="主要分頁">
     <button data-act="go" data-to="" class="on"><svg class="ic"><use href="#i-ambu"/></svg>後送建議</button>
     <button data-act="go" data-to="#lookup"><svg class="ic"><use href="#i-hosp"/></svg>醫院查詢</button>
@@ -857,7 +796,6 @@ body.intro .topbar,body.intro #jumpPill,body.intro #menu{display:none}
 <div id="menu" class="menu" hidden>
   <button data-act="go" data-to=""><svg class="ic"><use href="#i-ambu"/></svg>後送建議</button>
   <button data-act="go" data-to="#lookup"><svg class="ic"><use href="#i-hosp"/></svg>醫院查詢</button>
-  <button data-act="openIntro"><svg class="ic"><use href="#i-spark"/></svg>產品介紹與使用須知</button>
   <button data-act="go" data-to="#table"><svg class="ic"><use href="#i-grid"/></svg>醫院能力總表</button>
   <button data-act="go" data-to="#mci"><svg class="ic"><use href="#i-users"/></svg>大量傷病患分流</button>
   <button data-act="go" data-to="#hospital"><svg class="ic"><use href="#i-hosp"/></svg>醫院端・到院前通知</button>
@@ -924,11 +862,6 @@ body.intro .topbar,body.intro #jumpPill,body.intro #menu{display:none}
   <div id="resultsHead"></div>
   <div id="mapWrap" hidden><div id="mapBox"></div></div>
   <div id="results"></div>
-  <div id="emptyRight" class="empty-right">
-    <svg class="ic"><use href="#i-hosp"/></svg>
-    <b>貼上派遣內容，按「查詢鄰近醫院」</b>
-    <span>適合且目前可收治的醫院會排在最前面</span>
-  </div>
   <div id="dataInfo" class="foot"></div>
   <footer class="app-foot"></footer>
  </div>
@@ -950,102 +883,6 @@ body.intro .topbar,body.intro #jumpPill,body.intro #menu{display:none}
   <footer class="app-foot"></footer>
 </main>
 <main id="viewMci" hidden><div id="mciPanel"></div><footer class="app-foot"></footer></main>
-<!-- ================= 開場介紹（可略過）＋使用須知與創作者 ================= -->
-<main id="viewIntro" hidden>
-  <div class="in-top">
-    <span class="in-brand"><span class="logo"><svg class="ic"><use href="#i-logo"/></svg></span>救途 RescueRoute</span>
-    <button class="in-skip" data-act="introSkip">略過介紹 ›</button>
-  </div>
-  <div class="in-track" id="inTrack">
-    <section class="in-s in-cover">
-      <div class="in-in">
-        <p class="in-eye">救途 RescueRoute・救護送醫導航</p>
-        <h1>第一次，<br>就送對醫院。</h1>
-        <p class="in-lead">給救護人員的送醫決策輔助：依病況、治療時間窗與醫院能力，告訴你該送哪裡，以及為什麼。</p>
-        <div class="in-stripe"></div>
-        <p class="in-hint">往左滑或按「下一頁」</p>
-      </div>
-    </section>
-    <section class="in-s">
-      <div class="in-in">
-        <p class="in-eye">設計緣由</p>
-        <h2>一次真實的出勤</h2>
-        <ol class="in-tl">
-          <li><b>火場救出一名患者</b><span>口鼻有碳粒，吸入濃煙。</span></li>
-          <li><b>處置後送往市立三重醫院</b><span>當下判斷合理，距離也近。</span></li>
-          <li class="bad"><b>一氧化碳過高、喉頭水腫</b><span>需要高壓氧，這間醫院無法處置。</span></li>
-          <li class="bad"><b>立即再轉送他院</b><span>病人最需要時間的時候，花了更多時間在路上。</span></li>
-        </ol>
-      </div>
-    </section>
-    <section class="in-s">
-      <div class="in-in">
-        <h2>送錯一次，要付出多少時間？</h2>
-        <div class="in-big"><b>+48</b><span>分鐘</span></div>
-        <div class="in-bars">
-          <div class="in-bar"><div class="l"><span>直送有高壓氧的部立臺北</span><b>10 分</b></div><div class="in-track2"><span class="go" style="width:17.2%"></span></div></div>
-          <div class="in-bar"><div class="l"><span>先送最近的三重院區，再轉院</span><b>58 分</b></div>
-            <div class="in-track2"><span class="a" style="width:5.2%"></span><span class="wait" style="width:77.6%">檢查、聯繫、等候轉院 45</span><span class="t2" style="width:17.2%">轉院 10</span></div></div>
-        </div>
-        <p class="in-foot">以系統醫院資料與市區平均車速估算，轉院準備以 45 分鐘計，實際依路況而定。一氧化碳中毒在 6 小時內接受高壓氧，預後較佳。</p>
-      </div>
-    </section>
-    <section class="in-s">
-      <div class="in-in">
-        <h2>為什麼會送錯？</h2>
-        <div class="in-three">
-          <div><b>問不到</b><span>勤務中心忙線，現場沒辦法即時確認哪間醫院能收。</span></div>
-          <div><b>不知道</b><span>哪間醫院有高壓氧、取栓、葉克膜，大多只能靠經驗與記憶。</span></div>
-          <div><b>看不到</b><span>能力是否只有平日白天才有、此刻能不能做，出發前無從得知。</span></div>
-        </div>
-      </div>
-    </section>
-    <section class="in-s">
-      <div class="in-in">
-        <p class="in-eye">解法</p>
-        <h2>貼上派遣內容，答案就出來</h2>
-        <div class="in-steps">
-          <div><i>1</i><b>貼上或用說的</b><span>勤務中心的案件摘要，原文貼上即可。</span></div>
-          <div><i>2</i><b>自動判斷</b><span>性別、年齡、主訴、發作時間、危險徵象；可加上 Gemini AI。</span></div>
-          <div><i>3</i><b>建議送往</b><span>有能力、此刻能做、到院時還來得及的醫院，並說明為什麼不是最近那間。</span></div>
-        </div>
-      </div>
-    </section>
-    <section class="in-s">
-      <div class="in-in">
-        <p class="in-eye">資料</p>
-        <h2>依新北市 115 年第三季能力表</h2>
-        <div class="in-nums"><div><b>20</b><span>間醫院（新北 19＋林口長庚）</span></div><div><b>19</b><span>個專科欄位</span></div><div><b>3</b><span>種標記（人力／設備／編制床）</span></div></div>
-        <div class="in-list">
-          <div><b>服務時段</b><span>「僅平日上班時間」的能力，半夜自動不算可用。</span></div>
-          <div><b>有條件</b><span>「請先來電確認」的醫院，排到「建議先電話確認」。</span></div>
-          <div><b>已插管</b><span>高壓氧不收呼吸器病人的醫院，自動排除。</span></div>
-        </div>
-      </div>
-    </section>
-    <section class="in-s">
-      <div class="in-in">
-        <h2>為第一線設計的每一個細節</h2>
-        <div class="in-grid">
-          <div><b>治療時間窗</b><span>中風、心肌梗塞、一氧化碳……到院時還剩多少時間。</span></div>
-          <div><b>為什麼不是最近那間</b><span>建議卡片直接說明：最近的醫院缺哪項能力，或此刻做不到。</span></div>
-          <div><b>到院前通知</b><span>一鍵送出 ISBAR 交班摘要，醫院回覆可收治或請改送。</span></div>
-          <div><b>醫院查詢</b><span>下拉選單選一間醫院，看它能做哪些處置；總表一頁看完全部醫院。</span></div>
-          <div><b>大量傷病患分流</b><span>依醫院等級與專科能力自動分配，不讓傷患擠進同一間急診。</span></div>
-          <div><b>隨機情境</b><span>32 種病況、29 區、白天與深夜，用來訓練與示範。</span></div>
-        </div>
-      </div>
-    </section>
-    <section class="in-s in-welcome" id="inWelcome">
-      <div class="in-in" id="inWelcomeBody"></div>
-    </section>
-  </div>
-  <div class="in-nav">
-    <button class="in-prev" data-act="introPrev" aria-label="上一頁">‹</button>
-    <div class="in-dots" id="inDots"></div>
-    <button class="in-next" data-act="introNext">下一頁 ›</button>
-  </div>
-</main>
 <main id="viewTable" hidden><section class="card mx-card"><div id="matrixBox"></div></section><footer class="app-foot"></footer></main>
 <!-- ================= 後台 ================= -->
 <main id="viewAdmin" hidden>
@@ -1101,7 +938,7 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "",
   appId: ""
 };
-const APP_VERSION = 'v3.6.1';
+const APP_VERSION = 'v3.6.2';
 // 醫院即時量能（急救室、候床、ICU、滿載）：目前沒有醫院即時回報的資料來源，先關閉；之後有資料來源再改成 true
 const SHOW_CAPACITY = false;
 const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
@@ -1554,7 +1391,7 @@ function normNotice(n = {}) {
 const localCfg = Object.assign({
   unit: '', geminiKey: '', geminiModel: DEFAULT_GEMINI_MODEL, aiAuto: true,
   sim: !FIREBASE_CONFIG.apiKey, showDemo: true, sortBy: 'rec', showMap: false, dismissed: [], theme: 'auto', transferPrep: 45, autoSearch: true, usage: {},
-  introDone: false, introEvery: false, lkId: '', lkAll: false
+  lkId: '', lkAll: false
 }, readLS(LOCAL_CFG_KEY) || {});
 if (!['rec', 'dist'].includes(localCfg.sortBy)) localCfg.sortBy = 'rec'; // v2.0 的「車程」排序併入建議／距離
 if (!['auto', 'light', 'dark'].includes(localCfg.theme)) localCfg.theme = 'auto';
@@ -2769,7 +2606,7 @@ function tierOf(x, hl) {
 function renderResults() {
   renderHint();
   const box = $('#results'), head = $('#resultsHead');
-  $('#emptyRight').classList.toggle('off', !!(state.searched && state.pos));
+  $('#viewEms').classList.toggle('split', !!(state.searched && state.pos));
   if (!state.searched || !state.pos) { box.innerHTML = ''; head.innerHTML = ''; $('#mapWrap').hidden = true; return; }
   const hl = getHighlight();
   const all = computeList(hl);
@@ -3850,21 +3687,16 @@ function textHash(t) { let h = 0; for (const ch of String(t)) h = (h * 31 + ch.c
 function noticeHtml() {
   const lines = state.settings.notice.split(/\n+/).map(x => x.trim()).filter(Boolean);
   return `<ul class="ack-list">${lines.map(l => `<li>${esc(l)}</li>`).join('')}</ul>
+    <div class="ds-h">資料說明：哪些是真的、哪些是估算</div>${dataStatusHtml()}
     ${creditHtml('ack-credit')}`;
 }
 function maybeShowAck() {
-  if (window.__skipAck || isRoute('#intro')) return;
+  if (window.__skipAck) return;
   const acked = localCfg.ack === textHash(state.settings.notice);
-  // 救護端：第一次開啟（或須知改過、或設定每次播放）先看開場介紹，最後一頁是使用須知＋創作者
-  if (isRoute('') && (!acked || (localCfg.introEvery && !state.introShown))) {
-    // 第一次使用從頭播；之前同意過（只是須知改了）直接到使用須知頁
-    state.introStart = (!localCfg.ack && !localCfg.introDone) || (localCfg.introEvery && !state.introShown) ? 0 : 'welcome';
-    location.hash = '#intro'; return;
-  }
   if (acked) return;
   if (!$('#modal').hidden && state.modalLocked) return;
   openModal({
-    title: '使用前請先了解', noClose: true,
+    title: '使用須知', noClose: true,
     body: `<div class="ack">${ic('shield', 'lg')}<p>救途是給第一線救護人員的<b>送醫判斷輔助工具</b>。</p></div>${noticeHtml()}`,
     buttons: [{ text: '我了解，開始使用', cls: 'primary', onClick: () => { localCfg.ack = textHash(state.settings.notice); saveLocalCfg(); closeModal(); } }]
   });
@@ -3892,44 +3724,8 @@ function dataStatusHtml() {
     ['sim', '模擬', `救護車位置在沒有 GPS 時為模擬路線；隨機情境的地點與時間；數據分析的示範數據`]
   ];
   if (demo) rows.push(['sim', '示範模式', '資料只存在這台裝置；「通知醫院」不會送到真的醫院，醫院端的回覆也只在這台裝置示範']);
-  return `<div class="in-data">${rows.map(([k, t, d]) => `<div class="${k}"><b>${esc(t)}</b><span>${esc(d)}</span></div>`).join('')}</div>`;
+  return `<div class="ds-list">${rows.map(([k, t, d]) => `<div class="${k}"><b>${esc(t)}</b><span>${esc(d)}</span></div>`).join('')}</div>`;
 }
-function renderIntro() {
-  document.body.classList.add('intro');
-  const lines = state.settings.notice.split(/\n+/).map(x => x.trim()).filter(Boolean);
-  $('#inWelcomeBody').innerHTML = `<p class="in-eye">開始使用前</p><h2>使用須知</h2>
-    <ul class="in-notice">${lines.map(l => `<li>${esc(l)}</li>`).join('')}</ul>
-    <h3>資料說明：哪些是真的、哪些是模擬</h3>${dataStatusHtml()}
-    <button class="in-start" data-act="introDone">${ic('check')}我了解，開始使用</button>
-    <p class="in-disc">${esc(state.settings.disclaimer)}</p>
-    ${creditHtml('in-credit', 'p')}`;
-  const n = $$('#inTrack .in-s').length;
-  $('#inDots').innerHTML = Array.from({ length: n }, (_, i) => `<button data-act="introGo" data-i="${i}" aria-label="第 ${i + 1} 頁"></button>`).join('');
-  const start = state.introStart === 'welcome' ? n - 1 : 0;
-  state.introStart = 0;
-  requestAnimationFrame(() => { introGo(start, false); });
-}
-function introIndex() { const t = $('#inTrack'); return t && t.clientWidth ? Math.round(t.scrollLeft / t.clientWidth) : 0; }
-function introGo(i, smooth = true) {
-  const t = $('#inTrack'), n = $$('#inTrack .in-s').length; if (!t) return;
-  i = Math.max(0, Math.min(n - 1, i));
-  t.scrollTo({ left: i * t.clientWidth, behavior: smooth ? 'smooth' : 'auto' });
-  introMark(i);
-}
-function introMark(i) {
-  const n = $$('#inTrack .in-s').length;
-  $$('#inDots button').forEach((b, j) => b.classList.toggle('on', j === i));
-  const last = i >= n - 1, nx = $('#viewIntro .in-next');
-  nx.textContent = last ? '我了解，開始使用' : '下一頁 ›'; nx.dataset.act = last ? 'introDone' : 'introNext';
-  $('#viewIntro .in-skip').hidden = last;
-  $('#viewIntro .in-prev').disabled = i === 0;
-}
-function introFinish() {
-  localCfg.ack = textHash(state.settings.notice); localCfg.introDone = true; saveLocalCfg();
-  state.introShown = true;
-  location.hash = '';
-}
-
 /* ========== 重現真實案例（示範案例第一個） ========== */
 const STORY_SCENE = { lat: 25.0640, lng: 121.4930, name: '示範現場：新北市三重區' };
 // 位置設在三重、貼上當天的派遣內容，直接查詢
@@ -3948,15 +3744,14 @@ async function storyDemo() {
 /* ========== 後台 ========== */
 function isRoute(r) { return (location.hash || '') === r; }
 function route() {
-  if (location.hash === '#launch') history.replaceState(null, '', '#intro');   // 舊網址
+  // 舊網址：開場介紹已移除，直接回到後送建議
+  if (['#launch', '#intro'].includes(location.hash)) history.replaceState(null, '', location.pathname + location.search);
   const r = location.hash;
-  $('#viewEms').hidden = !(r === '' || r === '#' || !['#hospital', '#admin', '#mci', '#table', '#intro', '#lookup'].includes(r));
+  $('#viewEms').hidden = !(r === '' || r === '#' || !['#hospital', '#admin', '#mci', '#table', '#lookup'].includes(r));
   $('#viewLookup').hidden = r !== '#lookup';
   const ems = !$('#viewEms').hidden;
   $('#mtabs').hidden = !(ems || r === '#lookup');
   $$('#mtabs button').forEach(b => { const on = (b.dataset.to === '#lookup') === (r === '#lookup'); b.classList.toggle('on', on); b.setAttribute('aria-current', on ? 'page' : 'false'); });
-  $('#viewIntro').hidden = r !== '#intro';
-  if (r !== '#intro') document.body.classList.remove('intro');
   $('#viewTable').hidden = r !== '#table';
   $('#viewHospital').hidden = r !== '#hospital';
   $('#viewAdmin').hidden = r !== '#admin';
@@ -3971,7 +3766,6 @@ function route() {
   else if (r === '#hospital') { renderHospital(); prepareHospital(); }
   else if (r === '#mci') renderMci();
   else if (r === '#table') renderMatrix();
-  else if (r === '#intro') renderIntro();
   else if (r === '#lookup') renderLookup();
   else renderMain();
   renderFoots();
@@ -4623,7 +4417,7 @@ function openLocalSettings() {
         <label class="chk"><input type="checkbox" id="ls_sim" ${localCfg.sim ? 'checked' : ''}>示範：模擬救護車行進（沒有 GPS 時，醫院端看板顯示救護車沿路線前進）</label>
         <label class="chk"><input type="checkbox" id="ls_demo" ${localCfg.showDemo ? 'checked' : ''}>顯示示範案例</label>
         <label class="chk"><input type="checkbox" id="ls_auto" ${localCfg.autoSearch ? 'checked' : ''}>辨識出主訴後自動查詢</label>
-        <label class="chk"><input type="checkbox" id="ls_intro" ${localCfg.introEvery ? 'checked' : ''}>每次開啟先播放產品介紹（報告示範用）</label>
+        
       </div>`,
     buttons: [{ text: '取消', cls: 'ghost', onClick: () => closeModal() }, { text: '儲存', cls: 'primary', onClick: saveLocalSettings }]
   });
@@ -4632,7 +4426,7 @@ function readLocalForm() {
   return {
     unit: $('#ls_unit').value.trim(), geminiKey: $('#ls_key').value.trim(),
     geminiModel: $('#ls_model').value.trim() || DEFAULT_GEMINI_MODEL, aiAuto: $('#ls_aiAuto').checked,
-    sim: $('#ls_sim').checked, showDemo: $('#ls_demo').checked, autoSearch: $('#ls_auto').checked, introEvery: $('#ls_intro').checked,
+    sim: $('#ls_sim').checked, showDemo: $('#ls_demo').checked, autoSearch: $('#ls_auto').checked,
     theme: ($('#ls_theme button.on') || {}).dataset ? $('#ls_theme button.on').dataset.v : localCfg.theme
   };
 }
@@ -4807,12 +4601,6 @@ const ACTIONS = {
   mciStep: el => { const c = el.dataset.c; state.mci[c] = Math.max(0, Math.min(200, state.mci[c] + Number(el.dataset.d))); state.mci.result = null; renderMci(); },
   mciRun: () => mciRun(),
   showNotice: () => { $('#menu').hidden = true; showNotice(); },
-  openIntro: () => { $('#menu').hidden = true; state.introStart = 0; if (isRoute('#intro')) renderIntro(); else location.hash = '#intro'; },
-  introNext: () => introGo(introIndex() + 1),
-  introPrev: () => introGo(introIndex() - 1),
-  introSkip: () => introGo(99),
-  introGo: el => introGo(Number(el.dataset.i)),
-  introDone: () => introFinish(),
   randomCase: () => randomScenario(),
   endScn: () => endScenario(),
   hospTable: el => { closeModal(); openHospTable(el.dataset.id); },
@@ -4974,15 +4762,6 @@ $('#brand').addEventListener('click', () => {
   if (tapN >= 5) { tapN = 0; location.hash = isRoute('#admin') ? '' : '#admin'; }
 });
 window.addEventListener('hashchange', () => { closeModal(); route(); });
-$('#inTrack').addEventListener('scroll', () => { clearTimeout(window.__inT); window.__inT = setTimeout(() => introMark(introIndex()), 60); }, { passive: true });
-window.addEventListener('resize', () => { if (isRoute('#intro')) introGo(introIndex(), false); });
-document.addEventListener('keydown', e => {
-  if (!isRoute('#intro') || (e.target.matches && e.target.matches('input,textarea,select'))) return;
-  if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); introGo(introIndex() + 1); }
-  else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); introGo(introIndex() - 1); }
-  else if (e.key === 'Escape' || e.key === 'End') introGo(99);
-  else if (e.key === 'Home') introGo(0);
-});
 setInterval(renderClock, 15000);
 window.addEventListener('scroll', () => { if (isRoute('') && state.searched) renderJump(); }, { passive: true });
 // 時間窗倒數：有設定發作時間時每 20 秒更新
