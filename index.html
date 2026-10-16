@@ -500,6 +500,11 @@ summary{cursor:pointer;font-size:14px;color:var(--ink)}
 .fb-dev{margin:8px 0 0;padding:10px 12px;border-radius:10px;background:var(--field);color:var(--muted);font:12px/1.6 var(--sans);white-space:pre-wrap;word-break:break-all}
 .fb-type{display:grid;grid-template-columns:repeat(4,1fr)}.fb-type button{padding:8px 2px;white-space:nowrap}
 .fb-hosp{display:inline-flex;align-items:center;gap:6px;margin-top:12px;font-size:13px}
+.ho-call{text-decoration:none;margin:4px 0 6px}
+.ho-call.disabled{opacity:.5;pointer-events:none}
+.pin-card{max-width:420px;margin:24px auto}
+.pin-card input{font-size:22px;letter-spacing:6px;text-align:center}
+.pin-card input::placeholder{font-size:16px;letter-spacing:1px}
 .tw-dt{display:flex;align-items:center;gap:8px;min-width:0;flex-wrap:wrap}
 .tw-day{font-size:13px;font-weight:800;padding:4px 10px;border-radius:999px;background:var(--field);color:var(--muted);white-space:nowrap}
 .tw-day.other{background:var(--amber-soft);color:var(--amber)}
@@ -658,6 +663,7 @@ body.board .bd-m b{font-size:22px}body.board .bd-m span{font-size:18px}body.boar
 .h-lim .ic{margin-top:2px;flex:none}
 .h-lim .ask{color:var(--amber)}.h-lim .info{color:var(--muted)}
 .rec-why-ok li.info{color:var(--muted)}
+.rec-alt.close{color:var(--blue)}.rec-alt.close span{flex-basis:100%;font-size:12px;color:var(--muted)}
 .rec-alt.cond{color:var(--amber)}.rec-alt.cond span{font-size:12px;color:var(--muted);margin-left:6px}
 .chip.dice{border-color:var(--amber);color:var(--amber);font-weight:750}
 .chip.dice .ic{margin-right:4px}
@@ -809,7 +815,7 @@ td.mx.off .dt{opacity:.35}
   <button data-act="go" data-to="#lookup"><svg class="ic"><use href="#i-hosp"/></svg>醫院查詢</button>
   <button data-act="go" data-to="#table"><svg class="ic"><use href="#i-grid"/></svg>醫院能力總表</button>
   <button data-act="go" data-to="#mci"><svg class="ic"><use href="#i-users"/></svg>大量傷病患分流</button>
-  <button data-act="go" data-to="#hospital"><svg class="ic"><use href="#i-hosp"/></svg>醫院端・到院前通知</button>
+  <button data-act="go" data-to="#hospital"><svg class="ic"><use href="#i-hosp"/></svg>醫院端（示範）</button>
   <button data-act="go" data-to="#admin"><svg class="ic"><use href="#i-shield"/></svg>管理後台</button>
   <hr>
   <button data-act="localSettings"><svg class="ic"><use href="#i-gear"/></svg>本機設定（AI、單位、模擬）</button>
@@ -901,7 +907,16 @@ td.mx.off .dt{opacity:.35}
   <div class="admin-top">
     <span class="who" id="adminWho"></span>
     <button class="btn sm" id="btnLogout" data-act="logout" hidden>登出</button>
+    <button class="btn sm" id="btnAdminLock" data-act="adminLock" hidden>鎖定後台</button>
   </div>
+  <section id="adminPin" class="card form pin-card" hidden>
+    <div class="sec-title">管理後台需要密碼</div>
+    <div class="hint" style="margin:0 0 6px">後台可以修改醫院資料、主訴配對與設定，試用的人請不用進來。</div>
+    <label for="adminPinInput">管理員密碼</label>
+    <input id="adminPinInput" type="password" inputmode="numeric" autocomplete="off" maxlength="12" placeholder="請輸入密碼">
+    <button class="btn-cta" data-act="adminUnlock">解鎖</button>
+    <button class="btn ghost" data-act="go" data-to="" style="width:100%;margin-top:8px">回到後送建議</button>
+  </section>
   <section id="adminLogin" class="card form" hidden>
     <div class="sec-title">管理者登入</div>
     <label>Email</label><input id="loginEmail" type="email" autocomplete="username">
@@ -950,7 +965,7 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "",
   appId: ""
 };
-const APP_VERSION = 'v3.9.0';
+const APP_VERSION = 'v3.11.0';
 // 醫院即時量能（急救室、候床、ICU、滿載）：目前沒有醫院即時回報的資料來源，先關閉；之後有資料來源再改成 true
 const SHOW_CAPACITY = false;
 const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
@@ -1193,7 +1208,7 @@ const DEFAULT_TEXTS = {
     '本 App 是送醫決策的「輔助」工具，不取代救護人員的專業判斷、勤務中心的指示，以及醫院的實際回覆。',
     '醫院能力與車程可能有誤差；App 不顯示醫院即時滿床情形，送醫前請以現場評估為準，必要時先電話確認。',
     'AI 辨識、危險徵象與時間窗僅供參考，不構成醫療診斷或處置建議。',
-    '示範版本中，救護車位置為模擬數據；尚未接上雲端前，「通知醫院」只在這台裝置示範，不會送到真的醫院。',
+    '「交班」只在手機上整理交班摘要，不會自動傳給醫院；請撥打急診電話或自行分享。示範版本中，救護車位置為模擬數據。',
     '請勿輸入病患姓名、身分證字號、病歷號等個人資料。'
   ].join('\n'),
   credit: '板橋救護義消 尤崧保／新板警消 尤偉檁 共同製作'
@@ -1204,6 +1219,12 @@ const OLD_NOTICES = [[
   '醫院能力、即時量能與車程可能有誤差或延遲；送醫前請以現場評估為準，必要時先電話確認。',
   'AI 辨識、危險徵象與時間窗僅供參考，不構成醫療診斷或處置建議。',
   '示範版本中，醫院即時量能（急救室、候床、ICU）與救護車位置為模擬數據；尚未接上雲端前，「通知醫院」只在這台裝置示範，不會送到真的醫院。',
+  '請勿輸入病患姓名、身分證字號、病歷號等個人資料。'
+].join('\n'), [
+  '本 App 是送醫決策的「輔助」工具，不取代救護人員的專業判斷、勤務中心的指示，以及醫院的實際回覆。',
+  '醫院能力與車程可能有誤差；App 不顯示醫院即時滿床情形，送醫前請以現場評估為準，必要時先電話確認。',
+  'AI 辨識、危險徵象與時間窗僅供參考，不構成醫療診斷或處置建議。',
+  '示範版本中，救護車位置為模擬數據；尚未接上雲端前，「通知醫院」只在這台裝置示範，不會送到真的醫院。',
   '請勿輸入病患姓名、身分證字號、病歷號等個人資料。'
 ].join('\n')];
 // 車程的時段車流係數（說明見「車程：道路通暢時間 × 時段車流係數」）
@@ -2113,6 +2134,8 @@ function trafficInfo(d = capNow()) {
 // 道路通暢分鐘 → 依現在（或情境）時段的預估分鐘
 const trafficMin = base => Math.max(1, Math.round(base * trafficInfo().f + 1));
 // 沒有路線資料時：直線距離 × 1.35（繞路）÷ 每分鐘 0.62 km（約時速 37 公里的通暢車速）
+// 建議醫院與其他一樣適合的醫院，車程差在幾分鐘內就提醒「車程相近」
+const CLOSE_ETA_MIN = 2;
 const estMin = km => trafficMin(km * 1.35 / 0.62);
 // OSRM 的結果只存道路通暢時間，分鐘數每次依時段重算（切換情境時間也會跟著變）
 const makeEta = (base, km) => ({ base, km, get min() { return trafficMin(this.base); } });
@@ -2563,7 +2586,7 @@ async function renderMap(items, hl) {
       <div class="m">${eta}${fmtKmTxt(x.d)}${x.load ? '，' + LOAD_TXT[x.load] : ''}${x.m ? '，適合' : ''}</div>
       <button class="btn sm" data-act="focusCard" data-id="${esc(x.h.id)}">看詳細</button>
       <button class="btn sm" data-act="openMap" data-id="${esc(x.h.id)}">Google 地圖</button>
-      <button class="btn sm primary" data-act="notify" data-id="${esc(x.h.id)}">通知醫院</button></div>`);
+      <button class="btn sm primary" data-act="notify" data-id="${esc(x.h.id)}">交班／撥打</button></div>`);
     pts.push([x.h.lat, x.h.lng]);
   });
   // 只有醫院清單或位置改變時才重新縮放，即時量能更新不打斷使用者拖曳地圖
@@ -2693,7 +2716,7 @@ function hospCard(x, hl) {
       ${st && st.note ? `<div class="h-note">${ic('alert', 'sm')}<span>${esc(st.note)}</span></div>` : ''}
       ${h.note ? `<div class="h-note plain">${esc(h.note)}</div>` : ''}
       <div class="h-actions">
-        <button class="btn sm ${x.m && !crowded ? 'primary' : ''}" data-act="notify" data-id="${esc(h.id)}">${ic('bell', 'sm')}通知醫院</button>
+        <button class="btn sm ${x.m && !crowded ? 'primary' : ''}" data-act="notify" data-id="${esc(h.id)}">${ic('list', 'sm')}交班</button>
         <a class="btn sm ${tel ? '' : 'disabled'}" href="${tel ? 'tel:' + esc(tel) : '#'}">${ic('phone', 'sm')}${tel ? '撥打' : '無電話'}</a>
         <button class="btn sm ghost" data-act="hospTable" data-id="${esc(h.id)}">${ic('list', 'sm')}能力表</button>
         ${src ? `<span class="srcline">${src}</span>` : ''}
@@ -2755,11 +2778,11 @@ function renderResults() {
     <div class="res-ctl">
       <div class="seg mini" role="tablist" aria-label="排序">
         <button class="${rec ? 'on' : ''}" data-act="sortBy" data-v="rec">建議順序</button>
-        <button class="${rec ? '' : 'on'}" data-act="sortBy" data-v="dist">距離順序</button>
+        <button class="${rec ? '' : 'on'}" data-act="sortBy" data-v="dist">車程順序</button>
       </div>
       ${hl.active ? `<label class="switch"><input type="checkbox" data-change="onlyMatch" ${state.onlyMatch ? 'checked' : ''}>只看適合</label>` : ''}
     </div>
-    <div class="res-note">${rec ? (hl.active ? '適合且可收治的醫院排在最前面，同組再依距離' : '尚未選主訴或處置能力，先依距離排序') : '單純依距離由近到遠'}${etaTxt ? '　' + etaTxt : ''}　${live}</div>`;
+    <div class="res-note">${rec ? (hl.active ? '適合且可收治的醫院排在最前面，同組再依車程' : '尚未選主訴或處置能力，先依車程排序') : (state.etaState === 'ok' ? '單純依車程由短到長，不分是否適合' : '單純依直線距離由近到遠（車程尚未算出）')}${etaTxt ? '　' + etaTxt : ''}　${live}</div>`;
   let html = '';
   if (!all.length) html = '<div class="empty">還沒有醫院資料。到管理後台新增或匯入 CSV。</div>';
   else {
@@ -2898,11 +2921,16 @@ function renderRecommend(ordered, hl) {
     ${why}
     <div class="rec-act">
       <a class="btn primary" href="${esc(navUrl(h))}" target="_blank" rel="noopener">${ic('nav', 'sm')}開始導航</a>
-      <button class="btn" data-act="notify" data-id="${esc(h.id)}">${ic('bell', 'sm')}通知醫院</button>
+      <button class="btn" data-act="notify" data-id="${esc(h.id)}">${ic('list', 'sm')}交班</button>
       <a class="btn ${tel ? '' : 'disabled'}" href="${tel ? 'tel:' + esc(tel) : '#'}">${ic('phone', 'sm')}撥打</a>
     </div>
     ${(() => { const nc = ordered.filter(y => y.m && y.cond && y !== x && etaOf(y) < etaOf(x)).sort((a, b) => etaOf(a) - etaOf(b))[0];
       return nc ? `<div class="rec-alt cond">較近、但有條件：<button data-act="focusCard" data-id="${esc(nc.h.id)}">${esc(nc.h.short || nc.h.name)} ${etaOf(nc)} 分</button><span>先電話確認可收再改送</span></div>` : ''; })()}
+    ${(() => { // 車程相近（2 分鐘內）而且一樣適合：估算有誤差，提醒救護員依路況自行判斷
+      if (state.etaState !== 'ok' || !x.eta) return '';
+      const near = ordered.filter(y => y !== x && y.m && y.eta && tierOf(y, hl) === tierOf(x, hl) && Math.abs(etaOf(y) - etaOf(x)) <= CLOSE_ETA_MIN).slice(0, 2);
+      return near.length ? `<div class="rec-alt close">${ic('info', 'sm')}車程相近：${near.map(y => `<button data-act="focusCard" data-id="${esc(y.h.id)}">${esc(y.h.short || y.h.name)} ${etaOf(y)} 分・${(y.eta.km ?? y.d).toFixed(1)} km</button>`).join('')}
+        <span>差距在 ${CLOSE_ETA_MIN} 分鐘內，車程是估算的，請依當下路況與現場判斷</span></div>` : ''; })()}
     ${rc.alts.length ? `<div class="rec-alt">次選：${rc.alts.map(a => `<button data-act="focusCard" data-id="${esc(a.h.id)}">${esc(a.h.short || a.h.name)} ${etaOf(a)} 分</button>`).join('')}</div>` : ''}
     <div class="rec-disc">${ic('shield', 'sm')}<span>${esc(state.settings.disclaimer)}</span></div>
   </section>`;
@@ -3052,9 +3080,9 @@ async function makeHandover(hid) {
   const h = hospById(hid); if (!h) return;
   const ta = $('#n_handover'), btn = document.querySelector('[data-act="makeHandover"]');
   const f = handoverFacts(h);
-  if (!aiReady()) { ta.value = templateHandover(f); return; }
+  if (!aiReady()) { ta.value = templateHandover(f); state.hoEdited = false; return; }
   const old = btn.innerHTML; btn.innerHTML = `${ic('spark', 'sm')}產生中…`; btn.disabled = true;
-  try { ta.value = await geminiHandover(f); }
+  try { ta.value = await geminiHandover(f); state.hoEdited = true; }
   catch (e) { ta.value = templateHandover(f); toast('AI 產生失敗，已改用自動格式：' + e.message, 4000); }
   finally { if (document.body.contains(btn)) { btn.innerHTML = old; btn.disabled = false; } }
 }
@@ -3226,7 +3254,8 @@ function renderMciResult() {
     </section>
     <div id="mciMapWrap"><div id="mciMap"></div></div>
     <div class="hlist">${rows || '<div class="empty">附近沒有可收治的醫院</div>'}</div>
-    ${r.used.length ? `<button class="btn-cta" data-act="mciNotify" ${batchNotices.length ? 'disabled' : ''}>${ic('bell')}<span>${batchNotices.length ? '已通知所有醫院' : `一鍵通知 ${r.used.length} 間醫院`}</span></button>` : ''}
+    ${r.used.length ? `<button class="btn-cta" data-act="mciNotify">${ic('paste')}<span>${navigator.share ? '分享' : '複製'}分流結果（${r.used.length} 間醫院）</span></button>
+      <div class="hint">分流結果只在這支手機上整理，不會自動傳給醫院；請傳給勤務中心或指揮官，再由各車撥打醫院電話交班。</div>` : ''}
     <div class="nbar" id="mciNotices" style="margin-top:12px"></div>
     <div class="foot">分配原則：由危急到輕傷逐一指派到「車程＋已分配人數×5 分」最小的醫院；危急傷患需中度級以上（創傷需重度級＋創傷團隊）。僅供示範與討論。</div>`;
   renderMciNotices();
@@ -3257,25 +3286,25 @@ async function mciRun() {
     const o = $('#mciOut'); if (o) window.scrollTo({ top: o.getBoundingClientRect().top + window.scrollY - 70, behavior: 'smooth' });
   } finally { setRunning(false); if (btn && document.body.contains(btn)) btn.querySelector('span').textContent = '計算分流'; }
 }
-async function mciNotify() {
-  const r = state.mci.result; if (!r || !r.used.length) return;
-  const unit = localCfg.unit || prompt('出勤單位（例：新板91）') || '';
-  if (!unit.trim()) throw new Error('請填出勤單位');
-  if (unit !== localCfg.unit) { localCfg.unit = unit.trim(); saveLocalCfg(); }
-  const batch = uid('mci');
+// 分流結果整理成文字（給勤務中心、指揮官或 LINE 群組）；不會自動傳給醫院
+function mciText() {
+  const r = state.mci.result; if (!r || !r.used.length) throw new Error('請先按「分配」');
   const note = state.mci.note.trim();
-  for (const x of r.used) {
-    const counts = MCI_COLORS.filter(([c]) => x.got[c]).map(([c, t]) => `${t} ${x.got[c]}`).join('、');
-    await Store.createNotice(normNotice({
-      id: uid('n'), hid: x.h.id, hospitalName: x.h.short || x.h.name, unit: localCfg.unit, creatorUid: Store.uid(), createdAt: Date.now(),
-      eta: x.eta, patient: `大量傷病患（${MCI_TYPES[r.input.type]}）：${counts}`,
-      summary: `${note ? note + '。' : ''}本事故共 ${r.total} 人，分送 ${r.used.length} 間醫院。`.slice(0, 300),
-      status: 'pending', batch, origin: state.pos
-    }));
+  return [`【大量傷病患分流】${MCI_TYPES[r.input.type]}・共 ${r.total} 人・${fmtClock(Date.now())}${localCfg.unit ? '・' + localCfg.unit : ''}`,
+    note ? `現場：${note}` : '',
+    ...r.used.map((x, i) => `${i + 1}. ${x.h.short || x.h.name}（${x.eta} 分）：${MCI_COLORS.filter(([c]) => x.got[c]).map(([c, t]) => `${t} ${x.got[c]}`).join('、')}${x.h.tel ? '　☎ ' + x.h.tel : ''}`),
+    MCI_COLORS.some(([c]) => r.unassigned[c]) ? `尚未分配：${MCI_COLORS.filter(([c]) => r.unassigned[c]).map(([c, t]) => `${t} ${r.unassigned[c]}`).join('、')}` : ''
+  ].filter(Boolean).join('\n');
+}
+async function mciNotify() {
+  const t = mciText();
+  try {
+    if (navigator.share) { await navigator.share({ title: '大量傷病患分流', text: t }); return; }
+    await navigator.clipboard.writeText(t); toast('已複製分流結果，可以貼到 LINE 或念給勤務中心');
+  } catch (e) {
+    if (e && e.name === 'AbortError') return;
+    try { await navigator.clipboard.writeText(t); toast('已複製分流結果'); } catch (er) { toast('無法自動複製，請截圖分享'); }
   }
-  state.mci.batch = batch;
-  toast(`已通知 ${r.used.length} 間醫院`);
-  renderMciResult();
 }
 
 /* ========== 到院前通知（救護端） ========== */
@@ -3304,42 +3333,55 @@ function patientText() {
   const p = state.patient, r = state.rules.find(x => x.id === p.ruleId);
   return [p.sex === 'M' ? '男' : p.sex === 'F' ? '女' : '', fmtAge(p.age), r ? r.name : ''].filter(Boolean).join('・');
 }
+// 交班／撥打：在手機上整理 ISBAR 交班摘要，撥打急診電話念給醫院，或複製、分享（LINE 等）；不會自動傳給醫院
 function openNoticeModal(hid) {
   const h = hospById(hid); if (!h) return;
   const x = state.pos ? { d: distKm(state.pos, h), eta: state.eta[hid] } : null;
   const eta = x ? (x.eta ? x.eta.min : estMin(x.d)) : '';
-  const st = liveStatus(hid), load = loadLevel(st);
+  const tel = h.tel.replace(/[^\d+#]/g, '');
+  state.hoHid = h.id; state.hoEdited = false;
   openModal({
-    title: `到院前通知・${h.short || h.name}`,
-    body: `${load === 'full' || load === 'high' ? `<div class="notice" style="margin-top:12px">${ic('alert', 'sm')} 此醫院目前${LOAD_TXT[load]}，建議先電話確認</div>` : ''}
-      <div class="row2"><div><label>出勤單位</label><input id="n_unit" value="${esc(localCfg.unit)}" placeholder="例：新板91"></div>
-        <div><label>預計到院（分鐘）</label><input id="n_eta" class="num" type="number" inputmode="numeric" value="${eta}"></div></div>
-      <label>病患（性別・年齡・主訴）</label><input id="n_patient" value="${esc(patientText())}">
-      <label>案件摘要</label><textarea id="n_summary" rows="2">${esc(state.caseText.trim())}</textarea>
-      <label>生命徵象</label><input id="n_vitals" placeholder="例：GCS E2V2M4、BP 90/60、HR 120、SpO2 92%">
-      <label>已給處置</label><input id="n_tx" placeholder="例：CPR、AED 電擊 1 次、頸圈固定">
-      <div class="ho-h"><label for="n_handover">交班摘要（ISBAR）</label>
-        <button class="btn sm ${aiReady() ? 'ai' : ''}" data-act="makeHandover" data-id="${esc(h.id)}">${ic('spark', 'sm')}${aiReady() ? 'AI 產生' : '自動產生'}</button></div>
-      <textarea id="n_handover" rows="6" placeholder="按「${aiReady() ? 'AI 產生' : '自動產生'}」整理成醫院好讀的交班格式，送出前可再修改"></textarea>
-      <div class="hint">⚠ 請勿輸入病患姓名、身分證字號等個資。醫院端回覆會即時顯示在查詢頁上方。</div>`,
-    buttons: [{ text: '取消', cls: 'ghost', onClick: () => closeModal() },
-      { text: '送出通知', cls: 'primary', onClick: () => sendNotice(h) }]
+    title: `交班・${h.short || h.name}`,
+    body: `<a class="btn-cta ho-call ${tel ? '' : 'disabled'}" href="${tel ? 'tel:' + esc(tel) : '#'}">${ic('phone')}<span>${tel ? `撥打急診　${esc(h.tel)}` : '這間醫院沒有電話資料'}</span></a>
+      <div class="row2"><div><label for="n_unit">出勤單位</label><input id="n_unit" value="${esc(localCfg.unit)}" placeholder="例：新板91"></div>
+        <div><label for="n_eta">預計到院（分鐘）</label><input id="n_eta" class="num" type="number" inputmode="numeric" value="${eta}"></div></div>
+      <label for="n_patient">病患（性別・年齡・主訴）</label><input id="n_patient" value="${esc(patientText())}">
+      <label for="n_vitals">生命徵象</label><input id="n_vitals" placeholder="例：GCS E2V2M4、BP 90/60、HR 120、SpO2 92%">
+      <label for="n_tx">已給處置</label><input id="n_tx" placeholder="例：CPR、AED 電擊 1 次、頸圈固定">
+      <label for="n_summary">案件摘要</label><textarea id="n_summary" rows="2">${esc(state.caseText.trim())}</textarea>
+      <div class="ho-h"><label for="n_handover">交班摘要（ISBAR）・電話中可以照著念</label>
+        <button class="btn sm ${aiReady() ? 'ai' : ''}" data-act="makeHandover" data-id="${esc(h.id)}">${ic('spark', 'sm')}${aiReady() ? 'AI 整理' : '重新整理'}</button></div>
+      <textarea id="n_handover" rows="7"></textarea>
+      <div class="hint">交班摘要只在這支手機上整理，<b>不會自動傳給醫院</b>：請撥打急診電話念給醫院，或用「分享」傳送。上面的欄位改了，摘要會跟著更新。⚠ 請勿輸入病患姓名、身分證字號等個資。</div>`,
+    buttons: [{ text: '複製', onClick: () => hoCopy(h) },
+      ...(navigator.share ? [{ text: '分享', onClick: () => hoShare(h) }] : []),
+      { text: '完成', cls: 'primary', onClick: () => closeModal() }]
   });
+  $('#n_handover').value = templateHandover(handoverFacts(h));
 }
-async function sendNotice(h) {
-  const unit = $('#n_unit').value.trim();
-  if (!unit) throw new Error('請填出勤單位');
-  if (unit !== localCfg.unit) { localCfg.unit = unit; saveLocalCfg(); }
-  const n = normNotice({
-    id: uid('n'), hid: h.id, hospitalName: h.short || h.name, unit, creatorUid: Store.uid(), createdAt: Date.now(),
-    eta: $('#n_eta').value, patient: $('#n_patient').value.trim(), summary: $('#n_summary').value.trim().slice(0, 300),
-    vitals: $('#n_vitals').value.trim(), treatment: $('#n_tx').value.trim(), status: 'pending',
-    handover: $('#n_handover').value.trim().slice(0, 1200), origin: state.pos
-  });
-  await Store.createNotice(n);
-  logEvent({ type: 'notice', hid: h.id, ruleId: state.patient.ruleId || '', handover: !!n.handover });
-  closeModal(); toast(`已通知 ${n.hospitalName}，等待回覆`);
-  window.scrollTo({ top: $('#noticeBar').offsetTop - 80, behavior: 'smooth' });
+function hoSaveUnit() { const u = $('#n_unit') ? $('#n_unit').value.trim() : ''; if (u && u !== localCfg.unit) { localCfg.unit = u; saveLocalCfg(); } }
+function hoText(h) {
+  const t = $('#n_handover').value.trim();
+  if (!t) throw new Error('交班摘要是空的，請先按「重新整理」');
+  return `【交班・送往 ${h.short || h.name}】\n${t}`;
+}
+// 只記方式與醫院（欄位需符合 firestore.rules 的 logs 白名單），不含病患資料
+function hoLog(h, how) { logEvent({ type: 'handover', hid: h.id, ruleId: state.patient.ruleId || '', handover: how }); }
+async function hoCopy(h) {
+  const t = hoText(h); hoSaveUnit();
+  try { await navigator.clipboard.writeText(t); toast('已複製交班摘要'); hoLog(h, 'copy'); }
+  catch (e) { toast('無法自動複製，請長按交班摘要自行複製'); }
+}
+async function hoShare(h) {
+  const t = hoText(h); hoSaveUnit();
+  try { await navigator.share({ title: `交班・${h.short || h.name}`, text: t }); hoLog(h, 'share'); }
+  catch (e) { if (e && e.name !== 'AbortError') toast('無法分享：' + e.message); }
+}
+// 交班視窗的欄位改了 → 摘要跟著更新（使用者自己改過摘要就不覆蓋）
+function hoAutoUpdate() {
+  if (state.hoEdited) return;
+  const h = hospById(state.hoHid), ta = $('#n_handover'); if (!h || !ta) return;
+  ta.value = templateHandover(handoverFacts(h));
 }
 
 /* ========== 醫院端 ========== */
@@ -3847,7 +3889,8 @@ function dataStatusHtml() {
     ['est', '未提供', '醫院即時滿床、急救室與 ICU 空床：目前沒有醫院即時回報的資料來源，App 不顯示，送醫前請電話確認'],
     ['sim', '模擬', `救護車位置在沒有 GPS 時為模擬路線；隨機情境的地點與時間；數據分析的示範數據`]
   ];
-  if (demo) rows.push(['sim', '示範模式', '資料只存在這台裝置；「通知醫院」不會送到真的醫院，醫院端的回覆也只在這台裝置示範']);
+  if (demo) rows.push(['sim', '示範模式', '資料只存在這台裝置；醫院端頁面只在這台裝置示範']);
+  rows.push(['est', '不自動傳送', '「交班」摘要與大量傷病患的分流結果只在手機上整理，不會自動傳給醫院或勤務中心']);
   return `<div class="ds-list">${rows.map(([k, t, d]) => `<div class="${k}"><b>${esc(t)}</b><span>${esc(d)}</span></div>`).join('')}</div>`;
 }
 /* ========== 意見回饋／回報問題 ========== */
@@ -3955,8 +3998,42 @@ function route() {
   maybeShowAck();
   window.scrollTo(0, 0);
 }
+/* ----- 示範模式的後台密碼（防止試用者誤改；密碼在手機上比對，不是真正的資安保護，正式使用請接 Firebase 管理者帳號） ----- */
+const ADMIN_PIN_HASH = '1481479';     // 要換密碼：在瀏覽器主控台執行 textHash('新密碼')，把結果貼到這裡
+const ADMIN_OK_KEY = 'hf_admin_ok';
+const adminPin = { fails: 0, lockUntil: 0, ok: false };
+function adminUnlocked() {
+  if (Store.mode !== 'demo' || adminPin.ok) return true;
+  try { return sessionStorage.getItem(ADMIN_OK_KEY) === ADMIN_PIN_HASH; } catch (e) { return false; }
+}
+function adminUnlock() {
+  const el = $('#adminPinInput'); if (!el) return;
+  if (Date.now() < adminPin.lockUntil) throw new Error(`錯誤太多次，請 ${Math.ceil((adminPin.lockUntil - Date.now()) / 1000)} 秒後再試`);
+  if (textHash(el.value.trim()) !== ADMIN_PIN_HASH) {
+    el.value = ''; adminPin.fails++;
+    if (adminPin.fails >= 5) { adminPin.lockUntil = Date.now() + 30e3; adminPin.fails = 0; throw new Error('密碼錯誤 5 次，請 30 秒後再試'); }
+    throw new Error('密碼錯誤');
+  }
+  adminPin.ok = true; adminPin.fails = 0;
+  try { sessionStorage.setItem(ADMIN_OK_KEY, ADMIN_PIN_HASH); } catch (e) { /* 私密瀏覽：只在這次開啟有效 */ }
+  el.value = ''; toast('已解鎖管理後台'); renderAdmin();
+}
+function adminLock() {
+  adminPin.ok = false;
+  try { sessionStorage.removeItem(ADMIN_OK_KEY); } catch (e) { /* ignore */ }
+  toast('已鎖定管理後台'); location.hash = '';
+}
 function renderAdmin() {
   if (!isRoute('#admin')) return;
+  const needPin = Store.mode === 'demo' && !adminUnlocked();
+  $('#adminPin').hidden = !needPin;
+  $('#btnAdminLock').hidden = !(Store.mode === 'demo' && !needPin);
+  if (needPin) {
+    $('#adminLogin').hidden = true; $('#adminBody').hidden = true; $('#btnLogout').hidden = true;
+    $('#adminWho').textContent = '示範模式';
+    setTimeout(() => { const el = $('#adminPinInput'); if (el && isRoute('#admin')) el.focus(); }, 50);
+    return;
+  }
   const needLogin = Store.mode === 'firebase' && !Store.email();
   $('#adminLogin').hidden = !needLogin;
   $('#adminBody').hidden = needLogin;
@@ -4605,7 +4682,7 @@ async function saveSettingsForm() {
 function openLocalSettings() {
   openModal({
     title: '本機設定（只存在這台裝置）',
-    body: `<label>出勤單位（到院前通知使用）</label><input id="ls_unit" value="${esc(localCfg.unit)}" placeholder="例：新板91">
+    body: `<label>出勤單位（交班摘要使用）</label><input id="ls_unit" value="${esc(localCfg.unit)}" placeholder="例：新板91">
       <div class="notice ai" style="margin-top:16px">${ic('spark', 'sm')} <b>Gemini AI 辨識</b><br>到 Google AI Studio 申請 API 金鑰後貼上。金鑰只存在這台裝置，不會上傳到 GitHub 或雲端資料庫。
         案件摘要會傳送給 Google Gemini 分析，請勿輸入姓名、身分證等個資。</div>
       <label>Gemini API 金鑰</label><input id="ls_key" type="password" value="${esc(localCfg.geminiKey)}" placeholder="AIza…" autocomplete="off">
@@ -4808,6 +4885,8 @@ const ACTIONS = {
   feedback: () => openFeedback(),
   fbType: el => { state.fbType = el.dataset.v; $$('.fb-type button').forEach(b => b.classList.toggle('on', b.dataset.v === state.fbType)); },
   fbHosp: el => { const h = hospById(el.dataset.id); openFeedback({ type: 'data', text: h ? `醫院：${h.name}\n有誤的地方：` : '' }); },
+  adminUnlock: () => adminUnlock(),
+  adminLock: () => adminLock(),
   showNotice: () => { $('#menu').hidden = true; showNotice(); },
   randomCase: () => randomScenario(),
   endScn: () => endScenario(),
@@ -4938,6 +5017,7 @@ document.addEventListener('click', e => {
   runAction(el, e);
 });
 document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.id === 'adminPinInput') { e.preventDefault(); runAction($('[data-act="adminUnlock"]'), e); return; }
   if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('.h-card[data-act]')) { e.preventDefault(); runAction(e.target, e); }
 });
 document.addEventListener('change', e => {
@@ -4962,9 +5042,13 @@ document.addEventListener('input', e => {
   if (t.id === 'hSearch') { state.hSearch = t.value; renderHospList(); }
   if (t.id === 'hpNote' && state.hp.draft) { state.hp.draft.note = t.value; hpChanged(false); }
   if (t.id === 'mciNote') state.mci.note = t.value;
+  if (['n_unit', 'n_eta', 'n_patient', 'n_vitals', 'n_tx', 'n_summary'].includes(t.id)) hoAutoUpdate();
+  if (t.id === 'n_handover') state.hoEdited = true;
   if (t.dataset && t.dataset.mt === 'label') mtSetLabel(Number(t.dataset.gi), t.value);
 });
 $('#btnSearch').addEventListener('click', doSearch);
+// 交班視窗的「撥打急診」：讓 tel: 連結照常撥號，只順便記一筆（不含病患資料）
+document.addEventListener('click', e => { const a = e.target.closest('.ho-call'); if (!a) return; if (a.classList.contains('disabled')) { e.preventDefault(); return; } const h = hospById(state.hoHid); if (h) { hoSaveUnit(); hoLog(h, 'call'); } });
 // 隱藏入口：連點標題 5 下進後台
 let tapN = 0, tapT = 0;
 $('#brand').addEventListener('click', () => {
