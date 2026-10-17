@@ -8,8 +8,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="救途">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest?v=2">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=2">
 <title>救途 RescueRoute｜救護送醫導航</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"%3E%3Cdefs%3E%3ClinearGradient id="g" x1="0" y1="0" x2="1" y2="1"%3E%3Cstop offset="0" stop-color="#22304A"/%3E%3Cstop offset="1" stop-color="#0F1520"/%3E%3C/linearGradient%3E%3ClinearGradient id="n" x1="0" y1="0" x2="0" y2="1"%3E%3Cstop offset="0" stop-color="#FF6B57"/%3E%3Cstop offset="1" stop-color="#D3302A"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="512" height="512" rx="112" fill="url(#g)"/%3E%3Ccircle cx="256" cy="256" r="172" fill="none" stroke="#fff" stroke-width="26"/%3E%3Cg stroke="#fff" stroke-width="16" stroke-linecap="round"%3E%3Cpath d="M256 98v28M256 386v28M98 256h28M386 256h28"/%3E%3C/g%3E%3Cpath d="M256 112L304 256H208Z" fill="url(#n)"/%3E%3Cpath d="M256 112V256H208Z" fill="#000" opacity=".12"/%3E%3Cpath d="M256 400L304 256H208Z" fill="#C9D1DC"/%3E%3Cpath d="M256 400V256H208Z" fill="#000" opacity=".14"/%3E%3Ccircle cx="256" cy="256" r="46" fill="#fff" stroke="#0F1520" stroke-width="8"/%3E%3Cpath d="M256 232v48M232 256h48" stroke="#D3302A" stroke-width="16" stroke-linecap="round"/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -94,6 +94,9 @@ body{min-height:100vh;padding-bottom:calc(36px + env(safe-area-inset-bottom))}
 #caseCard:not(.collapsed) .case-type,body:not(.formal) .case-opt{display:none}
 .case-opt{color:var(--muted);font-size:12px;margin-left:6px}
 body.formal #demoCases,body.formal #scnBar{display:none}
+.mode-seg{display:inline-flex;padding:2px;border-radius:999px;vertical-align:middle}
+.mode-seg button{padding:3px 12px;font-size:12px;border-radius:999px;min-height:0}
+.mode-seg button.on.demo{background:var(--yellow);color:#1c1b19}
 .logo{-webkit-touch-callout:none;touch-action:manipulation;position:relative}
 .logo.pressing{animation:lpress 2s linear forwards}
 @keyframes lpress{from{box-shadow:0 0 0 0 rgba(255,255,255,0)}to{box-shadow:0 0 0 5px var(--yellow)}}
@@ -984,7 +987,7 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "653252329719",
   appId: "1:653252329719:web:c3c9ca0891de64c69b13f2"
 };
-const APP_VERSION = 'v3.13.1';
+const APP_VERSION = 'v3.14.0';
 // 醫院即時量能（急救室、候床、ICU、滿載）：目前沒有醫院即時回報的資料來源，先關閉；之後有資料來源再改成 true
 const SHOW_CAPACITY = false;
 const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
@@ -1736,8 +1739,8 @@ const Store = {
       this.bus.status.add(fire); fire();
       return () => this.bus.status.delete(fire);
     }
-    // 即時量能目前關閉（SHOW_CAPACITY）：不監聽，省雲端讀取次數
-    if (!this.db || !SHOW_CAPACITY) { cb({}); return () => {}; }
+    // 醫院端回報的設備／處置能力狀態（暫停、忙碌、公告）：救護端即時收到
+    if (!this.db) { cb({}); return () => {}; }
     return this.db.collection('status').onSnapshot(snap => {
       const m = {}; snap.forEach(d => { m[d.id] = d.data(); }); cb(m);
     }, e => console.warn('status 監聽失敗', e));
@@ -2926,7 +2929,7 @@ function renderClock() {
 function renderHeroPills() {
   const box = $('#heroPills'); if (!box) return;
   box.innerHTML = [
-    isDemoUI() ? `<button class="pill warn" data-act="toggleUiMode"><span class="dot"></span>示範模式</button>` : '',
+    `<div class="seg mode-seg" role="group" aria-label="正式或示範"><button class="${isDemoUI() ? '' : 'on'}" data-act="setUiMode" data-v="formal">正式</button><button class="${isDemoUI() ? 'on demo' : ''}" data-act="setUiMode" data-v="demo">示範</button></div>`,
     aiReady() ? `<span class="pill ai"><span class="dot"></span>AI 辨識開啟</span>` : isDemoUI() ? `<button class="pill" data-act="localSettings">AI 辨識未設定</button>` : '',
     SHOW_CAPACITY && localCfg.sim ? `<span class="pill info"><span class="dot"></span>模擬量能</span>` : '',
     state.scn ? `<span class="pill warn"><span class="dot"></span>情境時間 ${fmtScnTime(state.scn.time)}</span>` : ''
@@ -3540,19 +3543,14 @@ function renderHospital() {
   const h = hpHospital();
   const picker = (state.hp.allowed === 'all' || opts.length > 1) ? `<label class="label" style="margin-top:0">${Store.mode === 'demo' ? '示範模式：選擇要扮演的醫院' : '選擇醫院'}</label>
       <select id="hpSelect"><option value="">— 請選擇 —</option>${opts.map(o => `<option value="${esc(o.id)}" ${o.id === state.hp.hid ? 'selected' : ''}>${esc(o.short || o.name)}（${esc(o.level || '未分級')}）</option>`).join('')}</select>` : '';
-  p.innerHTML = `${Store.mode === 'demo' ? `<div class="notice info">${ic('hosp', 'sm')} 示範技巧：用另一個分頁開救護端，這裡的變更與通知回覆會即時出現在救護端。</div>` : ''}
+  p.innerHTML = `<div class="notice info">${ic('hosp', 'sm')} 在這裡把某項處置設為「忙碌」或「暫停」（例如 CT 故障、導管室滿檯），前台會即時把這間醫院的該項能力標成無法使用；公告會顯示在醫院卡片上。回報 2 小時後自動失效，避免忘記改回來。</div>
     ${picker ? `<section class="card hp-picker">${picker}</section>` : ''}
     ${h ? `<div class="hp-title"><div class="ico">${ic('hosp', 'lg')}</div><div style="flex:1;min-width:0"><b>${esc(h.short || h.name)}</b><small>${esc(h.level)}・${esc(h.addr)}</small></div>
-      <div class="sync" id="hpSync"></div>
-      <button class="btn sm ${state.hp.board ? 'ink' : ''}" data-act="hpBoardMode">${state.hp.board ? '一般模式' : '大螢幕'}</button></div>
-    <div class="hp-grid">
-      <section class="card hp-board" id="hpBoard"></section>
-      <section class="card"><div class="sec-h">${ic('bell')}<b>到院前通知</b><span id="hpPendN"></span></div><div id="hpNotices"></div></section>
-    </div>
+      <div class="sync" id="hpSync"></div></div>
     <section class="card" id="hpLive"></section>` : '<div class="empty">請先選擇醫院</div>'}
     ${Store.mode === 'firebase' ? `<div class="foot">${esc(Store.email())}　<button class="btn sm ghost" data-act="logout">登出</button></div>` : ''}`;
   if (h) { renderHpNotices(); renderHpBoard(); renderHpLive(); renderHpSync(); }
-  document.body.classList.toggle('board', !!(state.hp.board && h));
+  document.body.classList.remove('board');
 }
 const arrivalAt = n => n.arrivedAt || n.etaAt || (n.eta != null ? n.createdAt + n.eta * 60e3 : null);
 // 來院看板：所有正在前往本院的救護車（地圖只建立一次，之後只更新圖釘與清單，不會打斷縮放）
@@ -4065,7 +4063,7 @@ function route() {
   $('#viewHospital').hidden = r !== '#hospital';
   $('#viewAdmin').hidden = r !== '#admin';
   $('#viewMci').hidden = r !== '#mci';
-  const T = { '#hospital': ['醫院端', '到院前通知與設備狀態'], '#admin': ['管理後台', '醫院、主訴與能力設定'], '#mci': ['大量傷病患分流', '依醫院等級與能力分配傷患'], '#table': ['醫院能力總表', '24 小時專科處置能力'] }[r] || ['救途 RescueRoute', '救護送醫導航'];
+  const T = { '#hospital': ['醫院端', '設備／處置能力狀態回報'], '#admin': ['管理後台', '醫院、主訴與能力設定'], '#mci': ['大量傷病患分流', '依醫院等級與能力分配傷患'], '#table': ['醫院能力總表', '24 小時專科處置能力'] }[r] || ['救途 RescueRoute', '救護送醫導航'];
   $('#appTitle').textContent = T[0]; $('#appSub').textContent = T[1];
   $$('#menu button[data-act="go"]').forEach(b => b.classList.toggle('cur', (b.dataset.to || '') === (ems ? '' : r)));
   renderSide();
@@ -4950,6 +4948,7 @@ const ACTIONS = {
     state.caseOpen = false; if (isRoute('')) renderMain(); else renderCaseCard();
     toast(isDemoUI() ? '示範模式：顯示派遣內容與示範案例' : '正式模式：直接選主訴查詢');
   },
+  setUiMode: el => { if ((el.dataset.v === 'demo') !== isDemoUI()) return ACTIONS.toggleUiMode(); },
   caseOpen: () => { state.caseOpen = true; renderCaseCard(); $('#caseText').focus(); },
   go: el => { $('#menu').hidden = true; const to = el.dataset.to || ''; if (location.hash === to || (!location.hash && !to)) route(); else location.hash = to; },
   localSettings: () => { $('#menu').hidden = true; openLocalSettings(); },
@@ -5193,9 +5192,18 @@ function useOfflineData(quiet) {
   else { applyData(seedData()); state.dataSource = 'none'; }
   if (!quiet) toast(state.dataSource === 'cache' ? '無法連線資料庫，使用上次同步的離線資料' : '無法連線資料庫，先使用內建的醫院能力表', 4500);
 }
+let stopStatusWatch = null;
+function startStatusWatch() {
+  if (stopStatusWatch) stopStatusWatch();
+  stopStatusWatch = Store.watchStatus(m => {
+    const out = {}; for (const [k, v] of Object.entries(m || {})) out[k] = normStatus(v);
+    state.status = out; onLiveChange();
+  });
+}
 async function cloudSync() {
   try {
     await Store.init();
+    startStatusWatch();
     const d = await withTimeout(Store.loadAll(), 15000);
     state.syncing = false; onRemoteData(d, true);
   } catch (e) {
@@ -5213,10 +5221,7 @@ async function boot() {
     useOfflineData(true); state.syncing = true;
   }
   Store._bootDone = true;
-  Store.watchStatus(m => {
-    const out = {}; for (const [k, v] of Object.entries(m || {})) out[k] = normStatus(v);
-    state.status = out; onLiveChange();
-  });
+  if (Store.mode === 'demo') startStatusWatch();
   if (SHOW_CAPACITY && localCfg.sim) Sim.start();
   Tracker.start();
   if (Store.mode === 'demo') { await Store.authReady; startEmsNoticeWatch(); route(); }
