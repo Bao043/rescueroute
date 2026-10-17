@@ -89,6 +89,7 @@ body{min-height:100vh;padding-bottom:calc(36px + env(safe-area-inset-bottom))}
 :root[data-theme="dark"] .logo{box-shadow:0 0 0 1px rgba(255,255,255,.18)}
 /* 正式模式：派遣內容收起來（要用再按「說話／貼上／打字」），不顯示示範案例 */
 #caseCard.collapsed{padding-top:12px;padding-bottom:12px}
+.opt-h{margin-top:16px!important}.opt-h small{font-weight:500;color:var(--muted);margin-left:8px;font-size:12px}
 #caseCard.collapsed .sec-h{margin-bottom:0}
 #caseCard.collapsed #caseText,#caseCard.collapsed #parseResult,#caseCard.collapsed #aiBox,#caseCard.collapsed .case-clear{display:none}
 #caseCard:not(.collapsed) .case-type,body:not(.formal) .case-opt{display:none}
@@ -231,7 +232,7 @@ input:disabled{opacity:.6}
 .cap-group{margin-bottom:12px}
 .cap-gt{font-size:12px;color:var(--muted);font-weight:700;margin:0 0 6px 2px}
 .sel-line{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin:12px 0 10px;min-height:28px}
-.prow{display:grid;grid-template-columns:1.25fr 1fr;gap:12px;align-items:end}
+.prow{display:grid;grid-template-columns:1.25fr 1fr;gap:12px;align-items:center}
 .loc-row{display:flex;gap:8px;align-items:center;margin-top:16px;font-size:13px;color:var(--muted)}
 .loc-row span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .loc-row select{width:auto;max-width:52%;padding:7px 28px 7px 10px;font-size:13px}
@@ -872,15 +873,13 @@ td.mx.off .dt{opacity:.35}
     </div>
 
     <div id="panelPatient">
-      <div class="prow">
-        <div><div class="label">性別</div>
-          <div class="seg sex" id="sexSeg"><button data-act="sex" data-v="M" class="m">男</button><button data-act="sex" data-v="F" class="f">女</button></div>
-        </div>
-        <div><div class="label">年齡（歲）</div><input id="ageInput" class="num" type="number" inputmode="decimal" min="0" max="130" placeholder="例：45"></div>
-      </div>
-      <div id="freqBox"></div>
-      <div class="label">主訴</div>
+      <div class="label" style="margin-top:16px">求救原因與初步診斷</div>
       <div id="complaintChips" class="chips"></div>
+      <div class="label opt-h">性別／年齡<small>非必填・少數狀況會用到（例如腹痛的女性是否考慮產科）</small></div>
+      <div class="prow">
+        <div class="seg sex" id="sexSeg"><button data-act="sex" data-v="M" class="m">男</button><button data-act="sex" data-v="F" class="f">女</button></div>
+        <input id="ageInput" class="num" type="number" inputmode="decimal" min="0" max="130" placeholder="年齡（歲）" aria-label="年齡（歲）">
+      </div>
       <div id="clockBox"></div>
     </div>
     <div id="panelQuick" hidden>
@@ -988,7 +987,7 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "653252329719",
   appId: "1:653252329719:web:c3c9ca0891de64c69b13f2"
 };
-const APP_VERSION = 'v3.14.1';
+const APP_VERSION = 'v3.15.0';
 // 醫院即時量能（急救室、候床、ICU、滿載）：目前沒有醫院即時回報的資料來源，先關閉；之後有資料來源再改成 true
 const SHOW_CAPACITY = false;
 const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
@@ -1142,8 +1141,8 @@ const SEED_RULES = [
   { id: 'r09', name: '腹痛', kw: '腹痛 肚子痛 胃痛', g: [
     { label: '育齡女性→高危險妊娠', sex: 'F', ageMin: 12, ageMax: 50, caps: ['OBS'] },
     { label: '高齡→中度級以上', ageMin: 65, minLevel: '中度級' }] },
-  { id: 'r10', name: '孕婦急症／產兆', kw: '孕婦 懷孕 產兆 破水 陣痛 待產 急產', g: [{ label: '高危險妊娠', sex: 'F', caps: ['OBS'] }] },
-  { id: 'r11', name: '兒童急症', prio: 6, kw: '兒童 小孩 幼童 嬰兒 男童 女童 熱性痙攣', g: [{ label: '小兒加護', ageMax: 17, caps: ['PICU'] }] },
+  { id: 'r10', name: '孕婦急症／產兆', kw: '孕婦 懷孕 產兆 破水 陣痛 待產 急產', g: [{ label: '高危險妊娠', caps: ['OBS'] }] },
+  { id: 'r11', name: '兒童急症', prio: 6, kw: '兒童 小孩 幼童 嬰兒 男童 女童 熱性痙攣', g: [{ label: '小兒加護', caps: ['PICU'] }] },
   { id: 'r12', name: '主動脈剝離', kw: '主動脈剝離 撕裂痛 背部撕裂 胸背部撕裂', g: [{ label: '心臟外科（大血管手術）', caps: ['CVS'], exclude: ['h09'] }],
     note: '恩主公醫院依能力表無法執行 A 型主動脈剝離急診手術，已排除' },
   { id: 'r13', name: '消化道出血', kw: '吐血 嘔血 解黑便 黑便 血便 消化道出血 胃出血', g: [{ label: '可緊急內視鏡止血', caps: ['ENDO'] }] },
@@ -1268,7 +1267,7 @@ function normTraffic(t) {
 // 意見回饋：收件 Email（示範模式下每支手機的設定分開存，所以預設值寫在這裡，大家才寄得到）與選填的表單連結
 const DEFAULT_FEEDBACK_EMAIL = '';
 const DEFAULT_FEEDBACK_URL = '';
-const SEED_SETTINGS = { listCount: 20, presets: [{ name: '板橋車站（測試用）', lat: 25.0143, lng: 121.4635 }] };
+const SEED_SETTINGS = { rulesV2: true, listCount: 20, presets: [{ name: '板橋車站（測試用）', lat: 25.0143, lng: 121.4635 }] };
 const DEFAULT_TABLE_SRC = '115年度第四季新北市各急救責任醫院急重症病人24小時專科處置能力一覽表';
 // 舊版預設的資料來源文字：存著舊預設的裝置自動換成新版（自己改過的不動）
 const OLD_TABLE_SRC = ['新北市 115 年度第三季急救責任醫院急重症病人 24 小時專科處置能力一覽表', '115年度第三季新北市各急救責任醫院急重症病人24小時專科處置能力一覽表'];
@@ -1463,7 +1462,8 @@ function normSettings(s = {}) {
     tableSrcTpe: String(s.tableSrcTpe || '').trim().slice(0, 120) || TPE_TABLE_SRC,
     feedbackEmail: (v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? v : DEFAULT_FEEDBACK_EMAIL)(String(s.feedbackEmail || '').trim().slice(0, 120)),
     feedbackUrl: (v => /^https:\/\/\S+$/i.test(v) ? v : DEFAULT_FEEDBACK_URL)(String(s.feedbackUrl || '').trim().slice(0, 300)),
-    traffic: normTraffic(s.traffic)
+    traffic: normTraffic(s.traffic),
+    rulesV2: s.rulesV2 === true   // v3.15 預設主訴調整已套用
   };
 }
 function normStatus(s = {}) {
@@ -1549,6 +1549,29 @@ function groupedCaps(list) {
   (list || state.caps).forEach(c => { const g = CAP_GROUPS.includes(c.group) ? c.group : '其他'; if (!m.has(g)) m.set(g, []); m.get(g).push(c); });
   return [...m.entries()].sort((a, b) => CAP_GROUPS.indexOf(a[0]) - CAP_GROUPS.indexOf(b[0]));
 }
+// v3.15：孕婦急症只要點就找產科（不必先選女性）、兒童急症只要點就找小兒加護（不必先填 17 歲以下）
+// 只改「還是舊預設」的條件；管理者自己改過的不動。改完記一個旗標，之後不再改（管理者要再加回性別年齡也不會被蓋掉）
+let migrPending = null;
+function migrateRulesV2() {
+  const changed = [];
+  state.rules.forEach(r => {
+    if (r.groups.length !== 1) return;
+    const g = r.groups[0], only = cap => g.caps.length === 1 && g.caps[0] === cap && !g.minLevel && !g.include.length && !g.exclude.length;
+    if (r.id === 'r10' && only('OBS') && g.sex === 'F' && g.ageMin == null && g.ageMax == null) { g.sex = 'any'; changed.push(r); }
+    if (r.id === 'r11' && only('PICU') && g.sex === 'any' && g.ageMin == null && g.ageMax === 17) { g.ageMax = null; changed.push(r); }
+  });
+  state.settings.rulesV2 = true;
+  migrPending = changed;
+}
+// 把調整存回去：本機模式直接存；雲端模式等管理者登入時寫回雲端（一般救護員只在自己手機上套用）
+async function saveMigration() {
+  if (!migrPending) return;
+  if (Store.mode === 'demo') { migrPending = null; Store._persistLocal(); return; }
+  if (!Store.email() || Store.cloudEmpty || !Store.db) return;
+  const ch = migrPending; migrPending = null;
+  try { if (ch.length) await Store.saveMany('rules', ch); await Store.saveSettings(state.settings); }
+  catch (e) { console.warn('主訴調整寫回雲端失敗', e); migrPending = ch; }
+}
 function applyData(d) {
   state.caps = (d.caps || []).map(normCap); sortCaps();
   state.hospitals = (d.hospitals || []).map(normHosp);
@@ -1561,6 +1584,7 @@ function applyData(d) {
     return normRule(r);
   });
   state.settings = normSettings(d.settings || SEED_SETTINGS);
+  if (!state.settings.rulesV2) { migrateRulesV2(); }
   if (state.patient.ruleId && !state.rules.some(r => r.id === state.patient.ruleId)) state.patient.ruleId = '';
   [...state.quickCaps].forEach(id => { if (!capById(id)) state.quickCaps.delete(id); });
   if (document.querySelector('.app-foot')) renderFoots();
@@ -2054,7 +2078,14 @@ function getHighlight() {
 }
 
 /* ========== 案件摘要辨識（關鍵字） ========== */
-const normText = s => String(s || '').normalize('NFKC').toLowerCase().replace(/\s+/g, '');
+// 語音輸入常把英文縮寫聽成中文（「內科OHCA」→「內科歐卡」）：先換回正確寫法再比對主訴
+const SPEECH_FIX = [
+  [/(?:歐|喔|噢|偶|o)(?:卡|咖)|歐西(?:a|欸|誒|ㄟ)/g, 'ohca'],
+  [/[斯思史施]坦米|[斯思]tm[iy]|stemy/g, 'stemi'],
+  [/西歐中毒|c\.o\.?中毒/g, 'co中毒'],
+  [/西批阿/g, 'cpr']
+];
+const normText = s => SPEECH_FIX.reduce((t, [re, to]) => t.replace(re, to), String(s || '').normalize('NFKC').toLowerCase().replace(/\s+/g, ''));
 function cnNum(s) {
   const D = { 零: 0, 〇: 0, 一: 1, 二: 2, 兩: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9 };
   let total = 0, num = 0;
@@ -2705,14 +2736,9 @@ function renderPatient() {
   if (ai.value !== String(state.patient.age)) ai.value = state.patient.age;
   const alts = new Set(state.parsed && state.caseText.trim() ? state.parsed.alts : []);
   const rules = [...state.rules].sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
-  // 常用：查詢過 2 次以上的主訴，最多 5 個
-  const freq = Object.entries(localCfg.usage).filter(([id, n]) => n >= 2 && rules.some(r => r.id === id))
-    .sort((a, b) => b[1] - a[1]).slice(0, 5).map(([id]) => rules.find(r => r.id === id));
-  $('#freqBox').innerHTML = freq.length ? `<div class="label">常用</div><div class="chips">${freq.map(r =>
-    `<button class="chip big ${state.patient.ruleId === r.id ? 'on' : ''}" data-act="complaint" data-id="${esc(r.id)}">${esc(r.name)}</button>`).join('')}</div>` : '';
   $('#complaintChips').innerHTML = rules.length
     ? rules.map(r => `<button class="chip big ${state.patient.ruleId === r.id ? 'on' : (alts.has(r.id) ? 'alt' : '')}" data-act="complaint" data-id="${esc(r.id)}">${esc(r.name)}</button>`).join('')
-    : '<span class="hint">尚未設定主訴，請到後台新增</span>';
+    : '<span class="hint">尚未設定求救原因，請到後台新增</span>';
 }
 function renderHint() {
   renderClockBox();
@@ -3478,6 +3504,7 @@ const HP_FIELDS = [
 ];
 function hpHospital() { return hospById(state.hp.hid); }
 async function onAuthChanged() {
+  saveMigration();
   startEmsNoticeWatch();
   renderSide();
   state.hp.allowed = null;
@@ -4774,7 +4801,7 @@ async function saveSettingsForm() {
   syncPresetDraft();
   const bad = state.presetDraft.findIndex(p => p.lat === '' || !p.name);
   if (bad >= 0) throw new Error(`第 ${bad + 1} 個出發點的名稱或座標有誤`);
-  const s = normSettings({ listCount: $('#s_count').value, presets: state.presetDraft,
+  const s = normSettings({ rulesV2: state.settings.rulesV2, listCount: $('#s_count').value, presets: state.presetDraft,
     disclaimer: $('#s_disc').value, notice: $('#s_notice').value, credit: $('#s_credit').value,
     tableSrc: $('#s_tsrc').value, tableSrcTpe: $('#s_tsrc2').value,
     feedbackEmail: $('#s_fbmail').value, feedbackUrl: $('#s_fburl').value,
@@ -5209,7 +5236,7 @@ async function cloudSync() {
     await Store.init();
     startStatusWatch();
     const d = await withTimeout(Store.loadAll(), 15000);
-    state.syncing = false; onRemoteData(d, true);
+    state.syncing = false; onRemoteData(d, true); saveMigration();
   } catch (e) {
     console.warn(e); state.syncing = false; renderNet();
     toast(state.dataSource === 'cache' ? '無法連線資料庫，使用上次同步的離線資料' : '無法連線資料庫，先使用內建的醫院能力表', 4500);
@@ -5219,7 +5246,7 @@ async function boot() {
   applyTheme();
   if (Store.mode === 'demo') {
     await Store.init();
-    try { const d = await Store.loadAll(); applyData(d); state.dataSource = d.source; }
+    try { const d = await Store.loadAll(); applyData(d); state.dataSource = d.source; saveMigration(); }
     catch (e) { console.warn(e); useOfflineData(); }
   } else {
     useOfflineData(true); state.syncing = true;
