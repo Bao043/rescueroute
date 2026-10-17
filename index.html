@@ -89,6 +89,10 @@ body{min-height:100vh;padding-bottom:calc(36px + env(safe-area-inset-bottom))}
 :root[data-theme="dark"] .logo{box-shadow:0 0 0 1px rgba(255,255,255,.18)}
 /* 正式模式：派遣內容收起來（要用再按「說話／貼上／打字」），不顯示示範案例 */
 #caseCard.collapsed{padding-top:12px;padding-bottom:12px}
+.ctier{margin-top:10px}.ctier:first-child{margin-top:2px}
+.ctier-h{font-size:12px;font-weight:700;color:var(--muted);margin:0 0 6px;letter-spacing:.5px}
+.ctier-life .ctier-h{color:var(--red)}
+.ctier-life .chip:not(.on){border-color:var(--red);color:var(--red)}
 .opt-h{margin-top:16px!important}.opt-h small{font-weight:500;color:var(--muted);margin-left:8px;font-size:12px}
 #caseCard.collapsed .sec-h{margin-bottom:0}
 #caseCard.collapsed #caseText,#caseCard.collapsed #parseResult,#caseCard.collapsed #aiBox,#caseCard.collapsed .case-clear{display:none}
@@ -874,7 +878,7 @@ td.mx.off .dt{opacity:.35}
 
     <div id="panelPatient">
       <div class="label" style="margin-top:16px">求救原因與初步診斷</div>
-      <div id="complaintChips" class="chips"></div>
+      <div id="complaintChips"></div>
       <div class="label opt-h">性別／年齡<small>非必填・少數狀況會用到（例如腹痛的女性是否考慮產科）</small></div>
       <div class="prow">
         <div class="seg sex" id="sexSeg"><button data-act="sex" data-v="M" class="m">男</button><button data-act="sex" data-v="F" class="f">女</button></div>
@@ -987,7 +991,7 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "653252329719",
   appId: "1:653252329719:web:c3c9ca0891de64c69b13f2"
 };
-const APP_VERSION = 'v3.15.0';
+const APP_VERSION = 'v3.16.0';
 // 醫院即時量能（急救室、候床、ICU、滿載）：目前沒有醫院即時回報的資料來源，先關閉；之後有資料來源再改成 true
 const SHOW_CAPACITY = false;
 const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
@@ -1128,7 +1132,7 @@ const SEED_HOSP = [
 // 規則：keywords 用來從案件摘要辨識主訴（主訴名稱本身也自動當關鍵字）；條件組在 seedData() 正規化
 const SEED_RULES = [
   { id: 'r01', name: '胸痛／疑似 STEMI', proto: 'STEMI', kw: '胸痛 胸悶 胸悶痛 STEMI 心肌梗塞 心梗', g: [{ label: '可做心導管', caps: ['PCI'] }] },
-  { id: 'r02', name: '疑似腦中風', proto: 'STROKE', kw: '中風 單側無力 半側無力 肢體無力 右側無力 左側無力 口齒不清 言語不清 講話不清楚 嘴歪 臉歪', g: [{ label: '可動脈取栓', caps: ['EVT'] }],
+  { id: 'r02', name: '疑似腦中風', proto: 'STROKE', kw: '中風 CVA 單側無力 半側無力 肢體無力 右側無力 左側無力 口齒不清 言語不清 講話不清楚 嘴歪 臉歪', g: [{ label: '可動脈取栓', caps: ['EVT'] }],
     note: '疑似大血管阻塞優先送可取栓醫院' },
   { id: 'r03', name: '一氧化碳中毒', proto: 'CO', prio: 8, kw: '一氧化碳 CO中毒 燒炭 熱水器', g: [{ label: '有高壓氧', caps: ['HBO'] }] },
   { id: 'r04', name: '潛水夫病／減壓症', kw: '潛水 減壓症 潛水夫病', g: [{ label: '有高壓氧', caps: ['HBO'] }] },
@@ -1432,13 +1436,22 @@ function normHosp(h = {}) {
     note: String(h.note || ''), verified: !!h.verified, updatedAt: h.updatedAt || null
   };
 }
+// 求救原因分類（救護端依這個順序分組顯示：最危急的在最上面）
+const RULE_TIERS = [['life', '危及生命'], ['time', '黃金時間'], ['special', '特殊處置'], ['obped', '婦幼'], ['other', '其他專科']];
+const SEED_TIER = { r07: 'life', r08: 'life', r01: 'time', r02: 'time', r12: 'time', r05: 'time', r20: 'time', r21: 'time',
+  r03: 'special', r22: 'special', r06: 'special', r14: 'special', r13: 'special', r15: 'special', r28: 'special', r04: 'special', r23: 'special', r24: 'special',
+  r10: 'obped', r25: 'obped', r11: 'obped', r09: 'other', r16: 'other', r27: 'other', r26: 'other', r17: 'other', r18: 'other', r19: 'other' };
+// 分類內的預設順序（跟著嚴重程度）；管理者改過「排序」就照管理者的
+const SEED_TIER_ORDER = ['r07', 'r08', 'r01', 'r02', 'r12', 'r05', 'r20', 'r21', 'r03', 'r22', 'r06', 'r14', 'r13', 'r15', 'r28', 'r04', 'r23', 'r24', 'r10', 'r25', 'r11', 'r09', 'r16', 'r27', 'r26', 'r17', 'r18', 'r19'];
+const tierIdx = t => Math.max(0, RULE_TIERS.findIndex(([k]) => k === t));
 function normRule(r = {}) {
   return {
     id: String(r.id), name: String(r.name || '(未命名)'), order: Number(r.order) || 0, note: String(r.note || ''),
     priority: clampInt(r.priority, 0, 10, 0), // 摘要同時出現多個主訴時，優先度高的勝出
     protocol: PROTOCOLS[r.protocol] ? r.protocol : '',
     keywords: [...new Set(arr(r.keywords).map(s => s.trim()).filter(Boolean))],
-    groups: (Array.isArray(r.groups) ? r.groups : []).map(normGroup)
+    groups: (Array.isArray(r.groups) ? r.groups : []).map(normGroup),
+    tier: RULE_TIERS.some(([k]) => k === r.tier) ? r.tier : (SEED_TIER[r.id] || 'other')
   };
 }
 function normCap(c = {}) {
@@ -2078,14 +2091,18 @@ function getHighlight() {
 }
 
 /* ========== 案件摘要辨識（關鍵字） ========== */
-// 語音輸入常把英文縮寫聽成中文（「內科OHCA」→「內科歐卡」）：先換回正確寫法再比對主訴
+// 語音輸入常把英文縮寫聽成中文（「內科OHCA」→「內科鷗卡／歐卡」）：換回正確寫法再比對，語音輸入的文字也直接改成英文
 const SPEECH_FIX = [
-  [/(?:歐|喔|噢|偶|o)(?:卡|咖)|歐西(?:a|欸|誒|ㄟ)/g, 'ohca'],
-  [/[斯思史施]坦米|[斯思]tm[iy]|stemy/g, 'stemi'],
-  [/西歐中毒|c\.o\.?中毒/g, 'co中毒'],
-  [/西批阿/g, 'cpr']
+  [/[歐鷗毆甌謳偶喔噢哦oO](?:[\s.]?)[卡咖喀](?!啡|片|車|通|拉|住|位|號|關)/g, 'OHCA'],
+  [/(內科|外科|外傷|創傷)[\s.]*(?:ok|o\.k\.?|okay|歐凱|偶凱)/gi, '$1OHCA'],
+  [/歐[\s.]*(?:西|c)[\s.]*(?:a|欸|誒|ㄟ|诶)|o[\s.]*h[\s.]*c[\s.]*a/gi, 'OHCA'],
+  [/[斯思史施絲司][坦特得迪]米|stemy|s[\s.]*t[\s.]*e[\s.]*m[\s.]*i/gi, 'STEMI'],
+  [/西[\s.]*(?:威|v)[\s.]*(?:a|欸|誒|ㄟ)|c[\s.]*v[\s.]*a(?![a-z])/gi, 'CVA'],
+  [/西歐中毒|c\.o\.?中毒/gi, 'CO中毒'],
+  [/西批阿|西皮阿/g, 'CPR']
 ];
-const normText = s => SPEECH_FIX.reduce((t, [re, to]) => t.replace(re, to), String(s || '').normalize('NFKC').toLowerCase().replace(/\s+/g, ''));
+const fixSpeech = s => SPEECH_FIX.reduce((t, [re, to]) => t.replace(re, to), String(s || '').normalize('NFKC'));
+const normText = s => fixSpeech(s).toLowerCase().replace(/\s+/g, '');
 function cnNum(s) {
   const D = { 零: 0, 〇: 0, 一: 1, 二: 2, 兩: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9 };
   let total = 0, num = 0;
@@ -2730,14 +2747,20 @@ function renderQuickCaps() {
       <div class="chips">${list.map(c => `<button class="chip ${state.quickCaps.has(c.id) ? 'on' : ''}" data-act="qcap" data-id="${esc(c.id)}" title="${esc(c.desc)}"><span class="cdot" style="background:${c.color}"></span>${esc(c.name)}</button>`).join('')}</div></div>`).join('')
     : '<span class="hint">尚未設定處置能力</span>';
 }
+function sortedRules() {
+  const so = r => { const i = SEED_TIER_ORDER.indexOf(r.id); return i < 0 ? 999 : i; };
+  return [...state.rules].sort((a, b) => tierIdx(a.tier) - tierIdx(b.tier) || a.order - b.order || so(a) - so(b) || a.name.localeCompare(b.name));
+}
 function renderPatient() {
   $$('#sexSeg button').forEach(b => b.classList.toggle('on', b.dataset.v === state.patient.sex));
   const ai = $('#ageInput');
   if (ai.value !== String(state.patient.age)) ai.value = state.patient.age;
   const alts = new Set(state.parsed && state.caseText.trim() ? state.parsed.alts : []);
-  const rules = [...state.rules].sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
+  const rules = sortedRules();
+  const chip = r => `<button class="chip big ${state.patient.ruleId === r.id ? 'on' : (alts.has(r.id) ? 'alt' : '')}" data-act="complaint" data-id="${esc(r.id)}">${esc(r.name)}</button>`;
   $('#complaintChips').innerHTML = rules.length
-    ? rules.map(r => `<button class="chip big ${state.patient.ruleId === r.id ? 'on' : (alts.has(r.id) ? 'alt' : '')}" data-act="complaint" data-id="${esc(r.id)}">${esc(r.name)}</button>`).join('')
+    ? RULE_TIERS.map(([k, t]) => { const list = rules.filter(r => r.tier === k); return list.length
+        ? `<div class="ctier ctier-${k}"><div class="ctier-h">${esc(t)}</div><div class="chips">${list.map(chip).join('')}</div></div>` : ''; }).join('')
     : '<span class="hint">尚未設定求救原因，請到後台新增</span>';
 }
 function renderHint() {
@@ -3214,7 +3237,7 @@ const Speech = {
     rec.onresult = ev => {
       let txt = '';
       for (let i = 0; i < ev.results.length; i++) txt += ev.results[i][0].transcript;
-      setCaseText(this.base + txt);
+      setCaseText(fixSpeech(this.base + txt));
     };
     rec.onerror = ev => { toast(ev.error === 'not-allowed' ? '麥克風權限被拒絕，請到設定允許' : '語音辨識中斷：' + ev.error); this.stop(); };
     rec.onend = () => { if (this.on) { this.on = false; renderMic(); } };
@@ -4191,10 +4214,10 @@ function renderAdminPanel() {
       <button class="btn primary" data-act="hAdd">＋ 新增</button></div><div id="hList"></div>`;
     renderHospList();
   } else if (state.adminTab === 'rules') {
-    const rules = [...state.rules].sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
+    const rules = sortedRules();
     p.innerHTML = demoNote + `<div class="tools"><div class="hint" style="flex:1;margin:0">病患符合任一條件組、醫院也符合該組要求 → 標綠色</div>
       <button class="btn primary" data-act="rAdd">＋ 新增主訴</button></div>` +
-      (rules.map(r => `<div class="row-item" data-act="rEdit" data-id="${esc(r.id)}"><div class="main"><b>${esc(r.name)}${r.priority ? ` <span class="tagx">優先 ${r.priority}</span>` : ''}${r.protocol ? ` <span class="tagx">⏱ ${esc(PROTOCOLS[r.protocol].name)}</span>` : ''}</b>
+      (rules.map(r => `<div class="row-item" data-act="rEdit" data-id="${esc(r.id)}"><div class="main"><b><span class="tagx">${esc((RULE_TIERS.find(([k]) => k === r.tier) || [, ''])[1])}</span> ${esc(r.name)}${r.priority ? ` <span class="tagx">優先 ${r.priority}</span>` : ''}${r.protocol ? ` <span class="tagx">⏱ ${esc(PROTOCOLS[r.protocol].name)}</span>` : ''}</b>
         <small>${r.groups.map(g => esc(groupLabel(g)) + groupCondText(g)).join('｜') || '尚無條件'}</small>
         <small>🔑 ${r.keywords.length ? r.keywords.map(esc).join('、') : '（只用主訴名稱辨識）'}</small></div><span class="chev">${ic('chev')}</span></div>`).join('')
         || '<div class="empty">尚無主訴</div>');
@@ -4533,7 +4556,7 @@ async function deleteHosp(h) {
 }
 
 /* ----- 主訴配對（簡易版）：每個主訴需要醫院具備哪些處置 ----- */
-function mtRules() { return [...state.rules].sort((a, b) => a.order - b.order || a.name.localeCompare(b.name)); }
+function mtRules() { return sortedRules(); }
 function needText(g) {
   if (g.caps.length) return g.caps.map(capName).join(g.mode === 'any' ? ' 或 ' : '＋') + (g.minLevel ? `（${g.minLevel}以上）` : '');
   if (g.minLevel) return g.minLevel + '以上';
@@ -4676,6 +4699,8 @@ function ruleFormHtml() {
   return `<label>主訴名稱 *</label><input id="r_name" value="${esc(d.name)}" placeholder="例：一氧化碳中毒">
     <div class="row2"><div><label>排序（小的在前）</label><input id="r_order" class="num" type="number" value="${d.order}"></div>
     <div><label>辨識優先度 0–10（摘要同時提到多個主訴時，高的優先）</label><input id="r_prio" class="num" type="number" min="0" max="10" value="${d.priority || 0}"></div></div>
+    <label>分類（救護端依這個分組，最危急的在最上面）</label>
+    <select id="r_tier">${RULE_TIERS.map(([k, t]) => `<option value="${k}" ${(d.tier || 'other') === k ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select>
     <label>時間窗計時（選了之後，救護端會出現發作時間與倒數）</label>
     <select id="r_proto"><option value="">不計時</option>${Object.entries(PROTOCOLS).map(([k, v]) =>
       `<option value="${k}" ${d.protocol === k ? 'selected' : ''}>${esc(v.name)}（${esc(v.start)}起算）</option>`).join('')}</select>
@@ -4720,6 +4745,7 @@ function syncRuleDraft() {
   d.order = Number($('#r_order').value) || 0;
   d.priority = clampInt($('#r_prio').value, 0, 10, 0);
   d.protocol = $('#r_proto').value;
+  d.tier = $('#r_tier').value;
   d.note = $('#r_note').value.trim();
   d.keywords = [...new Set($('#r_kw').value.split(/[、,，;；\n]+/).map(s => s.trim()).filter(Boolean))];
   d.groups = $$('#groupsBox fieldset.grp').map(fs => normGroup({
