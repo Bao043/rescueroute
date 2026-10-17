@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>救途 RescueRoute｜救護送醫導航</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23D3302A'/%3E%3Cpath d='M10 34h11l5-12 8 22 5-10h15' fill='none' stroke='white' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"%3E%3Cdefs%3E%3ClinearGradient id="g" x1="0" y1="0" x2="1" y2="1"%3E%3Cstop offset="0" stop-color="#22304A"/%3E%3Cstop offset="1" stop-color="#0F1520"/%3E%3C/linearGradient%3E%3ClinearGradient id="n" x1="0" y1="0" x2="0" y2="1"%3E%3Cstop offset="0" stop-color="#FF6B57"/%3E%3Cstop offset="1" stop-color="#D3302A"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="512" height="512" rx="112" fill="url(#g)"/%3E%3Ccircle cx="256" cy="256" r="172" fill="none" stroke="#fff" stroke-width="26"/%3E%3Cg stroke="#fff" stroke-width="16" stroke-linecap="round"%3E%3Cpath d="M256 98v28M256 386v28M98 256h28M386 256h28"/%3E%3C/g%3E%3Cpath d="M256 112L304 256H208Z" fill="url(#n)"/%3E%3Cpath d="M256 112V256H208Z" fill="#000" opacity=".12"/%3E%3Cpath d="M256 400L304 256H208Z" fill="#C9D1DC"/%3E%3Cpath d="M256 400V256H208Z" fill="#000" opacity=".14"/%3E%3Ccircle cx="256" cy="256" r="46" fill="#fff" stroke="#0F1520" stroke-width="8"/%3E%3Cpath d="M256 232v48M232 256h48" stroke="#D3302A" stroke-width="16" stroke-linecap="round"/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
 <style>
@@ -83,8 +83,20 @@ body{min-height:100vh;padding-bottom:calc(36px + env(safe-area-inset-bottom))}
 .topbar.run::after{animation:lights .5s linear infinite}
 @keyframes lights{to{background-position:28.28px 0}}
 .brand{display:flex;align-items:center;gap:10px;flex:1;min-width:0;user-select:none;-webkit-user-select:none;cursor:pointer}
-.logo{width:34px;height:34px;border-radius:9px;flex:none;display:grid;place-items:center;background:var(--red)}
-.logo .ic{width:21px;height:21px;stroke:#fff;stroke-width:2.6}
+.logo{width:36px;height:36px;border-radius:10px;flex:none;display:grid;place-items:center;background:#0F1520;overflow:hidden}
+.logo .logo-img{width:100%;height:100%;display:block}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .logo{box-shadow:0 0 0 1px rgba(255,255,255,.18)}}
+:root[data-theme="dark"] .logo{box-shadow:0 0 0 1px rgba(255,255,255,.18)}
+/* 正式模式：派遣內容收起來（要用再按「說話／貼上／打字」），不顯示示範案例 */
+#caseCard.collapsed{padding-top:12px;padding-bottom:12px}
+#caseCard.collapsed .sec-h{margin-bottom:0}
+#caseCard.collapsed #caseText,#caseCard.collapsed #parseResult,#caseCard.collapsed #aiBox,#caseCard.collapsed .case-clear{display:none}
+#caseCard:not(.collapsed) .case-type,body:not(.formal) .case-opt{display:none}
+.case-opt{color:var(--muted);font-size:12px;margin-left:6px}
+body.formal #demoCases,body.formal #scnBar{display:none}
+.logo{-webkit-touch-callout:none;touch-action:manipulation;position:relative}
+.logo.pressing{animation:lpress 2s linear forwards}
+@keyframes lpress{from{box-shadow:0 0 0 0 rgba(255,255,255,0)}to{box-shadow:0 0 0 5px var(--yellow)}}
 .brand-t{font-weight:800;font-size:17px;letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .brand-s{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:650;padding:4px 10px;border-radius:999px;
@@ -799,7 +811,7 @@ td.mx.off .dt{opacity:.35}
 
 <header class="topbar" id="topbar">
   <div class="brand" id="brand">
-    <div class="logo"><svg class="ic"><use href="#i-logo"/></svg></div>
+    <div class="logo" title="長按 2 秒：前台／後台切換"><svg class="logo-img" aria-hidden="true" viewBox="0 0 512 512"><defs><linearGradient id="lgG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22304A"/><stop offset="1" stop-color="#0F1520"/></linearGradient><linearGradient id="lgN" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF6B57"/><stop offset="1" stop-color="#D3302A"/></linearGradient></defs><rect width="512" height="512" rx="0" fill="url(#lgG)"/><circle cx="256" cy="256" r="172" fill="none" stroke="#fff" stroke-width="26"/><g stroke="#fff" stroke-width="16" stroke-linecap="round"><path d="M256 98v28M256 386v28M98 256h28M386 256h28"/></g><path d="M256 112L304 256H208Z" fill="url(#lgN)"/><path d="M256 112V256H208Z" fill="#000" opacity=".12"/><path d="M256 400L304 256H208Z" fill="#C9D1DC"/><path d="M256 400V256H208Z" fill="#000" opacity=".14"/><circle cx="256" cy="256" r="46" fill="#fff" stroke="#0F1520" stroke-width="8"/><path d="M256 232v48M232 256h48" stroke="#D3302A" stroke-width="16" stroke-linecap="round"/></svg></div>
     <div style="min-width:0"><div class="brand-t" id="appTitle">救途 RescueRoute</div><div class="brand-s" id="appSub">救護送醫導航</div></div>
   </div>
   <span id="netPill" class="pill"></span>
@@ -811,16 +823,20 @@ td.mx.off .dt{opacity:.35}
   </nav>
 </header>
 <div id="menu" class="menu" hidden>
-  <button data-act="go" data-to=""><svg class="ic"><use href="#i-ambu"/></svg>後送建議</button>
-  <button data-act="go" data-to="#lookup"><svg class="ic"><use href="#i-hosp"/></svg>醫院查詢</button>
-  <button data-act="go" data-to="#table"><svg class="ic"><use href="#i-grid"/></svg>醫院能力總表</button>
-  <button data-act="go" data-to="#mci"><svg class="ic"><use href="#i-users"/></svg>大量傷病患分流</button>
-  <button data-act="go" data-to="#hospital"><svg class="ic"><use href="#i-hosp"/></svg>醫院端（示範）</button>
-  <button data-act="go" data-to="#admin"><svg class="ic"><use href="#i-shield"/></svg>管理後台</button>
-  <hr>
-  <button data-act="localSettings"><svg class="ic"><use href="#i-gear"/></svg>本機設定（AI、單位、模擬）</button>
-  <button data-act="showNotice"><svg class="ic"><use href="#i-shield"/></svg>使用須知</button>
-  <button data-act="feedback"><svg class="ic"><use href="#i-mail"/></svg>意見回饋／回報問題</button>
+  <button data-side="front" data-act="go" data-to=""><svg class="ic"><use href="#i-ambu"/></svg>後送建議</button>
+  <button data-side="front" data-act="go" data-to="#lookup"><svg class="ic"><use href="#i-hosp"/></svg>醫院查詢</button>
+  <button data-side="front" data-act="go" data-to="#table"><svg class="ic"><use href="#i-grid"/></svg>醫院能力總表</button>
+  <button data-side="front" data-act="go" data-to="#mci"><svg class="ic"><use href="#i-users"/></svg>大量傷病患分流</button>
+  <button data-side="back" data-act="go" data-to="#admin"><svg class="ic"><use href="#i-shield"/></svg>管理後台</button>
+  <button data-side="back" data-act="go" data-to="#hospital"><svg class="ic"><use href="#i-hosp"/></svg>醫院端（示範）</button>
+  <hr data-side="switch">
+  <button data-side="toBack" data-act="go" data-to="#admin"><svg class="ic"><use href="#i-shield"/></svg>切換到後台</button>
+  <button data-side="back" data-act="go" data-to=""><svg class="ic"><use href="#i-ambu"/></svg>回到前台</button>
+  <hr data-side="front">
+  <button data-side="front" data-act="toggleUiMode" id="mUiMode"><svg class="ic"><use href="#i-dice"/></svg>切換到示範模式</button>
+  <button data-side="front" data-act="localSettings"><svg class="ic"><use href="#i-gear"/></svg>本機設定（AI、單位、模擬）</button>
+  <button data-side="front" data-act="showNotice"><svg class="ic"><use href="#i-shield"/></svg>使用須知</button>
+  <button data-side="front" data-act="feedback"><svg class="ic"><use href="#i-mail"/></svg>意見回饋／回報問題</button>
 </div>
 
 <!-- ================= 救護端 ================= -->
@@ -830,12 +846,13 @@ td.mx.off .dt{opacity:.35}
     <div class="clock num" id="clock">--:--</div>
     <div class="hero-r"><div class="hero-date" id="heroDate"></div><div class="hero-pills" id="heroPills"></div></div>
   </div>
-  <section class="card">
+  <section class="card" id="caseCard">
     <div class="sec-h">
-      <b>派遣內容</b><span class="spacer"></span>
+      <b>派遣內容</b><small class="case-opt">選填</small><span class="spacer"></span>
       <button class="btn sm" id="micBtn" data-act="mic" aria-pressed="false"><svg class="ic sm"><use href="#i-mic"/></svg>說話</button>
       <button class="btn sm" data-act="pasteCase"><svg class="ic sm"><use href="#i-paste"/></svg>貼上</button>
-      <button class="btn sm ghost" data-act="clearCase">清除</button>
+      <button class="btn sm case-type" data-act="caseOpen">打字</button>
+      <button class="btn sm ghost case-clear" data-act="clearCase">清除</button>
     </div>
     <textarea id="caseText" rows="2" placeholder="貼上勤務中心的案件摘要，例如：急病 一名男性年約35歲 主訴內科OHCA"></textarea>
     <div id="demoCases" class="demo-cases"></div>
@@ -906,6 +923,7 @@ td.mx.off .dt{opacity:.35}
 <main id="viewAdmin" hidden>
   <div class="admin-top">
     <span class="who" id="adminWho"></span>
+    <button class="btn sm" data-act="go" data-to="">回到前台</button>
     <button class="btn sm" id="btnLogout" data-act="logout" hidden>登出</button>
     <button class="btn sm" id="btnAdminLock" data-act="adminLock" hidden>鎖定後台</button>
   </div>
@@ -966,7 +984,7 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "653252329719",
   appId: "1:653252329719:web:c3c9ca0891de64c69b13f2"
 };
-const APP_VERSION = 'v3.12.0';
+const APP_VERSION = 'v3.13.1';
 // 醫院即時量能（急救室、候床、ICU、滿載）：目前沒有醫院即時回報的資料來源，先關閉；之後有資料來源再改成 true
 const SHOW_CAPACITY = false;
 const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
@@ -1476,13 +1494,18 @@ function normNotice(n = {}) {
 /* ========== 本機設定（不上傳） ========== */
 const localCfg = Object.assign({
   unit: '', geminiKey: '', geminiModel: DEFAULT_GEMINI_MODEL, aiAuto: true,
-  sim: !FIREBASE_CONFIG.apiKey, showDemo: true, sortBy: 'rec', showMap: false, dismissed: [], theme: 'auto', transferPrep: 45, autoSearch: true, usage: {},
+  sim: !FIREBASE_CONFIG.apiKey, uiMode: 'formal', sortBy: 'rec', showMap: false, dismissed: [], theme: 'auto', transferPrep: 45, autoSearch: true, usage: {},
   lkId: '', lkAll: false
 }, readLS(LOCAL_CFG_KEY) || {});
 if (!['rec', 'dist'].includes(localCfg.sortBy)) localCfg.sortBy = 'rec'; // v2.0 的「車程」排序併入建議／距離
 if (!['auto', 'light', 'dark'].includes(localCfg.theme)) localCfg.theme = 'auto';
 localCfg.transferPrep = clampInt(localCfg.transferPrep, 0, 240, 45);
 if (!localCfg.usage || typeof localCfg.usage !== 'object') localCfg.usage = {};
+if (!['formal', 'demo'].includes(localCfg.uiMode)) localCfg.uiMode = 'formal';
+delete localCfg.showDemo;
+// 網址加 ?demo=1 直接進示範模式（上課、簡報用）；?demo=0 回正式
+try { const q = new URLSearchParams(location.search).get('demo'); if (q === '1' || q === '0') { localCfg.uiMode = q === '1' ? 'demo' : 'formal'; writeLS(LOCAL_CFG_KEY, localCfg); } } catch (e) {}
+const isDemoUI = () => localCfg.uiMode === 'demo';
 function saveLocalCfg() { writeLS(LOCAL_CFG_KEY, localCfg); }
 function applyTheme() {
   const r = document.documentElement;
@@ -1498,7 +1521,7 @@ function isDark() {
 const EMPTY_P = { sex: '', age: null, ruleId: '', alts: [], onset: '' };
 const state = {
   caps: [], hospitals: [], rules: [], settings: normSettings(SEED_SETTINGS),
-  dataSource: '', cachedAt: null,
+  dataSource: '', cachedAt: null, syncing: false, caseOpen: false,
   tab: 'patient', quickCaps: new Set(), patient: { sex: '', age: '', ruleId: '' }, onlyMatch: false,
   caseText: '', lastParsed: null, parsed: null, kwParsed: null,
   clock: { onsetAt: null, src: '', unknown: false, fmcAt: null }, // 時間窗：發作時間、首次接觸病人時間
@@ -1555,9 +1578,9 @@ const Store = {
       return;
     }
     try {
-      for (const f of ['app', 'auth', 'firestore']) {
-        await withTimeout(loadScript(`https://www.gstatic.com/firebasejs/10.12.2/firebase-${f}-compat.js`), 8000);
-      }
+      // app 先載，auth 與 firestore 同時載（原本一個接一個，開啟比較慢）
+      const sdk = f => withTimeout(loadScript(`https://www.gstatic.com/firebasejs/10.12.2/firebase-${f}-compat.js`), 8000);
+      await sdk('app'); await Promise.all([sdk('auth'), sdk('firestore')]);
     } catch (e) { console.warn('Firebase SDK 載入失敗', e); this.authReady = Promise.resolve(); return; }
     if (typeof firebase === 'undefined') { this.authReady = Promise.resolve(); return; }
     firebase.initializeApp(FIREBASE_CONFIG);
@@ -1614,17 +1637,41 @@ const Store = {
       return { ...d, source: 'demo' };
     }
     if (!this.db) throw new Error('Firebase SDK 未載入');
-    const [c, h, r, s] = await Promise.all([
-      this.db.collection('caps').get(), this.db.collection('hospitals').get(),
-      this.db.collection('rules').get(), this.db.collection('settings').doc('main').get()
-    ]);
+    return this._watchData();
+  },
+  // 即時同步：監聽醫院、能力、主訴、設定；後台一改，所有開著 App 的手機馬上更新（第一次讀取也用同一組監聽，不重複計費）
+  _live: null, _liveTimer: 0,
+  _watchData() {
+    if (this._live) return this._live.first;
+    const live = this._live = { parts: {}, got: new Set() };
     const docs = snap => snap.docs.map(x => ({ ...x.data(), id: x.id }));
-    // 雲端還沒寫入資料（剛建好資料庫）→ 先用內建能力表，救護員照樣能查；管理者到後台按「寫入內建資料到雲端」
-    this.cloudEmpty = !c.size && !h.size && !r.size;
-    if (this.cloudEmpty) return { ...seedData(), settings: s.exists ? s.data() : SEED_SETTINGS, source: 'seed' };
-    const data = { caps: docs(c), hospitals: docs(h), rules: docs(r), settings: s.exists ? s.data() : SEED_SETTINGS };
-    writeLS(CACHE_KEY, { ...data, cachedAt: Date.now() });
-    return { ...data, source: 'firebase' };
+    const build = () => {
+      const { caps = [], hospitals = [], rules = [], settings } = live.parts;
+      // 雲端還沒寫入資料（剛建好資料庫）→ 先用內建能力表，救護員照樣能查；管理者到後台按「寫入內建資料到雲端」
+      this.cloudEmpty = !caps.length && !hospitals.length && !rules.length;
+      if (this.cloudEmpty) return { ...seedData(), settings: settings || SEED_SETTINGS, source: 'seed' };
+      const data = { caps, hospitals, rules, settings: settings || SEED_SETTINGS };
+      writeLS(CACHE_KEY, { ...data, cachedAt: Date.now() });
+      return { ...data, source: 'firebase' };
+    };
+    live.first = new Promise((res, rej) => {
+      const got = (k, v, snap) => {
+        live.parts[k] = v; live.got.add(k);
+        if (live.got.size < 4) return;
+        // 這支手機自己剛寫入的變更：畫面已經更新過，只記下內容、不重畫
+        if (live.ready && snap.metadata && snap.metadata.hasPendingWrites) return;
+        if (!live.ready) {
+          live.ready = true; const d = build(); res(d);
+          return;
+        }
+        clearTimeout(this._liveTimer);
+        this._liveTimer = setTimeout(() => onRemoteData(build()), 250);
+      };
+      const fail = e => { console.warn('雲端同步失敗', e); if (!live.ready) { this._live = null; rej(e); } };
+      ['caps', 'hospitals', 'rules'].forEach(col => this.db.collection(col).onSnapshot(snap => got(col, docs(snap), snap), fail));
+      this.db.collection('settings').doc('main').onSnapshot(d => got('settings', d.exists ? d.data() : null, d), fail);
+    });
+    return live.first;
   },
   _persistLocal() {
     const snap = plain({ caps: state.caps, hospitals: state.hospitals, rules: state.rules, settings: state.settings, seedVer: 8 });
@@ -1689,7 +1736,8 @@ const Store = {
       this.bus.status.add(fire); fire();
       return () => this.bus.status.delete(fire);
     }
-    if (!this.db) { cb({}); return () => {}; }
+    // 即時量能目前關閉（SHOW_CAPACITY）：不監聽，省雲端讀取次數
+    if (!this.db || !SHOW_CAPACITY) { cb({}); return () => {}; }
     return this.db.collection('status').onSnapshot(snap => {
       const m = {}; snap.forEach(d => { m[d.id] = d.data(); }); cb(m);
     }, e => console.warn('status 監聽失敗', e));
@@ -1780,10 +1828,28 @@ const Store = {
   },
   async setHospitalUser(email, hid) { this._requireWrite(true); await this.db.collection('hospitalUsers').doc(email.toLowerCase()).set({ hid }); },
   async removeHospitalUser(email) { this._requireWrite(true); await this.db.collection('hospitalUsers').doc(email).delete(); },
-  async login(email, pw) { if (!this.auth) throw new Error('Firebase 未載入'); await this.auth.signInWithEmailAndPassword(email, pw); },
+  async login(email, pw) { if (!this.auth) throw new Error(state.syncing ? '還在連線雲端，請稍等幾秒再登入' : 'Firebase 未載入（請確認網路後重新整理）'); await this.auth.signInWithEmailAndPassword(email, pw); },
   async logout() { if (this.auth) await this.auth.signOut(); }
 };
 
+// 雲端資料有變更（後台或其他手機改的）→ 套用並重畫目前的頁面；正在編輯的視窗不打斷
+let remotePending = null;
+function onRemoteData(d, first) {
+  if (!$('#modal').hidden && isRoute('#admin')) { remotePending = d; return; }   // 後台正在編輯：關掉視窗後再套用
+  remotePending = null;
+  const before = JSON.stringify(plain({ c: state.caps, h: state.hospitals, r: state.rules, s: state.settings }));
+  applyData(d);
+  state.dataSource = d.source;
+  renderNet();
+  const changed = before !== JSON.stringify(plain({ c: state.caps, h: state.hospitals, r: state.rules, s: state.settings }));
+  if (!changed) { if (isRoute('#admin')) renderAdmin(); else if (isRoute('')) renderDataInfo(); return; }
+  if (isRoute('#admin')) { if (state.adminTab !== 'settings') renderAdminPanel(); }
+  else if (isRoute('#lookup')) renderLookup();
+  else if (isRoute('#table')) renderMatrix();
+  else if (isRoute('#mci')) renderMci();
+  else if (isRoute('')) { if (state.searched) renderResults(); else renderMain(); }
+  if (!first) toast('醫院資料已更新');
+}
 // 記錄使用情形（失敗不影響操作）
 function logEvent(e) {
   const evt = { ...e, at: Date.now(), uid: Store.uid() || '' };
@@ -2608,7 +2674,8 @@ async function renderMap(items, hl) {
 function renderNet() {
   const p = $('#netPill');
   if (!navigator.onLine) { p.className = 'pill bad'; p.innerHTML = '<span class="dot"></span>離線'; return; }
-  if (Store.mode === 'demo') { p.className = 'pill warn'; p.innerHTML = '<span class="dot"></span>示範模式'; }
+  if (Store.mode === 'demo') { p.className = 'pill warn'; p.innerHTML = '<span class="dot"></span>本機資料'; }
+  else if (state.syncing) { p.className = 'pill'; p.innerHTML = '<span class="dot"></span>同步中'; }
   else if (state.dataSource === 'cache') { p.className = 'pill warn'; p.innerHTML = '<span class="dot"></span>離線資料'; }
   else if (state.dataSource === 'none') { p.className = 'pill bad'; p.innerHTML = '<span class="dot"></span>未連線'; }
   else if (state.dataSource === 'seed') { p.className = 'pill warn'; p.innerHTML = '<span class="dot"></span>內建資料'; }
@@ -2657,9 +2724,15 @@ function renderLoc() {
   sel.value = state.locSource;
   $('#locText').textContent = state.pos ? state.posLabel : '尚未定位';
 }
+function renderCaseCard() {
+  document.body.classList.toggle('formal', !isDemoUI());
+  const card = $('#caseCard'); if (!card) return;
+  card.classList.toggle('collapsed', !isDemoUI() && !state.caseOpen && !state.caseText.trim());
+}
 function renderDemoCases() {
+  renderCaseCard();
   const box = $('#demoCases');
-  box.innerHTML = localCfg.showDemo
+  box.innerHTML = isDemoUI()
     ? `<span class="lbl">示範案例</span><button class="chip dice" data-act="randomCase">${ic('dice', 'sm')}隨機情境</button>${DEMO_CASES.map((c, i) => `<button class="chip" data-act="demoCase" data-i="${i}">${esc(c.t)}</button>`).join('')}` : '';
 }
 function mapsUrl(h) {
@@ -2853,7 +2926,8 @@ function renderClock() {
 function renderHeroPills() {
   const box = $('#heroPills'); if (!box) return;
   box.innerHTML = [
-    aiReady() ? `<span class="pill ai"><span class="dot"></span>AI 辨識開啟</span>` : `<button class="pill" data-act="localSettings">AI 辨識未設定</button>`,
+    isDemoUI() ? `<button class="pill warn" data-act="toggleUiMode"><span class="dot"></span>示範模式</button>` : '',
+    aiReady() ? `<span class="pill ai"><span class="dot"></span>AI 辨識開啟</span>` : isDemoUI() ? `<button class="pill" data-act="localSettings">AI 辨識未設定</button>` : '',
     SHOW_CAPACITY && localCfg.sim ? `<span class="pill info"><span class="dot"></span>模擬量能</span>` : '',
     state.scn ? `<span class="pill warn"><span class="dot"></span>情境時間 ${fmtScnTime(state.scn.time)}</span>` : ''
   ].join('');
@@ -3400,6 +3474,7 @@ const HP_FIELDS = [
 function hpHospital() { return hospById(state.hp.hid); }
 async function onAuthChanged() {
   startEmsNoticeWatch();
+  renderSide();
   state.hp.allowed = null;
   if (isRoute('#hospital')) await prepareHospital();
   if (isRoute('#admin')) renderAdmin();
@@ -3866,8 +3941,8 @@ function noticeHtml() {
 }
 function maybeShowAck() {
   if (window.__skipAck) return;
-  const acked = localCfg.ack === textHash(state.settings.notice);
-  if (acked) return;
+  // 每支手機只在第一次開啟時顯示；之後（包括須知文字改過、App 更新）都不再自動跳出，可從選單「使用須知」再看
+  if (localCfg.ack) return;
   if (!$('#modal').hidden && state.modalLocked) return;
   openModal({
     title: '使用須知', noClose: true,
@@ -3897,7 +3972,7 @@ function dataStatusHtml() {
     ['est', '未提供', '醫院即時滿床、急救室與 ICU 空床：目前沒有醫院即時回報的資料來源，App 不顯示，送醫前請電話確認'],
     ['sim', '模擬', `救護車位置在沒有 GPS 時為模擬路線；隨機情境的地點與時間；數據分析的示範數據`]
   ];
-  if (demo) rows.push(['sim', '示範模式', '資料只存在這台裝置；醫院端頁面只在這台裝置示範']);
+  if (demo) rows.push(['sim', '本機資料', '尚未接上雲端，資料只存在這台裝置；醫院端頁面只在這台裝置示範']);
   rows.push(['est', '不自動傳送', '「交班」摘要與大量傷病患的分流結果只在手機上整理，不會自動傳給醫院或勤務中心']);
   return `<div class="ds-list">${rows.map(([k, t, d]) => `<div class="${k}"><b>${esc(t)}</b><span>${esc(d)}</span></div>`).join('')}</div>`;
 }
@@ -3993,6 +4068,7 @@ function route() {
   const T = { '#hospital': ['醫院端', '到院前通知與設備狀態'], '#admin': ['管理後台', '醫院、主訴與能力設定'], '#mci': ['大量傷病患分流', '依醫院等級與能力分配傷患'], '#table': ['醫院能力總表', '24 小時專科處置能力'] }[r] || ['救途 RescueRoute', '救護送醫導航'];
   $('#appTitle').textContent = T[0]; $('#appSub').textContent = T[1];
   $$('#menu button[data-act="go"]').forEach(b => b.classList.toggle('cur', (b.dataset.to || '') === (ems ? '' : r)));
+  renderSide();
   renderNet();
   if (r !== '#hospital') document.body.classList.remove('board');
   if (!ems && $('#jumpPill')) $('#jumpPill').hidden = true;   // 「建議送往」浮動提示只在後送建議頁
@@ -4006,13 +4082,37 @@ function route() {
   maybeShowAck();
   window.scrollTo(0, 0);
 }
+/* ----- 前台／後台：後台（管理後台、醫院端）不放在前台選單；長按左上角標誌進入，登入後選單可以切換 ----- */
+function isBackRoute() { return isRoute('#admin') || isRoute('#hospital'); }
+function adminSignedIn() { return Store.mode === 'firebase' ? !!Store.email() : (adminPin.ok || adminUnlockedStored()); }
+function renderSide() {
+  const back = isBackRoute(), signed = adminSignedIn();
+  document.body.classList.toggle('backend', back);
+  $$('#menu [data-side]').forEach(el => {
+    const sd = el.dataset.side;
+    el.hidden = sd === 'front' ? back : sd === 'back' ? !back : sd === 'toBack' ? (back || !signed) : sd === 'switch' ? !(back || signed) : false;
+  });
+}
+const LONG_PRESS_MS = 2000;
+function bindLongPress(el, fn) {
+  let tm = 0, x = 0, y = 0;
+  const cancel = () => { if (tm) { clearTimeout(tm); tm = 0; } el.classList.remove('pressing'); };
+  el.addEventListener('pointerdown', e => {
+    cancel(); x = e.clientX; y = e.clientY; el.classList.add('pressing');
+    tm = setTimeout(() => { tm = 0; el.classList.remove('pressing'); fn(); }, LONG_PRESS_MS);
+  });
+  el.addEventListener('pointermove', e => { if (Math.abs(e.clientX - x) > 12 || Math.abs(e.clientY - y) > 12) cancel(); });
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(t => el.addEventListener(t, cancel));
+  el.addEventListener('contextmenu', e => e.preventDefault());
+}
 /* ----- 示範模式的後台密碼（防止試用者誤改；密碼在手機上比對，不是真正的資安保護，正式使用請接 Firebase 管理者帳號） ----- */
 const ADMIN_PIN_HASH = '1481479';     // 要換密碼：在瀏覽器主控台執行 textHash('新密碼')，把結果貼到這裡
 const ADMIN_OK_KEY = 'hf_admin_ok';
 const adminPin = { fails: 0, lockUntil: 0, ok: false };
+function adminUnlockedStored() { try { return sessionStorage.getItem(ADMIN_OK_KEY) === ADMIN_PIN_HASH; } catch (e) { return false; } }
 function adminUnlocked() {
   if (Store.mode !== 'demo' || adminPin.ok) return true;
-  try { return sessionStorage.getItem(ADMIN_OK_KEY) === ADMIN_PIN_HASH; } catch (e) { return false; }
+  return adminUnlockedStored();
 }
 function adminUnlock() {
   const el = $('#adminPinInput'); if (!el) return;
@@ -4032,6 +4132,7 @@ function adminLock() {
   toast('已鎖定管理後台'); location.hash = '';
 }
 function renderAdmin() {
+  renderSide();
   if (!isRoute('#admin')) return;
   const needPin = Store.mode === 'demo' && !adminUnlocked();
   $('#adminPin').hidden = !needPin;
@@ -4090,7 +4191,7 @@ function renderAdminPanel() {
       <div class="sec-title" style="margin-top:22px">顯示文字</div>
       <label for="s_disc">免責提醒（顯示在「建議送往」下方與每頁頁尾，留白會用預設文字）</label>
       <textarea id="s_disc" rows="3">${esc(state.settings.disclaimer)}</textarea>
-      <label for="s_notice">使用前須知（第一次開啟時顯示，一行一點；修改後所有人下次開啟會再看到一次）</label>
+      <label for="s_notice">使用前須知（每支手機只在第一次開啟時顯示，之後可從選單「使用須知」查看；一行一點）</label>
       <textarea id="s_notice" rows="5">${esc(state.settings.notice)}</textarea>
       <label for="s_credit">製作者署名（以小字顯示在頁尾與「使用須知」頁最下方，可以留白；下一行會自動加上「更新資料：醫院能力資料來源」）</label>
       <input id="s_credit" value="${esc(state.settings.credit)}">
@@ -4309,7 +4410,7 @@ function openModal({ title, body, buttons, noClose }) {
   $('#modal').hidden = false; document.body.style.overflow = 'hidden';
   $('#modalBody').scrollTop = 0;
 }
-function closeModal() { $('#modal').hidden = true; document.body.style.overflow = ''; state.modalBtns = []; state.ruleDraft = null; state.modalLocked = false; $('#modal .modal-head button').hidden = false; }
+function closeModal() { if (remotePending) setTimeout(() => { if (remotePending && $('#modal').hidden) onRemoteData(remotePending); }, 0); $('#modal').hidden = true; document.body.style.overflow = ''; state.modalBtns = []; state.ruleDraft = null; state.modalLocked = false; $('#modal .modal-head button').hidden = false; }
 function checkedVals(selector, root) { return [...(root || document).querySelectorAll(selector)].filter(i => i.checked).map(i => i.value); }
 function capCheckGroups(name, sel, only) {
   const list = only ? state.caps.filter(c => only.includes(c.id)) : state.caps;
@@ -4706,7 +4807,7 @@ function openLocalSettings() {
       <div class="label" style="margin-top:18px">示範與顯示</div>
       <div class="chk-list">
         <label class="chk"><input type="checkbox" id="ls_sim" ${localCfg.sim ? 'checked' : ''}>示範：模擬救護車行進（沒有 GPS 時，醫院端看板顯示救護車沿路線前進）</label>
-        <label class="chk"><input type="checkbox" id="ls_demo" ${localCfg.showDemo ? 'checked' : ''}>顯示示範案例</label>
+        <label class="chk"><input type="checkbox" id="ls_demo" ${isDemoUI() ? 'checked' : ''}>示範模式（展開派遣內容、顯示示範案例與隨機情境；出勤時關掉比較快）</label>
         <label class="chk"><input type="checkbox" id="ls_auto" ${localCfg.autoSearch ? 'checked' : ''}>辨識出主訴後自動查詢</label>
         
       </div>`,
@@ -4717,7 +4818,7 @@ function readLocalForm() {
   return {
     unit: $('#ls_unit').value.trim(), geminiKey: $('#ls_key').value.trim(),
     geminiModel: $('#ls_model').value.trim() || DEFAULT_GEMINI_MODEL, aiAuto: $('#ls_aiAuto').checked,
-    sim: $('#ls_sim').checked, showDemo: $('#ls_demo').checked, autoSearch: $('#ls_auto').checked,
+    sim: $('#ls_sim').checked, uiMode: $('#ls_demo').checked ? 'demo' : 'formal', autoSearch: $('#ls_auto').checked,
     theme: ($('#ls_theme button.on') || {}).dataset ? $('#ls_theme button.on').dataset.v : localCfg.theme
   };
 }
@@ -4840,9 +4941,16 @@ function pickFile(inputSel) {
 }
 
 /* ========== 事件 ========== */
-function setCaseText(t) { $('#caseText').value = t; state.caseText = t; onCaseInput(); }
+function setCaseText(t) { $('#caseText').value = t; state.caseText = t; state.caseOpen = true; renderCaseCard(); onCaseInput(); }
 const ACTIONS = {
-  menu: () => { $('#menu').hidden = !$('#menu').hidden; },
+  menu: () => { $('#mUiMode').lastChild.textContent = isDemoUI() ? '切換到正式模式（出勤）' : '切換到示範模式'; $('#menu').hidden = !$('#menu').hidden; },
+  toggleUiMode: () => {
+    $('#menu').hidden = true; localCfg.uiMode = isDemoUI() ? 'formal' : 'demo'; saveLocalCfg();
+    if (!isDemoUI() && state.scn) state.scn = null;
+    state.caseOpen = false; if (isRoute('')) renderMain(); else renderCaseCard();
+    toast(isDemoUI() ? '示範模式：顯示派遣內容與示範案例' : '正式模式：直接選主訴查詢');
+  },
+  caseOpen: () => { state.caseOpen = true; renderCaseCard(); $('#caseText').focus(); },
   go: el => { $('#menu').hidden = true; const to = el.dataset.to || ''; if (location.hash === to || (!location.hash && !to)) route(); else location.hash = to; },
   localSettings: () => { $('#menu').hidden = true; openLocalSettings(); },
   pickTheme: el => { $$('#ls_theme button').forEach(b => b.classList.toggle('on', b === el)); },
@@ -4872,7 +4980,7 @@ const ACTIONS = {
   pasteCase: async () => {
     const ta = $('#caseText'); let t = null;
     try { if (navigator.clipboard && navigator.clipboard.readText) t = await navigator.clipboard.readText(); } catch (e) { t = null; }
-    if (t == null) { ta.focus(); throw new Error('無法讀取剪貼簿，請長按輸入框選「貼上」'); }
+    if (t == null) { state.caseOpen = true; renderCaseCard(); ta.focus(); throw new Error('無法讀取剪貼簿，請長按輸入框選「貼上」'); }
     if (!t.trim()) throw new Error('剪貼簿是空的');
     setCaseText(t);
   },
@@ -4881,7 +4989,7 @@ const ACTIONS = {
     state.caseText = ''; state.lastParsed = null; state.parsed = null; state.kwParsed = null; state.ai = { state: 'idle' };
     state.patient = { sex: '', age: '', ruleId: '' };
     resetClock();
-    $('#caseText').value = '';
+    $('#caseText').value = ''; state.caseOpen = false; renderCaseCard();
     renderPatient(); renderParse(); renderAi(); renderResults();
     toast('已清除，可貼上新案件');
   },
@@ -4910,7 +5018,7 @@ const ACTIONS = {
   statDemo: () => { const r = genDemoHistory(30); toast(`已產生示範數據：查詢 ${r.logs} 筆、通知 ${r.notices} 筆`); renderStats(); },
   statClearDemo: () => { if (!confirm('清除這台裝置上的示範數據？')) return; writeLS(DEMO_HIST_KEY, { logs: [], notices: [] }); toast('已清除'); renderStats(); },
   makeHandover: el => makeHandover(el.dataset.id),
-  mic: () => Speech.toggle(),
+  mic: () => { state.caseOpen = true; renderCaseCard(); return Speech.toggle(); },
   mciNotify: () => mciNotify(),
   sortBy: el => { localCfg.sortBy = el.dataset.v === 'dist' ? 'dist' : 'rec'; saveLocalCfg(); renderResults(); },
   openMap: el => { const h = hospById(el.dataset.id); if (h) openExternal(mapsUrl(h)); },
@@ -5058,12 +5166,8 @@ document.addEventListener('input', e => {
 $('#btnSearch').addEventListener('click', doSearch);
 // 交班視窗的「撥打急診」：讓 tel: 連結照常撥號，只順便記一筆（不含病患資料）
 document.addEventListener('click', e => { const a = e.target.closest('.ho-call'); if (!a) return; if (a.classList.contains('disabled')) { e.preventDefault(); return; } const h = hospById(state.hoHid); if (h) { hoSaveUnit(); hoLog(h, 'call'); } });
-// 隱藏入口：連點標題 5 下進後台
-let tapN = 0, tapT = 0;
-$('#brand').addEventListener('click', () => {
-  const now = Date.now(); tapN = now - tapT < 600 ? tapN + 1 : 1; tapT = now;
-  if (tapN >= 5) { tapN = 0; location.hash = isRoute('#admin') ? '' : '#admin'; }
-});
+// 隱藏入口：長按左上角標誌 2 秒進後台（在後台長按則回前台）
+bindLongPress($('#brand .logo'), () => { location.hash = isBackRoute() ? '' : '#admin'; });
 window.addEventListener('hashchange', () => { closeModal(); route(); });
 setInterval(renderClock, 15000);
 window.addEventListener('scroll', () => { if (isRoute('') && state.searched) renderJump(); }, { passive: true });
@@ -5082,27 +5186,41 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') {
 }
 window.addEventListener('online', () => { renderNet(); toast('已恢復連線'); });
 window.addEventListener('offline', () => { renderNet(); toast('目前離線：可繼續用上次的醫院資料查詢，設備狀態與通知會在恢復連線後更新', 5000); });
+// 雲端模式：先用上次同步的資料（或內建能力表）馬上顯示畫面，Firebase 在背景連線，連上後自動換成最新資料
+function useOfflineData(quiet) {
+  const c = readLS(CACHE_KEY);
+  if (c && Array.isArray(c.hospitals) && c.hospitals.length) { applyData(c); state.dataSource = 'cache'; state.cachedAt = c.cachedAt; }
+  else { applyData(seedData()); state.dataSource = 'none'; }
+  if (!quiet) toast(state.dataSource === 'cache' ? '無法連線資料庫，使用上次同步的離線資料' : '無法連線資料庫，先使用內建的醫院能力表', 4500);
+}
+async function cloudSync() {
+  try {
+    await Store.init();
+    const d = await withTimeout(Store.loadAll(), 15000);
+    state.syncing = false; onRemoteData(d, true);
+  } catch (e) {
+    console.warn(e); state.syncing = false; renderNet();
+    toast(state.dataSource === 'cache' ? '無法連線資料庫，使用上次同步的離線資料' : '無法連線資料庫，先使用內建的醫院能力表', 4500);
+  }
+}
 async function boot() {
   applyTheme();
-  await Store.init();
-  try {
-    const d = await withTimeout(Store.loadAll(), 10000);
-    applyData(d); state.dataSource = d.source;
-  } catch (e) {
-    console.warn(e);
-    const c = readLS(CACHE_KEY);
-    if (c && Array.isArray(c.hospitals)) { applyData(c); state.dataSource = 'cache'; state.cachedAt = c.cachedAt; toast('無法連線資料庫，使用上次同步的離線資料', 4000); }
-    else { applyData(seedData()); state.dataSource = 'none'; toast('無法連線資料庫，先使用內建的醫院能力表', 5000); }
+  if (Store.mode === 'demo') {
+    await Store.init();
+    try { const d = await Store.loadAll(); applyData(d); state.dataSource = d.source; }
+    catch (e) { console.warn(e); useOfflineData(); }
+  } else {
+    useOfflineData(true); state.syncing = true;
   }
+  Store._bootDone = true;
   Store.watchStatus(m => {
     const out = {}; for (const [k, v] of Object.entries(m || {})) out[k] = normStatus(v);
     state.status = out; onLiveChange();
   });
   if (SHOW_CAPACITY && localCfg.sim) Sim.start();
   Tracker.start();
-  await Store.authReady;
-  if (Store.mode === 'demo') startEmsNoticeWatch();
-  route();
+  if (Store.mode === 'demo') { await Store.authReady; startEmsNoticeWatch(); route(); }
+  else { route(); cloudSync().then(() => Store.authReady); }
 }
 boot();
 </script>
