@@ -303,7 +303,7 @@ input:disabled{opacity:.6}
 .h-caps{font-size:14px;color:var(--ink2);margin-top:5px;line-height:1.6}
 .h-caps .k{color:var(--muted)}
 .h-caps .req{color:var(--green);font-weight:750}
-.h-caps .busy{color:var(--amber);font-weight:650}
+.h-caps .busy{color:#2a1b00;background:var(--yellow);border-radius:5px;padding:0 4px;font-weight:650}
 .h-caps .down{color:var(--red2);text-decoration:line-through}
 .h-caps .none{color:var(--dim)}
 .more{border:0;background:none;color:var(--blue);font:inherit;font-size:13px;font-weight:650;cursor:pointer;padding:0 0 0 6px}
@@ -705,6 +705,7 @@ body.board .bd-m b{font-size:22px}body.board .bd-m span{font-size:18px}body.boar
 .cs{font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--field);color:var(--muted)}
 .cs.ok{background:var(--green-soft);color:var(--green)}.cs.lim{background:var(--amber-soft);color:var(--amber)}
 .cs.ask{background:var(--amber-soft);color:var(--amber)}.cs.off{background:var(--red-soft);color:var(--red)}
+.cs.busy{background:var(--yellow);color:#2a1b00}
 .cs-note{font-size:12px;color:var(--muted);flex-basis:100%}
 .ht-src{margin-top:14px;font-size:12px;color:var(--dim);line-height:1.6}
 @media (max-width:520px){.ht-row{grid-template-columns:1fr;gap:6px}.ht-k{flex-direction:row;align-items:center;justify-content:space-between}}
@@ -987,7 +988,7 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "653252329719",
   appId: "1:653252329719:web:c3c9ca0891de64c69b13f2"
 };
-const APP_VERSION = 'v3.14.0';
+const APP_VERSION = 'v3.14.1';
 // 醫院即時量能（急救室、候床、ICU、滿載）：目前沒有醫院即時回報的資料來源，先關閉；之後有資料來源再改成 true
 const SHOW_CAPACITY = false;
 const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
@@ -2753,7 +2754,7 @@ function capsLine(h, st, hl, x) {
     const req = hl.active && hl.reqCaps && hl.reqCaps.has(c.id);
     const lim = h.limits[c.id];
     if (p.has(c.id)) return { k: req ? 0 : 2, i, html: `<span class="down">${esc(c.name)}</span>` };
-    if (live) return { k: req ? 0 : 2, i, html: `<span class="${live.state === 'down' ? 'down' : 'busy'}">${esc(c.name)}${live.state === 'busy' ? `（忙至 ${live.until ? fmtClock(live.until) : '未定'}）` : ''}</span>` };
+    if (live) return { k: req ? 0 : 2, i, html: `<span class="${live.state === 'down' ? 'down' : 'busy'}">${esc(c.name)}${live.state === 'busy' ? `（忙至 ${live.until ? fmtClock(live.until) : '未定'}）` : `（暫停${live.until ? '至 ' + fmtClock(live.until) : ''}）`}</span>` };
     if (lim && !openAt(lim.when, d)) return { k: req ? 0 : 2, i, html: `<span class="off" title="${esc(lim.note)}">${esc(c.name)}（${esc(hoursText(lim.when))}）</span>` };
     if (ventilated() && noVent(h, c.id)) return { k: req ? 0 : 2, i, html: `<span class="off" title="${esc(lim.note)}">${esc(c.name)}（不收呼吸器）</span>` };
     const tag = lim && lim.when ? `<small class="lim">${esc(hoursText(lim.when))}</small>` : '';
@@ -2954,7 +2955,8 @@ function whyNot(x, hl) {
     if (stt === 'no') return `沒有${capName(c)}`;
     if (stt === 'closed') return `${capName(c)}現在不是服務時段（${hoursText(x.h.limits[c].when)}）`;
     if (stt === 'novent') return `${capName(c)}不收插管／呼吸器病人`;
-    return `${capName(c)}忙碌或暫停中`;
+    const lv = capLive(liveStatus(x.h.id), c);
+    return lv && lv.state === 'busy' ? `${capName(c)}醫院回報忙碌` : lv ? `${capName(c)}醫院回報暫停` : `${capName(c)}暫停中`;
   });
   if (!x.m) {
     if (state.tab === 'quick') out.push(...capIssue([...state.quickCaps]));
@@ -3788,9 +3790,11 @@ function markHtml(ch) {
 function capChip(h, c, d) {
   const n = capName(c), l = h.limits[c], stt = capState(h, c, d);
   if (stt === 'no') return `<span class="cs no">${esc(n)}・無</span>`;
+  // 醫院回報：忙碌＝黃色、暫停＝紅色（跟醫院端按鈕同色）
+  const lv = stt === 'live' ? capLive(liveStatus(h.id), c) : null, lvTo = lv ? (lv.until ? `至 ${fmtClock(lv.until)}` : '時間未定') : '';
   const txt = { ok: l && l.when ? hoursText(l.when) : '24 小時', ask: '有條件', closed: `現在不能做（${l ? hoursText(l.when) : ''}）`,
-    novent: '不收呼吸器病人', paused: '長期停用', live: '醫院回報忙碌' }[stt];
-  const cls = { ok: l && l.when ? 'lim' : 'ok', ask: 'ask' }[stt] || 'off';
+    novent: '不收呼吸器病人', paused: '長期停用', live: lv && lv.state === 'busy' ? `醫院回報忙碌（${lvTo}）` : `醫院回報暫停（${lvTo}）` }[stt];
+  const cls = { ok: l && l.when ? 'lim' : 'ok', ask: 'ask' }[stt] || (lv && lv.state === 'busy' ? 'busy' : 'off');
   return `<span class="cs ${cls}">${esc(n)}・${esc(txt)}</span>${l && l.note ? `<span class="cs-note">${esc(l.note)}</span>` : ''}`;
 }
 // 單一醫院的能力表內容：19 個欄位（標記、此刻狀態、原文說明）；showNone=false 時只列有提供的欄位
