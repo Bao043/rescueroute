@@ -4,14 +4,14 @@
  * - 地圖圖磚：看過的區域會留著，沒網路時還看得到
  * - Gemini、車程、Firebase 資料：一律走網路（資料另存在瀏覽器裡）
  */
-const VERSION = 'v3.13.1';
+const VERSION = 'v3.13.2';
 const SHELL = 'shell-' + VERSION;
 const LIBS = 'libs-v1';
 const TILES = 'tiles-v1';
 const TILE_MAX = 400;
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(SHELL).then(c => c.addAll(['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png']).catch(() => {})));
+  e.waitUntil(caches.open(SHELL).then(c => c.addAll(['./', './index.html', './manifest.webmanifest?v=2', './icon-192.png?v=2', './icon-512.png?v=2', './apple-touch-icon.png?v=2']).catch(() => {})));
   self.skipWaiting();
 });
 
