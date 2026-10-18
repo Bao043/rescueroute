@@ -1095,7 +1095,7 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "653252329719",
   appId: "1:653252329719:web:c3c9ca0891de64c69b13f2"
 };
-const APP_VERSION = 'v3.21.1';
+const APP_VERSION = 'v3.22.0';
 // 醫院即時量能（急救室、候床、ICU、滿載）：目前沒有醫院即時回報的資料來源，先關閉；之後有資料來源再改成 true
 const SHOW_CAPACITY = false;
 const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
@@ -1822,6 +1822,16 @@ function migrateRules(from) {
   migrPending = [...changed];
 }
 // 把調整存回去：本機模式直接存；雲端模式等管理者登入時寫回雲端（一般救護員只在自己手機上套用）
+// 升級後第一次：管理者登入、資料已從雲端（舊集合）載入 → 自動建立合併文件
+let bundling = false;
+async function ensureBundle() {
+  if (bundling || Store.mode !== 'firebase' || !Store.db || !Store.email() || Store.cloudEmpty) return;
+  if (Store.bundleState !== 'missing' || !Store._live || !Store._live.ready || state.dataSource !== 'firebase' || !state.hospitals.length) return;
+  bundling = true;
+  try { await Store._writeBundle(Store._dataWith(() => {})); if (Store.bundleState === 'ok') toast('已把醫院資料合併成一份：之後每次開啟只要讀 1 筆', 4000); }
+  catch (e) { console.warn('建立合併資料失敗', e); }
+  finally { bundling = false; }
+}
 async function saveMigration() {
   if (!migrPending) return;
   if (Store.mode === 'demo') { migrPending = null; Store._persistLocal(); return; }
@@ -1926,39 +1936,86 @@ const Store = {
     if (!this.db) throw new Error('Firebase SDK 未載入');
     return this._watchData();
   },
-  // 即時同步：監聽醫院、能力、主訴、設定；後台一改，所有開著 App 的手機馬上更新（第一次讀取也用同一組監聽，不重複計費）
-  _live: null, _liveTimer: 0,
+  /* 雲端資料「合併成一份」：醫院、處置能力、求救原因、設定整份存在 pub/data 這一個文件（json 字串）
+   * 救護端每次開啟只讀 1 筆（舊做法要讀約 100 筆）；後台一改，開著的手機各再讀 1 筆
+   * 舊的 caps／hospitals／rules／settings 集合仍會同步寫入（給還沒更新的舊版 App 用，也當備份）
+   * pub/data 還不存在（剛升級）或規則還沒開放 → 先用舊集合；管理者登入後自動建立合併文件 */
+  _live: null, _liveTimer: 0, bundleState: '', bundleRev: 0,
+  _parseBundle(d) {
+    try {
+      const o = JSON.parse(d.json);
+      if (!o || !Array.isArray(o.hospitals) || !Array.isArray(o.caps) || !Array.isArray(o.rules)) return null;
+      return { caps: o.caps, hospitals: o.hospitals, rules: o.rules, settings: o.settings || SEED_SETTINGS };
+    } catch (e) { console.warn('合併資料格式錯誤', e); return null; }
+  },
   _watchData() {
     if (this._live) return this._live.first;
-    const live = this._live = { parts: {}, got: new Set() };
+    const live = this._live = { parts: {}, got: new Set(), legacy: [] };
     const docs = snap => snap.docs.map(x => ({ ...x.data(), id: x.id }));
-    const build = () => {
-      const { caps = [], hospitals = [], rules = [], settings } = live.parts;
-      // 雲端還沒寫入資料（剛建好資料庫）→ 先用內建能力表，救護員照樣能查；管理者到後台按「寫入內建資料到雲端」
-      this.cloudEmpty = !caps.length && !hospitals.length && !rules.length;
-      if (this.cloudEmpty) return { ...seedData(), settings: settings || SEED_SETTINGS, source: 'seed' };
-      const data = { caps, hospitals, rules, settings: settings || SEED_SETTINGS };
-      writeLS(CACHE_KEY, { ...data, cachedAt: Date.now() });
-      return { ...data, source: 'firebase' };
-    };
     live.first = new Promise((res, rej) => {
-      const got = (k, v, snap) => {
-        live.parts[k] = v; live.got.add(k);
-        if (live.got.size < 4) return;
-        // 這支手機自己剛寫入的變更：畫面已經更新過，只記下內容、不重畫
-        if (live.ready && snap.metadata && snap.metadata.hasPendingWrites) return;
-        if (!live.ready) {
-          live.ready = true; const d = build(); res(d);
-          return;
-        }
+      const deliver = data => {
+        writeLS(CACHE_KEY, { caps: data.caps, hospitals: data.hospitals, rules: data.rules, settings: data.settings, cachedAt: Date.now() });
+        if (!live.ready) { live.ready = true; res(data); return; }
         clearTimeout(this._liveTimer);
-        this._liveTimer = setTimeout(() => onRemoteData(build()), 250);
+        this._liveTimer = setTimeout(() => onRemoteData(data), 250);
       };
       const fail = e => { console.warn('雲端同步失敗', e); if (!live.ready) { this._live = null; rej(e); } };
-      ['caps', 'hospitals', 'rules'].forEach(col => this.db.collection(col).onSnapshot(snap => got(col, docs(snap), snap), fail));
-      this.db.collection('settings').doc('main').onSnapshot(d => got('settings', d.exists ? d.data() : null, d), fail);
+      // 舊做法：分別監聽四個集合
+      const startLegacy = () => {
+        if (live.legacy.length) return;
+        live.got.clear();
+        const got = (k, v, snap) => {
+          live.parts[k] = v; live.got.add(k);
+          if (live.got.size < 4 || this.bundleState === 'ok') return;
+          if (live.ready && snap.metadata && snap.metadata.hasPendingWrites) return;   // 這支手機自己剛寫入的變更
+          const { caps = [], hospitals = [], rules = [], settings } = live.parts;
+          // 雲端還沒寫入資料（剛建好資料庫）→ 先用內建能力表，救護員照樣能查；管理者到後台按「寫入內建資料到雲端」
+          this.cloudEmpty = !caps.length && !hospitals.length && !rules.length;
+          if (this.cloudEmpty) { const sd = { ...seedData(), settings: settings || SEED_SETTINGS, source: 'seed' }; if (!live.ready) { live.ready = true; res(sd); } else onRemoteData(sd); return; }
+          deliver({ caps, hospitals, rules, settings: settings || SEED_SETTINGS, source: 'firebase' });
+        };
+        ['caps', 'hospitals', 'rules'].forEach(col => live.legacy.push(this.db.collection(col).onSnapshot(snap => got(col, docs(snap), snap), fail)));
+        live.legacy.push(this.db.collection('settings').doc('main').onSnapshot(d => got('settings', d.exists ? d.data() : null, d), fail));
+      };
+      const stopLegacy = () => { live.legacy.forEach(u => { try { u(); } catch (e) { /* ignore */ } }); live.legacy = []; };
+      this.db.collection('pub').doc('data').onSnapshot(doc => {
+        const b = doc.exists ? this._parseBundle(doc.data()) : null;
+        if (!b) { this.bundleState = 'missing'; startLegacy(); return; }
+        this.bundleState = 'ok'; this.bundleRev = Number(doc.data().rev) || 0; this.cloudEmpty = false; stopLegacy();
+        if (live.ready && doc.metadata && doc.metadata.hasPendingWrites) return;
+        deliver({ ...b, source: 'firebase' });
+      }, e => { console.warn('合併資料無法讀取（Firestore 規則還沒加上 pub），先用舊集合', e); this.bundleState = 'denied'; startLegacy(); });
     });
     return live.first;
+  },
+  // 寫入合併文件；規則還沒開放 pub 時先略過（舊集合仍會寫入），並提醒管理者更新規則
+  async _writeBundle(d) {
+    if (this.mode !== 'firebase' || !this.db) return;
+    // 雲端資料還沒載入完成時不能整份寫入（否則可能用舊的離線資料蓋掉雲端）
+    if (!this._live || !this._live.ready) throw new Error('雲端資料還在同步，請等右上角顯示「雲端同步」再儲存');
+    if (this.bundleState === 'denied') { if (!this._bundleWarned) { this._bundleWarned = true; toast('提醒：Firestore 規則還沒加上 pub（合併資料），請依 README 更新規則', 6000); } return; }
+    const json = JSON.stringify(plain({ caps: d.caps, hospitals: d.hospitals, rules: d.rules, settings: d.settings }));
+    const bytes = new TextEncoder().encode(json).length;
+    if (bytes > 900000) throw new Error(`資料太大（${Math.round(bytes / 1024)} KB），超過單一文件上限，請聯絡開發者`);
+    const FV = firebase.firestore && firebase.firestore.FieldValue;
+    const rev = this.bundleRev + 1;
+    try {
+      await this.db.collection('pub').doc('data').set({ v: 1, json, rev, bytes, updatedAt: FV ? FV.serverTimestamp() : Date.now() });
+    } catch (e) {
+      if (e && e.code === 'permission-denied' && this.bundleState !== 'ok') { this.bundleState = 'denied'; return this._writeBundle(d); }
+      throw e;
+    }
+    this.bundleRev = rev; this.bundleState = 'ok';
+    // 編輯視窗開著時收到的別人修改（remotePending）已經合併進這次寫入：關掉視窗後套用合併後的內容
+    if (remotePending) remotePending = { caps: d.caps, hospitals: d.hospitals, rules: d.rules, settings: d.settings, source: 'firebase' };
+  },
+  // 舊集合：同步寫入（失敗不影響，合併文件才是主要資料）
+  async _legacy(fn) { try { await fn(); } catch (e) { console.warn('舊集合同步寫入失敗（不影響使用）', e); } },
+  // 以最新的資料為底（編輯中收到別人的修改時，用那份），套上這次的修改
+  _dataWith(mut) {
+    const base = remotePending || state;
+    const d = { caps: base.caps.slice(), hospitals: base.hospitals.slice(), rules: base.rules.slice(), settings: base.settings };
+    mut(d); return d;
   },
   _persistLocal() {
     const snap = plain({ caps: state.caps, hospitals: state.hospitals, rules: state.rules, settings: state.settings, seedVer: 8 });
@@ -1978,40 +2035,52 @@ const Store = {
   },
   async save(col, item) {
     this._requireWrite();
-    if (this.mode === 'firebase') await this.db.collection(col).doc(item.id).set(plain(item));
+    if (this.mode === 'firebase') {
+      await this._writeBundle(this._dataWith(d => { const i = d[col].findIndex(x => x.id === item.id); if (i >= 0) d[col][i] = item; else d[col].push(item); }));
+      await this._legacy(() => this.db.collection(col).doc(item.id).set(plain(item)));
+    }
     this._upsert(col, item); this._persistLocal();
   },
   async saveMany(col, items) {
     if (!items.length) return;
     this._requireWrite();
     if (this.mode === 'firebase') {
-      for (const ch of chunks(items, 400)) {
-        const b = this.db.batch(); ch.forEach(it => b.set(this.db.collection(col).doc(it.id), plain(it))); await b.commit();
-      }
+      await this._writeBundle(this._dataWith(d => items.forEach(item => { const i = d[col].findIndex(x => x.id === item.id); if (i >= 0) d[col][i] = item; else d[col].push(item); })));
+      await this._legacy(async () => { for (const ch of chunks(items, 400)) {
+        const b = this.db.batch(); ch.forEach(it => b.set(this.db.collection(col).doc(it.id), plain(it))); await b.commit(); } });
     }
     items.forEach(it => this._upsert(col, it)); this._persistLocal();
   },
   async remove(col, id) {
     this._requireWrite();
-    if (this.mode === 'firebase') await this.db.collection(col).doc(id).delete();
+    if (this.mode === 'firebase') {
+      await this._writeBundle(this._dataWith(d => { d[col] = d[col].filter(x => x.id !== id); }));
+      await this._legacy(() => this.db.collection(col).doc(id).delete());
+    }
     state[col] = state[col].filter(x => x.id !== id); this._persistLocal();
   },
   async saveSettings(s) {
     this._requireWrite();
-    if (this.mode === 'firebase') await this.db.collection('settings').doc('main').set(plain(s));
+    if (this.mode === 'firebase') {
+      await this._writeBundle(this._dataWith(d => { d.settings = s; }));
+      await this._legacy(() => this.db.collection('settings').doc('main').set(plain(s)));
+    }
     state.settings = s; this._persistLocal();
   },
   async replaceAll(data) {
     this._requireWrite(true);
     if (this.mode === 'firebase') {
-      for (const col of ['caps', 'hospitals', 'rules']) {
-        const snap = await this.db.collection(col).get();
-        const keep = new Set(data[col].map(x => x.id));
-        const ops = [...snap.docs.filter(d => !keep.has(d.id)).map(d => ({ del: d.ref })),
-          ...data[col].map(x => ({ ref: this.db.collection(col).doc(x.id), val: plain(x) }))];
-        for (const ch of chunks(ops, 400)) { const b = this.db.batch(); ch.forEach(o => o.del ? b.delete(o.del) : b.set(o.ref, o.val)); await b.commit(); }
-      }
-      await this.db.collection('settings').doc('main').set(plain(data.settings));
+      await this._writeBundle(data);
+      await this._legacy(async () => {
+        for (const col of ['caps', 'hospitals', 'rules']) {
+          const snap = await this.db.collection(col).get();
+          const keep = new Set(data[col].map(x => x.id));
+          const ops = [...snap.docs.filter(d => !keep.has(d.id)).map(d => ({ del: d.ref })),
+            ...data[col].map(x => ({ ref: this.db.collection(col).doc(x.id), val: plain(x) }))];
+          for (const ch of chunks(ops, 400)) { const b = this.db.batch(); ch.forEach(o => o.del ? b.delete(o.del) : b.set(o.ref, o.val)); await b.commit(); }
+        }
+        await this.db.collection('settings').doc('main').set(plain(data.settings));
+      });
       this.cloudEmpty = false; state.dataSource = 'firebase';
     }
     applyData(data); this._persistLocal();
@@ -4137,7 +4206,7 @@ const HP_FIELDS = [
 ];
 function hpHospital() { return hospById(state.hp.hid); }
 async function onAuthChanged() {
-  saveMigration();
+  saveMigration().then(ensureBundle);
   startEmsNoticeWatch();
   renderSide();
   state.hp.allowed = null;
@@ -5941,7 +6010,7 @@ async function cloudSync() {
     await Store.init();
     startStatusWatch(); startStatsWatch().catch(e => console.warn(e));
     const d = await withTimeout(Store.loadAll(), 15000);
-    state.syncing = false; onRemoteData(d, true); saveMigration();
+    state.syncing = false; onRemoteData(d, true); saveMigration().then(ensureBundle);
   } catch (e) {
     console.warn(e); state.syncing = false; renderNet();
     toast(state.dataSource === 'cache' ? '無法連線資料庫，使用上次同步的離線資料' : '無法連線資料庫，先使用內建的醫院能力表', 4500);
