@@ -397,7 +397,7 @@ input:disabled{opacity:.6}
 .leaflet-popup-content-wrapper{background:var(--surface)!important;color:var(--ink)!important;border-radius:14px!important;box-shadow:var(--shadow-lg)!important}
 .leaflet-popup-tip{background:var(--surface)!important}
 .leaflet-popup-content{margin:12px 14px!important;font-family:var(--sans);font-size:14px}
-.leaflet-container{font-family:var(--sans);background:var(--sunken)}
+.leaflet-container{font-family:var(--sans);background:var(--sunken);isolation:isolate;z-index:0} /* 地圖自成一層：不會蓋住選單、頂列與彈出視窗 */
 .pop b{font-size:15px}.pop .m{color:var(--muted);font-size:12px;margin:2px 0 8px}
 .pop .btn{padding:6px 10px;font-size:13px;margin:2px 2px 0 0}
 
@@ -622,6 +622,7 @@ body.jump-on .run-fab{bottom:calc(74px + env(safe-area-inset-bottom))}
 .trg-vs .vs span{font-size:11px;color:var(--muted);white-space:nowrap}
 .trg-vs input{width:100%;min-width:0;height:40px;padding:0 6px;font-size:16px;text-align:center;border-radius:10px}
 .trg-vs input.auto{color:var(--blue);border-color:var(--blue)}
+.trg-vs input::-webkit-inner-spin-button,.trg-vs input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}.trg-vs input{-moz-appearance:textfield;appearance:textfield}
 .trg-si{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:6px;font-size:12px;color:var(--ink2)}
 .trg-si .bad{color:var(--red);font-weight:700}.trg-si .warn{color:var(--amber);font-weight:700}.trg-si .mute{color:var(--dim)}
 .trg-g{margin-top:10px}.trg-gh{font-size:12px;font-weight:750;margin-bottom:5px}
@@ -752,6 +753,18 @@ body.board .bd-m b{font-size:22px}body.board .bd-m span{font-size:18px}body.boar
 .app-foot .disc .ic{margin-top:2px;flex:none}
 .app-foot .credit{margin-top:6px;color:var(--dim);letter-spacing:.5px}
 .app-foot .ver{margin-top:4px;color:var(--dim)}
+.foot-stats{display:inline-flex;align-items:center;gap:14px;margin:12px auto 2px;padding:9px 18px 9px 14px;border:1px solid var(--line2);border-radius:999px;background:var(--card);box-shadow:0 1px 0 rgba(255,255,255,.04) inset}
+.foot-stats .fs-it{display:flex;align-items:baseline;gap:5px;white-space:nowrap}
+.foot-stats .fs-it b{font-family:var(--num);font-size:20px;font-weight:700;color:var(--ink);letter-spacing:.3px;font-variant-numeric:tabular-nums}
+.foot-stats .fs-it span{font-size:12px;color:var(--muted)}
+.foot-stats .fs-sep{width:1px;height:18px;background:var(--line2)}
+.foot-stats .fs-live{position:relative;width:8px;height:8px;flex:none}
+.foot-stats .fs-live i{position:absolute;inset:0;border-radius:50%;background:var(--green)}
+.foot-stats .fs-live i::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--green);opacity:0;animation:fsPing 2.4s ease-out infinite}
+@keyframes fsPing{0%{transform:scale(.5);opacity:.7}100%{transform:scale(1.4);opacity:0}}
+@media (prefers-reduced-motion:reduce){.foot-stats .fs-live i::after{animation:none}}
+.qr-wrap .foot-stats{margin:4px auto 10px}
+.foot-stats.compact{padding:7px 14px 7px 12px;gap:12px}.foot-stats.compact .fs-it b{font-size:18px}
 .linkish{border:0;background:none;color:var(--blue);font:inherit;font-size:12px;cursor:pointer;padding:0;text-decoration:underline}
 .ack{display:flex;align-items:center;gap:12px;margin:14px 0 4px;padding:12px 14px;border-radius:14px;background:var(--blue-soft);color:var(--blue)}
 .ack p{margin:0;color:var(--ink);font-size:15px}
@@ -1082,7 +1095,7 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "653252329719",
   appId: "1:653252329719:web:c3c9ca0891de64c69b13f2"
 };
-const APP_VERSION = 'v3.20.0';
+const APP_VERSION = 'v3.21.1';
 // 醫院即時量能（急救室、候床、ICU、滿載）：目前沒有醫院即時回報的資料來源，先關閉；之後有資料來源再改成 true
 const SHOW_CAPACITY = false;
 const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
@@ -1329,7 +1342,7 @@ function parseVitals(raw) {
   else if ((m = t.match(/(?:gcs|昏迷指數)[:：]?(\d{1,2})(?!\d)/)) && Number(m[1]) >= 3 && Number(m[1]) <= 15) out.gcs = Number(m[1]);
   return out;
 }
-const TRG_VS = [['sbp', '收縮壓', 'mmHg'], ['hr', '心跳', '次／分'], ['rr', '呼吸', '次／分'], ['spo2', 'SpO₂', '%'], ['gcs', 'GCS', '3–15']];
+const TRG_VS = [['sbp', '收縮壓', 'mmHg'], ['hr', '心跳', '/分'], ['rr', '呼吸', '/分'], ['spo2', 'SpO₂', '%'], ['gcs', 'GCS', '3–15']];
 function trgVitals() {
   const p = parseVitals(state.caseText), out = { m: p.m != null ? p.m : null, src: {} };
   TRG_VS.forEach(([k]) => {
@@ -1760,7 +1773,7 @@ function isDark() {
 const EMPTY_P = { sex: '', age: null, ruleId: '', alts: [], onset: '' };
 const state = {
   caps: [], hospitals: [], rules: [], settings: normSettings(SEED_SETTINGS),
-  dataSource: '', cachedAt: null, syncing: false, caseOpen: false, run: { events: [], dest: '' }, trg: { on: [], off: [], vs: {} }, reroute: null, runOpen: false, runPick: '',
+  dataSource: '', cachedAt: null, syncing: false, caseOpen: false, stats: null, statsAnimated: false, run: { events: [], dest: '' }, trg: { on: [], off: [], vs: {} }, reroute: null, runOpen: false, runPick: '',
   tab: 'patient', quickCaps: new Set(), patient: { sex: '', age: '', ruleId: '' }, onlyMatch: false,
   caseText: '', lastParsed: null, parsed: null, kwParsed: null,
   clock: { onsetAt: null, src: '', unknown: false, fmcAt: null }, // 時間窗：發作時間、首次接觸病人時間
@@ -1836,6 +1849,7 @@ function applyData(d) {
 }
 
 /* ========== 資料存取（示範模式 / Firebase） ========== */
+const STATS_KEY = 'hf_stats_v1', STATS_GAP = 5 * 60e3;
 const Store = {
   mode: FIREBASE_CONFIG.apiKey ? 'firebase' : 'demo',
   db: null, auth: null, user: null, authReady: null, cloudEmpty: false,
@@ -2098,6 +2112,25 @@ const Store = {
     this._requireWrite(true);
     const snap = await this.db.collection('hospitalUsers').get();
     return snap.docs.map(d => ({ email: d.id, hid: d.data().hid }));
+  },
+  // 瀏覽統計（meta/stats）：views 開啟次數（同一支手機 5 分鐘內只算一次）、devices 使用裝置數（每支手機只算一次）
+  // 費用：算一次 = 寫 1 筆；開啟時讀 1 筆（不用即時監聽，否則每次有人開啟，所有開著的手機都要再讀一次）
+  async countVisit() {
+    if (this.mode !== 'firebase' || !this.db || !(firebase.firestore && firebase.firestore.FieldValue)) return;
+    const ls = readLS(STATS_KEY) || {}, now = Date.now();
+    const count = !ls.last || now - ls.last > STATS_GAP;
+    writeLS(STATS_KEY, { ...ls, last: now });
+    if (!count) return;
+    const FV = firebase.firestore.FieldValue;
+    try {
+      await this.db.collection('meta').doc('stats').set({ views: FV.increment(1), devices: FV.increment(ls.dev ? 0 : 1), updatedAt: FV.serverTimestamp() }, { merge: true });
+      writeLS(STATS_KEY, { dev: true, last: now });
+    } catch (e) { writeLS(STATS_KEY, { ...ls }); console.warn('瀏覽次數無法寫入（請確認 firestore.rules 已加上 meta/stats）', e); }
+  },
+  async getStats() {
+    if (this.mode !== 'firebase' || !this.db) return null;
+    try { const d = await this.db.collection('meta').doc('stats').get(); return d.exists ? d.data() : null; }
+    catch (e) { console.warn('瀏覽次數讀取失敗', e); return null; }
   },
   async setHospitalUser(email, hid) { this._requireWrite(true); await this.db.collection('hospitalUsers').doc(email.toLowerCase()).set({ hid }); },
   async removeHospitalUser(email) { this._requireWrite(true); await this.db.collection('hospitalUsers').doc(email).delete(); },
@@ -3645,6 +3678,7 @@ function openShareApp() {
     body: `<div class="qr-wrap"><button class="qr-box" data-act="qrFull" aria-label="放大 QR Code">${QR_SVG}</button>
       <div class="qr-tip">請旁邊的人用手機相機掃描・<b>點 QR Code 可放大</b></div>
       <div class="qr-url">${esc(APP_URL)}</div>
+      ${statsHtml(true)}
       <div class="hint">打開後在 Safari 按「分享 → 加入主畫面」，就能像 App 一樣使用。</div></div>`,
     buttons: [{ text: '複製連結', onClick: async () => { try { await navigator.clipboard.writeText(APP_URL); toast('已複製連結'); } catch (e) { toast('無法自動複製，請長按網址自行複製'); } } },
       ...(navigator.share ? [{ text: '分享', onClick: () => navigator.share({ title: '救途 RescueRoute', text: '救護送醫導航', url: APP_URL }).catch(() => {}) }] : []),
@@ -4586,8 +4620,38 @@ function footHtml() {
   return `<div class="disc">${ic('shield', 'sm')}<span>${esc(state.settings.disclaimer)}</span></div>
     ${state.settings.credit ? `<div class="credit">${esc(state.settings.credit)}</div>` : ''}`;
 }
+/* ========== 瀏覽次數（雲端模式才有；開啟 App 時讀一次） ========== */
+async function startStatsWatch() {
+  await Store.countVisit();
+  const d = await Store.getStats();
+  const v = d && Number(d.views) > 0 ? { views: Number(d.views), devices: Math.max(1, Number(d.devices) || 0) } : null;
+  const first = !state.stats && v;
+  state.stats = v; renderFoots();
+  if (first) animateStats();
+}
+const fmtN = n => Number(n).toLocaleString('en-US');
+function statsHtml(compact) {
+  const st = state.stats; if (!st) return '';
+  return `<div class="foot-stats${compact ? ' compact' : ''}" role="group" aria-label="瀏覽統計">
+    <span class="fs-live" title="雲端統計（開啟 App 時更新）"><i></i></span>
+    <div class="fs-it"><b class="num" data-n="${st.views}">${fmtN(st.views)}</b><span>次開啟</span></div>
+    <span class="fs-sep" aria-hidden="true"></span>
+    <div class="fs-it"><b class="num" data-n="${st.devices}">${fmtN(st.devices)}</b><span>支手機使用</span></div>
+  </div>`;
+}
+// 第一次出現時數字從 0 跑上來（只跑一次；系統設定「減少動態效果」時不跑）
+function animateStats() {
+  if (state.statsAnimated) return; state.statsAnimated = true;
+  try { if (matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch (e) { /* ignore */ }
+  const els = $$('.foot-stats b[data-n]'); if (!els.length) return;
+  const t0 = performance.now(), D = 900;
+  const step = t => { const k = Math.min(1, (t - t0) / D), e = 1 - Math.pow(1 - k, 3);
+    $$('.foot-stats b[data-n]').forEach(b => { b.textContent = fmtN(Math.round(Number(b.dataset.n) * e)); });
+    if (k < 1) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+}
 function renderFoots() {
-  $$('.app-foot').forEach(el => { el.innerHTML = footHtml() + `<div class="ver">${APP_VERSION}　<button class="linkish" data-act="showNotice">使用須知</button>　<button class="linkish" data-act="go" data-to="#refs">參考文獻</button>　<button class="linkish" data-act="feedback">意見回饋</button></div>
+  $$('.app-foot').forEach(el => { el.innerHTML = footHtml() + statsHtml() + `<div class="ver">${APP_VERSION}　<button class="linkish" data-act="showNotice">使用須知</button>　<button class="linkish" data-act="go" data-to="#refs">參考文獻</button>　<button class="linkish" data-act="feedback">意見回饋</button></div>
     <button class="foot-qr" data-act="qrFull" aria-label="放大 App 的 QR Code">${QR_SVG}<span>掃描分享<br>點我放大</span></button>`; });
 }
 
@@ -5875,7 +5939,7 @@ function startStatusWatch() {
 async function cloudSync() {
   try {
     await Store.init();
-    startStatusWatch();
+    startStatusWatch(); startStatsWatch().catch(e => console.warn(e));
     const d = await withTimeout(Store.loadAll(), 15000);
     state.syncing = false; onRemoteData(d, true); saveMigration();
   } catch (e) {
