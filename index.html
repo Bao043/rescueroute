@@ -94,6 +94,14 @@ body{min-height:100vh;padding-bottom:calc(36px + env(safe-area-inset-bottom))}
 .ctier-life .ctier-h{color:var(--red)}
 .ctier-life .chip:not(.on){border-color:var(--red);color:var(--red)}
 .opt-h{margin-top:16px!important}
+#viewRefs{max-width:860px;margin:0 auto;padding:16px}
+.refs-intro p{margin:6px 0 10px;font-size:14px;line-height:1.7;color:var(--ink2)}
+.refs-nav{display:flex;flex-wrap:wrap;gap:6px}
+.refs-g{margin-top:12px}.refs-g h3{margin:0 0 6px;font-size:16px}
+.refs-g ol{margin:0;padding-left:20px}.refs-g li{padding:8px 0;border-bottom:1px solid var(--line)}.refs-g li:last-child{border-bottom:0}
+.refs-g .rc{font-size:14px;line-height:1.6;overflow-wrap:anywhere}
+.refs-g .rl{font-size:13px;margin-top:2px;overflow-wrap:anywhere}.refs-g .rl a{color:var(--blue,#3b82f6)}
+.refs-g .ru{font-size:12.5px;color:var(--muted);margin-top:3px}
 .tw-tips{margin:10px 0 0;padding:10px 12px 10px 28px;border-radius:12px;background:var(--field);font-size:13px;line-height:1.6;color:var(--ink2)}
 .tw-tips li+li{margin-top:4px}
 .btn.tw-arrest{width:100%;margin-top:10px;border-color:var(--red);color:var(--red);font-weight:700}
@@ -869,6 +877,7 @@ td.mx.off .dt{opacity:.35}
   <hr data-side="front">
   <button data-side="front" data-act="toggleUiMode" id="mUiMode"><svg class="ic"><use href="#i-dice"/></svg>切換到示範模式</button>
   <button data-side="front" data-act="localSettings"><svg class="ic"><use href="#i-gear"/></svg>本機設定（AI、單位、模擬）</button>
+  <button data-side="front" data-act="go" data-to="#refs"><svg class="ic"><use href="#i-list"/></svg>參考文獻</button>
   <button data-side="front" data-act="showNotice"><svg class="ic"><use href="#i-shield"/></svg>使用須知</button>
   <button data-side="front" data-act="feedback"><svg class="ic"><use href="#i-mail"/></svg>意見回饋／回報問題</button>
 </div>
@@ -938,6 +947,7 @@ td.mx.off .dt{opacity:.35}
 <!-- ================= 醫院端 ================= -->
 <main id="viewHospital" hidden><div id="hospPanel"></div><footer class="app-foot"></footer></main>
 <!-- ================= 醫院查詢 ================= -->
+<main id="viewRefs" hidden><div id="refsBox"></div><footer class="app-foot"></footer></main>
 <main id="viewLookup" hidden>
   <section class="card lk-pick">
     <div class="label" style="margin-top:0">選擇醫院，查看可以做哪些處置</div>
@@ -1018,7 +1028,7 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "653252329719",
   appId: "1:653252329719:web:c3c9ca0891de64c69b13f2"
 };
-const APP_VERSION = 'v3.17.0';
+const APP_VERSION = 'v3.18.0';
 // 醫院即時量能（急救室、候床、ICU、滿載）：目前沒有醫院即時回報的資料來源，先關閉；之後有資料來源再改成 true
 const SHOW_CAPACITY = false;
 const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
@@ -2448,7 +2458,7 @@ function renderClockBox() {
     ${pr.base === 'fmc' && c.onsetAt != null ? `<div class="tw-fmc">胸痛開始（派遣內容）<b class="num">${fmtDayClock(c.onsetAt)}</b></div>` : ''}
     ${pr.arrest ? `<button class="btn tw-arrest" data-act="runArrest">${ic('alert', 'sm')}途中心跳停止 → 改為外傷 OHCA，開始復甦性開胸計時</button>` : ''}
     ${pr.tips ? `<ul class="tw-tips">${pr.tips.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}
-    <div class="tw-ref">${esc(pr.ref)}・僅供決策輔助</div>
+    <div class="tw-ref">${esc(pr.ref)}・僅供決策輔助　<button class="linkish" data-act="refsGo" data-k="${esc(Object.keys(PROTOCOLS).find(k => PROTOCOLS[k] === pr))}">完整出處</button></div>
   </div>`;
 }
 function bestMatch() {
@@ -3287,6 +3297,56 @@ function renderRunBar() {
   box.innerHTML = `<section class="rr"><div class="rr-h"><b>${esc(rr.reason)}（${fmtClock(rr.at)}）</b>：已改為「${esc((activeRule() || {}).name || '')}」並用目前位置重新建議
     <button class="btn sm ghost" data-act="rerouteClose">關閉</button></div>${body}
     <div class="hint">車程以目前位置估算。改送前請回報勤務中心，並依醫療指導指示。</div></section>`;
+}
+
+
+/* ========== 參考文獻（App 裡每一個時間窗、資料來源的出處） ========== */
+// k：對應時間窗代碼（時間窗卡片的「出處」會跳到這一段）；doi／url 會變成連結
+const REFS = [
+  { k: 'DATA', t: '醫院資料', items: [
+    { c: '新北市政府：115 年度第四季新北市各急救責任醫院急重症病人 24 小時專科處置能力一覽表', use: '新北市 19 間醫院的處置能力、服務時段與原文說明（後台可改）' },
+    { c: '臺北市政府衛生局：115 年度臺北市急救責任醫院「急重症病人專科醫療處置能力」總表（115 年 7 月 10 日更新）', use: '臺北市 19 間醫院的處置能力' },
+    { c: '衛生福利部 醫事機構查詢（醫院名稱、地址、電話、評定等級）', url: 'https://ma.mohw.gov.tw/', use: '醫院地址與電話；座標為概略位置' },
+    { c: '林口長庚紀念醫院：不在上述兩份表內，處置能力依管理者設定', use: '林口長庚' }] },
+  { k: 'STROKE', t: '急性腦中風', items: [
+    { c: 'Prabhakaran S, et al. 2026 Guideline for the Early Management of Patients With Acute Ischemic Stroke: A Guideline From the American Heart Association/American Stroke Association. Stroke. 2026.', doi: '10.1161/STR.0000000000000513',
+      use: 'alteplase 或 tenecteplase 4.5 小時內；影像篩選可延至 9 小時；取栓 6／24 小時；沒有快速轉院機制時直送可取栓醫院' },
+    { c: 'Nogueira RG, et al. Thrombectomy 6 to 24 Hours after Stroke with a Mismatch between Deficit and Infarct (DAWN). N Engl J Med. 2018;378:11–21.', doi: '10.1056/NEJMoa1706442', use: '6–24 小時影像篩選後取栓' },
+    { c: 'Albers GW, et al. Thrombectomy for Stroke at 6 to 16 Hours with Selection by Perfusion Imaging (DEFUSE 3). N Engl J Med. 2018;378:708–718.', doi: '10.1056/NEJMoa1713973', use: '6–16 小時影像篩選後取栓' }] },
+  { k: 'STEMI', t: '急性心肌梗塞', items: [
+    { c: 'Byrne RA, et al. 2023 ESC Guidelines for the management of acute coronary syndromes. Eur Heart J. 2023;44(38):3720–3826.', doi: '10.1093/eurheartj/ehad191', use: '首次接觸病人到打通血管 ≤90 分；需轉院 ≤120 分；12 小時內再灌流' },
+    { c: 'Rao SV, O’Donoghue ML, Ruel M, et al. 2025 ACC/AHA/ACEP/NAEMSP/SCAI Guideline for the Management of Patients With Acute Coronary Syndromes. Circulation. 2025.', doi: '10.1161/CIR.0000000000001309', use: '美國急性冠心症指引（含到院前與轉院時間目標）' }] },
+  { k: 'TRAUMA', t: '重大創傷（TXA）', items: [
+    { c: 'CRASH-2 collaborators. Effects of tranexamic acid on death, vascular occlusive events, and blood transfusion in trauma patients with significant haemorrhage (CRASH-2). Lancet. 2010;376:23–32.', doi: '10.1016/S0140-6736(10)60835-5', use: '受傷 3 小時內給 TXA' },
+    { c: 'CRASH-2 collaborators. The importance of early treatment with tranexamic acid in bleeding trauma patients: an exploratory analysis of the CRASH-2 randomised controlled trial. Lancet. 2011;377:1096–1101.', doi: '10.1016/S0140-6736(11)60278-X', use: '1 小時內效果最好、超過 3 小時可能有害' }] },
+  { k: 'TCA', t: '外傷性心跳停止（復甦性開胸）', items: [
+    { c: 'Seamon MJ, et al. An evidence-based approach to patient selection for emergency department thoracotomy: A practice management guideline from the Eastern Association for the Surgery of Trauma. J Trauma Acute Care Surg. 2015;79(1):159–173.', doi: '10.1097/TA.0000000000000648', use: '依受傷機轉與生命跡象決定是否開胸' },
+    { c: 'Burlew CC, et al. Western Trauma Association critical decisions in trauma: resuscitative thoracotomy. J Trauma Acute Care Surg. 2012;73(6):1359–1363.', doi: '10.1097/TA.0b013e318270d2df', use: '穿刺傷 CPR ≤15 分、鈍傷 ≤10 分' }] },
+  { k: 'OHCA', t: '到院前心跳停止（ECPR）', items: [
+    { c: 'Richardson ASC, et al. Extracorporeal Cardiopulmonary Resuscitation in Adults. Interim Guideline Consensus Statement From the Extracorporeal Life Support Organization. ASAIO J. 2021.', doi: '10.1097/MAT.0000000000001344', use: 'ECPR 收案條件參考（倒下到上機 60 分內；各院標準不同）' }] },
+  { k: 'SE', t: '癲癇重積', items: [
+    { c: 'Glauser T, et al. Evidence-Based Guideline: Treatment of Convulsive Status Epilepticus in Children and Adults: Report of the Guideline Committee of the American Epilepsy Society. Epilepsy Curr. 2016;16(1):48–61.', doi: '10.5698/1535-7597-16.1.48', use: '0–5、5–20、20–40、40 分以上的分期處置' }] },
+  { k: 'CO', t: '一氧化碳中毒', items: [
+    { c: 'Weaver LK, et al. Hyperbaric oxygen for acute carbon monoxide poisoning. N Engl J Med. 2002;347:1057–1067.', doi: '10.1056/NEJMoa013121', use: '24 小時內高壓氧可降低認知後遺症' },
+    { c: 'Rose JJ, et al. Carbon Monoxide Poisoning: Pathogenesis, Management, and Future Directions of Therapy. Am J Respir Crit Care Med. 2017;195(5):596–606.', doi: '10.1164/rccm.201606-1275CI', use: '高壓氧適應症與時機（回顧文章）' },
+    { c: 'Goulon M, et al. 一氧化碳中毒與高壓氧（1969，英譯本刊於 J Hyperbaric Med. 1986;1:23–41）', use: '「6 小時內效果較好」來自早期回溯性觀察，證據等級較低' }] },
+  { k: 'REPLANT', t: '斷肢再接', items: [
+    { c: 'Maricevich M, Carlsen B, Mardini S, Moran S. Upper extremity and digital replantation. Hand (N Y). 2011;6(4):356–363.', doi: '10.1007/s11552-011-9353-5', use: '熱缺血：大肢體 6 小時、手指 12 小時（冷藏可延長）' }] },
+  { k: 'SEPSIS', t: '敗血症', items: [
+    { c: 'Evans L, et al. Surviving Sepsis Campaign: International Guidelines for Management of Sepsis and Septic Shock 2021. Crit Care Med. 2021;49(11):e1063–e1143.', doi: '10.1097/CCM.0000000000005337', use: '敗血症處置指引' },
+    { c: 'Levy MM, Evans LE, Rhodes A. The Surviving Sepsis Campaign Bundle: 2018 update. Crit Care Med. 2018;46(6):997–1000.', doi: '10.1097/CCM.0000000000003119', use: 'Hour-1 Bundle：1 小時內抗生素與輸液' }] },
+  { k: 'MAP', t: '車程與地圖', items: [
+    { c: 'OSRM（Open Source Routing Machine）公開路線服務', url: 'https://project-osrm.org/', use: '道路通暢時的車程與距離' },
+    { c: '地圖資料 © OpenStreetMap 貢獻者；底圖 © CARTO', url: 'https://www.openstreetmap.org/copyright', use: '地圖與圖磚' },
+    { c: '車流係數：本 App 依時段估算（非即時路況），管理者可在後台調整', use: '尖峰、深夜等時段的車程換算' }] }
+];
+function renderRefs() {
+  const box = $('#refsBox'); if (!box) return;
+  const link = it => it.doi ? `<a href="https://doi.org/${esc(it.doi)}" target="_blank" rel="noopener">doi:${esc(it.doi)}</a>` : it.url ? `<a href="${esc(it.url)}" target="_blank" rel="noopener">${esc(it.url.replace(/^https?:\/\//, '').replace(/\/$/, ''))}</a>` : '';
+  box.innerHTML = `<section class="card refs-intro"><b>參考文獻</b><p>App 裡的醫院資料、時間窗與提醒，都列在下面並附上出處。指引會更新，正式使用前請由醫療指導醫師確認；實際送醫以現場評估、勤務中心指示與醫院回覆為準。</p>
+      <div class="refs-nav">${REFS.map(g => `<button class="chip" data-act="refsJump" data-k="${g.k}">${esc(g.t)}</button>`).join('')}</div></section>` +
+    REFS.map(g => `<section class="card refs-g" id="ref-${g.k}"><h3>${esc(g.t)}</h3><ol>${g.items.map(it => `<li><div class="rc">${esc(it.c)}</div>${link(it) ? `<div class="rl">${link(it)}</div>` : ''}<div class="ru">用在：${esc(it.use)}</div></li>`).join('')}</ol></section>`).join('');
+  if (state.refFocus) { const k = state.refFocus; state.refFocus = ''; setTimeout(() => { const el = $('#ref-' + k); if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 76 }); }, 0); }
 }
 
 /* ========== 定位與查詢 ========== */
@@ -4212,7 +4272,7 @@ function footHtml() {
     ${creditHtml('credit')}`;
 }
 function renderFoots() {
-  $$('.app-foot').forEach(el => { el.innerHTML = footHtml() + `<div class="ver">${APP_VERSION}　<button class="linkish" data-act="showNotice">使用須知</button>　<button class="linkish" data-act="feedback">意見回饋</button></div>`; });
+  $$('.app-foot').forEach(el => { el.innerHTML = footHtml() + `<div class="ver">${APP_VERSION}　<button class="linkish" data-act="showNotice">使用須知</button>　<button class="linkish" data-act="go" data-to="#refs">參考文獻</button>　<button class="linkish" data-act="feedback">意見回饋</button></div>`; });
 }
 
 /* ========== 開場介紹（可略過）→ 使用須知與創作者 → 開始使用 ========== */
@@ -4235,7 +4295,7 @@ const recentErrors = [];
 window.addEventListener('error', e => { recentErrors.push(`${String(e.message || '').slice(0, 160)}${e.lineno ? ' @' + e.lineno : ''}`); if (recentErrors.length > 3) recentErrors.shift(); });
 window.addEventListener('unhandledrejection', e => { recentErrors.push('Promise：' + String((e.reason && e.reason.message) || e.reason || '').slice(0, 160)); if (recentErrors.length > 3) recentErrors.shift(); });
 const FB_TYPES = [['bug', '問題回報'], ['data', '資料有誤'], ['idea', '功能建議'], ['other', '其他']];
-const ROUTE_NAME = { '': '後送建議', '#lookup': '醫院查詢', '#table': '醫院能力總表', '#hospital': '醫院端', '#mci': '大量傷病患分流', '#admin': '管理後台' };
+const ROUTE_NAME = { '': '後送建議', '#lookup': '醫院查詢', '#refs': '參考文獻', '#table': '醫院能力總表', '#hospital': '醫院端', '#mci': '大量傷病患分流', '#admin': '管理後台' };
 function deviceInfo() {
   const ua = navigator.userAgent, ios = ua.match(/OS (\d+)_(\d+)/), and = ua.match(/Android ([\d.]+)/);
   const sys = ios ? `iOS ${ios[1]}.${ios[2]}` : and ? `Android ${and[1]}` : (navigator.platform || '');
@@ -4309,7 +4369,8 @@ function route() {
   // 舊網址：開場介紹已移除，直接回到後送建議
   if (['#launch', '#intro'].includes(location.hash)) history.replaceState(null, '', location.pathname + location.search);
   const r = location.hash;
-  $('#viewEms').hidden = !(r === '' || r === '#' || !['#hospital', '#admin', '#mci', '#table', '#lookup'].includes(r));
+  $('#viewEms').hidden = !(r === '' || r === '#' || !['#hospital', '#admin', '#mci', '#table', '#lookup', '#refs'].includes(r));
+  $('#viewRefs').hidden = r !== '#refs';
   $('#viewLookup').hidden = r !== '#lookup';
   const ems = !$('#viewEms').hidden;
   $('#mtabs').hidden = !(ems || r === '#lookup');
@@ -4318,7 +4379,7 @@ function route() {
   $('#viewHospital').hidden = r !== '#hospital';
   $('#viewAdmin').hidden = r !== '#admin';
   $('#viewMci').hidden = r !== '#mci';
-  const T = { '#hospital': ['醫院端', '設備／處置能力狀態回報'], '#admin': ['管理後台', '醫院、主訴與能力設定'], '#mci': ['大量傷病患分流', '依醫院等級與能力分配傷患'], '#table': ['醫院能力總表', '24 小時專科處置能力'] }[r] || ['救途 RescueRoute', '救護送醫導航'];
+  const T = { '#hospital': ['醫院端', '設備／處置能力狀態回報'], '#admin': ['管理後台', '醫院、主訴與能力設定'], '#mci': ['大量傷病患分流', '依醫院等級與能力分配傷患'], '#table': ['醫院能力總表', '24 小時專科處置能力'], '#refs': ['參考文獻', '時間窗與資料的出處'] }[r] || ['救途 RescueRoute', '救護送醫導航'];
   $('#appTitle').textContent = T[0]; $('#appSub').textContent = T[1];
   $$('#menu button[data-act="go"]').forEach(b => b.classList.toggle('cur', (b.dataset.to || '') === (ems ? '' : r)));
   renderSide();
@@ -4330,6 +4391,7 @@ function route() {
   else if (r === '#mci') renderMci();
   else if (r === '#table') renderMatrix();
   else if (r === '#lookup') renderLookup();
+  else if (r === '#refs') renderRefs();
   else renderMain();
   renderFoots();
   renderRunFab();
@@ -5289,6 +5351,8 @@ const ACTIONS = {
   },
   notify: el => { state.run.dest = el.dataset.id; saveRun(); openNoticeModal(el.dataset.id); },
   runOpen: () => openRunModal(),
+  refsGo: el => { $('#menu').hidden = true; state.refFocus = REFS.some(g => g.k === el.dataset.k) ? el.dataset.k : ''; if (location.hash === '#refs') renderRefs(); else location.hash = '#refs'; },
+  refsJump: el => { state.refFocus = el.dataset.k; renderRefs(); },
   runPick: el => { state.runPick = state.runPick === el.dataset.k ? '' : el.dataset.k; renderRunModal(); },
   runEv: el => {
     const t = el.dataset.t, e = runAdd(t, el.dataset.x || '');
