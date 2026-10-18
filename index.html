@@ -105,6 +105,8 @@ body{min-height:100vh;padding-bottom:calc(36px + env(safe-area-inset-bottom))}
 .qf-in{width:min(92vw,82vh,560px);text-align:center;color:#111}
 .qf-t{font-size:22px;font-weight:800;margin-top:6px}.qf-u{font-size:15px;margin-top:4px;color:#333;overflow-wrap:anywhere}.qf-x{font-size:13px;color:#777;margin-top:14px}
 #viewRefs{max-width:860px;margin:0 auto;padding:16px}
+.refs-data{margin-bottom:12px}.refs-data dl{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;margin:10px 0 0;font-size:14px;line-height:1.6}
+.refs-data dt{color:var(--muted);font-weight:700;white-space:nowrap}.refs-data dd{margin:0;color:var(--ink2);overflow-wrap:anywhere}
 .refs-intro p{margin:6px 0 10px;font-size:14px;line-height:1.7;color:var(--ink2)}
 .refs-nav{display:flex;flex-wrap:wrap;gap:6px}
 .refs-g{margin-top:12px}.refs-g h3{margin:0 0 6px;font-size:16px}
@@ -1045,7 +1047,7 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "653252329719",
   appId: "1:653252329719:web:c3c9ca0891de64c69b13f2"
 };
-const APP_VERSION = 'v3.19.1';
+const APP_VERSION = 'v3.19.2';
 // 醫院即時量能（急救室、候床、ICU、滿載）：目前沒有醫院即時回報的資料來源，先關閉；之後有資料來源再改成 true
 const SHOW_CAPACITY = false;
 const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
@@ -2168,7 +2170,7 @@ function getHighlight() {
       test: h => { const av = availCaps(h); return sel.every(c => av.has(c)) ? [sel.map(capName).join('＋')] : null; } };
   }
   const rule = state.rules.find(r => r.id === state.patient.ruleId);
-  if (!rule) return { active: false, hint: '選擇主訴，或貼上派遣內容自動帶入' };
+  if (!rule) return { active: false, hint: '選擇求救原因，或貼上派遣內容自動帶入' };
   const { groups, skipped } = applicableGroups(rule, state.patient.sex, ageVal());
   if (!groups.length) {
     return { active: false, warn: true, hint: skipped ? '此主訴的條件需要性別／年齡，請先填寫' : '此主訴對目前性別／年齡沒有設定條件，僅依距離排序' };
@@ -3045,14 +3047,13 @@ function renderResults() {
   $('#mapWrap').hidden = !localCfg.showMap;
   if (localCfg.showMap) renderMap(shown, hl);
 }
+// 查詢結果下方只留需要注意的警告；資料版本、車程算法移到「參考文獻」頁
+function dataSourceText() {
+  return { demo: '本機資料（存在這支手機）', firebase: '雲端資料庫', cache: `離線資料（${fmtTime(state.cachedAt)} 同步）`, none: '未連線，使用內建能力表', seed: '內建能力表（雲端尚未寫入資料）' }[state.dataSource] || '';
+}
 function renderDataInfo() {
   const unv = state.hospitals.filter(h => !h.verified).length;
-  const src = { demo: '示範模式（資料存在此裝置）', firebase: '雲端資料庫', cache: `離線快取（${fmtTime(state.cachedAt)} 同步）`, none: '未連線，使用內建能力表', seed: '內建能力表（雲端尚未寫入資料）' }[state.dataSource] || '';
-  $('#dataInfo').innerHTML = [
-    unv ? `⚠ ${unv} 間醫院的能力資料尚未驗證，請以實際聯繫醫院為準` : '',
-    `醫院能力：${esc(state.settings.tableSrc)}`,
-    `車程＝道路通暢時間（OSRM）× 時段車流係數，未含即時路況與救護車優先通行，僅供參考・資料來源：${esc(src)}`
-  ].filter(Boolean).join('<br>');
+  $('#dataInfo').innerHTML = unv ? `⚠ ${unv} 間醫院的能力資料尚未驗證，請以實際聯繫醫院為準` : '';
 }
 function renderNoticeBar() {
   const box = $('#noticeBar');
@@ -3370,7 +3371,14 @@ const REFS = [
 function renderRefs() {
   const box = $('#refsBox'); if (!box) return;
   const link = it => it.doi ? `<a href="https://doi.org/${esc(it.doi)}" target="_blank" rel="noopener">doi:${esc(it.doi)}</a>` : it.url ? `<a href="${esc(it.url)}" target="_blank" rel="noopener">${esc(it.url.replace(/^https?:\/\//, '').replace(/\/$/, ''))}</a>` : '';
-  box.innerHTML = `<section class="card refs-intro"><b>參考文獻</b><p>App 裡的醫院資料、時間窗與提醒，都列在下面並附上出處。指引會更新，正式使用前請由醫療指導醫師確認；實際送醫以現場評估、勤務中心指示與醫院回覆為準。</p>
+  const ti = trafficInfo();
+  const dataCard = `<section class="card refs-data"><b>目前使用的資料</b><dl>
+      <dt>新北市</dt><dd>${esc(state.settings.tableSrc)}</dd>
+      <dt>臺北市</dt><dd>${esc(state.settings.tableSrcTpe)}</dd>
+      <dt>林口長庚</dt><dd>不在上述兩份表內，處置能力依管理者設定</dd>
+      <dt>車程</dt><dd>道路通暢時間（OSRM）× 時段車流係數，未含即時路況與救護車優先通行，僅供參考；現在是「${esc(ti.name)}」×${ti.f}</dd>
+      <dt>資料來源</dt><dd>${esc(dataSourceText())}・${state.hospitals.length} 間醫院・${esc(APP_VERSION)}</dd></dl></section>`;
+  box.innerHTML = dataCard + `<section class="card refs-intro"><b>參考文獻</b><p>App 裡的醫院資料、時間窗與提醒，都列在下面並附上出處。指引會更新，正式使用前請由醫療指導醫師確認；實際送醫以現場評估、勤務中心指示與醫院回覆為準。</p>
       <div class="refs-nav">${REFS.map(g => `<button class="chip" data-act="refsJump" data-k="${g.k}">${esc(g.t)}</button>`).join('')}</div></section>` +
     REFS.map(g => `<section class="card refs-g" id="ref-${g.k}"><h3>${esc(g.t)}</h3><ol>${g.items.map(it => `<li><div class="rc">${esc(it.c)}</div>${link(it) ? `<div class="rl">${link(it)}</div>` : ''}<div class="ru">用在：${esc(it.use)}</div></li>`).join('')}</ol></section>`).join('');
   if (state.refFocus) { const k = state.refFocus; state.refFocus = ''; setTimeout(() => { const el = $('#ref-' + k); if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 76 }); }, 0); }
@@ -4318,7 +4326,7 @@ function showNotice() {
 // 頁尾：免責提醒＋署名（每個頁面都有）
 function footHtml() {
   return `<div class="disc">${ic('shield', 'sm')}<span>${esc(state.settings.disclaimer)}</span></div>
-    ${creditHtml('credit')}`;
+    ${state.settings.credit ? `<div class="credit">${esc(state.settings.credit)}</div>` : ''}`;
 }
 function renderFoots() {
   $$('.app-foot').forEach(el => { el.innerHTML = footHtml() + `<div class="ver">${APP_VERSION}　<button class="linkish" data-act="showNotice">使用須知</button>　<button class="linkish" data-act="go" data-to="#refs">參考文獻</button>　<button class="linkish" data-act="feedback">意見回饋</button></div>
@@ -4559,16 +4567,16 @@ function renderAdminPanel() {
       <textarea id="s_disc" rows="3">${esc(state.settings.disclaimer)}</textarea>
       <label for="s_notice">使用前須知（每支手機只在第一次開啟時顯示，之後可從選單「使用須知」查看；一行一點）</label>
       <textarea id="s_notice" rows="5">${esc(state.settings.notice)}</textarea>
-      <label for="s_credit">製作者署名（以小字顯示在頁尾與「使用須知」頁最下方，可以留白；下一行會自動加上「更新資料：醫院能力資料來源」）</label>
+      <label for="s_credit">製作者署名（以小字顯示在頁尾與「使用須知」最下方，可以留白）</label>
       <input id="s_credit" value="${esc(state.settings.credit)}">
-      <label for="s_tsrc">醫院能力資料來源（顯示在能力表，以及頁尾「更新資料：」後面）</label>
+      <label for="s_tsrc">醫院能力資料來源（顯示在能力表、使用須知與「參考文獻」頁）</label>
       <input id="s_tsrc" value="${esc(state.settings.tableSrc)}">
       <div class="sec-title" style="margin-top:22px">意見回饋</div>
       <label for="s_fbmail">收件 Email（可以填多個，用逗號分開，最多 5 個；使用者按「意見回饋」會用手機的 Mail 同時寄給這些人）</label>
       <input id="s_fbmail" type="text" inputmode="email" autocapitalize="off" value="${esc(state.settings.feedbackEmail)}" placeholder="例：a@example.com, b@example.com">
       <label for="s_fburl">意見表單連結（選填，例如 Google 表單；要 https 開頭）</label>
       <input id="s_fburl" type="url" inputmode="url" value="${esc(state.settings.feedbackUrl)}" placeholder="https://forms.gle/…">
-      <label for="s_tsrc2">臺北市醫院能力資料來源（頁尾第三行「臺北市：」後面）</label>
+      <label for="s_tsrc2">臺北市醫院能力資料來源（顯示在使用須知與「參考文獻」頁）</label>
       <input id="s_tsrc2" value="${esc(state.settings.tableSrcTpe)}">
       <div class="sec-title" style="margin-top:22px">車程估算（車流係數）</div>
       <div class="hint" style="margin:0 0 6px">車程＝道路通暢時間 × 下面的係數 ＋ 1 分鐘。1.0 代表完全不塞；1.8 代表要多花八成時間。可以拿 Google 地圖同一段路、同一時段的時間比對後調整。現在是「${esc(trafficInfo().name)}」，係數 ${trafficInfo().f}。</div>
