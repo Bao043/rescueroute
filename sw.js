@@ -1,13 +1,13 @@
 /* 救途 RescueRoute：離線快取
  * - 網頁本身：先用網路（拿到最新版），沒網路時用快取
  * - 地圖程式庫、字型、Firebase SDK：快取優先
- * - 地圖圖磚：看過的區域會留著，沒網路時還看得到
+ * - 地圖圖磚（OpenStreetMap）：看過的區域會留著，沒網路時還看得到
  * - Gemini、車程、Firebase 資料：一律走網路（資料另存在瀏覽器裡）
  */
-const VERSION = 'v3.19.2';
+const VERSION = 'v3.20.0';
 const SHELL = 'shell-' + VERSION;
 const LIBS = 'libs-v1';
-const TILES = 'tiles-v1';
+const TILES = 'tiles-v2';   // v2：改用 OpenStreetMap，舊的 CARTO 圖磚（含 API KEY 字樣）一併清掉
 const TILE_MAX = 400;
 
 self.addEventListener('install', e => {
@@ -17,7 +17,7 @@ self.addEventListener('install', e => {
 
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(keys => Promise.all(
-    keys.filter(k => k.startsWith('shell-') && k !== SHELL).map(k => caches.delete(k))
+    keys.filter(k => (k.startsWith('shell-') && k !== SHELL) || (k.startsWith('tiles-') && k !== TILES)).map(k => caches.delete(k))
   )).then(() => self.clients.claim()));
 });
 
@@ -54,7 +54,7 @@ self.addEventListener('fetch', e => {
     return;
   }
   // 地圖圖磚
-  if (/basemaps\.cartocdn\.com/.test(url.host)) {
+  if (/(^|\.)tile\.openstreetmap\.org$/.test(url.host)) {
     e.respondWith(caches.open(TILES).then(c => c.match(req).then(hit => {
       const net = fetch(req).then(res => {
         if (res.ok || res.type === 'opaque') { c.put(req, res.clone()); trimCache(TILES, TILE_MAX); }
