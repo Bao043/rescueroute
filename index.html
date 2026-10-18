@@ -386,6 +386,10 @@ input:disabled{opacity:.6}
 /* ---------- 地圖 ---------- */
 #mapWrap{border-radius:var(--r-sheet);overflow:hidden;border:1px solid var(--line);margin-bottom:14px;background:var(--sunken);box-shadow:var(--shadow)}
 #mapBox{height:52vh;min-height:300px}
+.osm-tiles{filter:saturate(.85)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .osm-tiles{filter:invert(1) hue-rotate(180deg) brightness(.82) contrast(.9) saturate(.6)}}
+:root[data-theme="dark"] .osm-tiles{filter:invert(1) hue-rotate(180deg) brightness(.82) contrast(.9) saturate(.6)}
+.h-pin .pin-lab{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:2px;white-space:nowrap;font-family:var(--sans);font-style:normal;font-size:11px;font-weight:700;line-height:1;padding:3px 5px;border-radius:6px;background:rgba(15,27,40,.85);color:#fff;pointer-events:none}
 .h-pin{display:grid!important;place-items:center;border-radius:50%;font-family:var(--num);font-weight:700;font-size:15px;color:#fff;
   background:#55657a;border:2px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,.35)}
 .h-pin.match{background:var(--green)}.h-pin.full{background:var(--yellow);color:#2a1b00}.h-pin.dim{opacity:.55}
@@ -605,6 +609,36 @@ body.jump-on .run-fab{bottom:calc(74px + env(safe-area-inset-bottom))}
 .tw-list li.cur b{color:var(--red2)}
 .tw-fmc{font-size:13px;color:var(--ink2);margin-top:8px;padding-top:8px;border-top:1px dashed var(--line2)}
 .tw-ref{font-size:11px;color:var(--dim);margin-top:8px}
+/* 創傷現場檢傷 */
+.trg{margin-top:12px;border:1px solid var(--line2);border-radius:16px;padding:14px;background:var(--field)}
+.trg-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.trg-h b{display:flex;align-items:center;gap:6px;font-size:15px}
+.trg-lv{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:12px;border-left:5px solid var(--line2);background:var(--surface);font-size:13px;line-height:1.5}
+.trg-lv b{font-size:15px}.trg-lv em{font-style:normal;color:var(--muted);font-size:12px}
+.trg-lv.red{border-left-color:var(--red);background:var(--red-soft)}.trg-lv.red b{color:var(--red)}
+.trg-lv.yellow{border-left-color:var(--yellow);background:var(--amber-soft)}.trg-lv.yellow b{color:var(--amber)}
+.trg-vs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-top:10px}
+.trg-vs .vs{display:flex;flex-direction:column;gap:3px;min-width:0}
+.trg-vs .vs span{font-size:11px;color:var(--muted);white-space:nowrap}
+.trg-vs input{width:100%;min-width:0;height:40px;padding:0 6px;font-size:16px;text-align:center;border-radius:10px}
+.trg-vs input.auto{color:var(--blue);border-color:var(--blue)}
+.trg-si{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:6px;font-size:12px;color:var(--ink2)}
+.trg-si .bad{color:var(--red);font-weight:700}.trg-si .warn{color:var(--amber);font-weight:700}.trg-si .mute{color:var(--dim)}
+.trg-g{margin-top:10px}.trg-gh{font-size:12px;font-weight:750;margin-bottom:5px}
+.trg-g.red .trg-gh{color:var(--red)}.trg-g.yellow .trg-gh{color:var(--amber)}
+.chip.trg-c{font-size:13px;padding:6px 10px;text-align:left;white-space:normal;line-height:1.35}
+.chip.trg-c.on.red{background:var(--red);border-color:var(--red);color:#fff}
+.chip.trg-c.on.yellow{background:var(--yellow);border-color:var(--yellow);color:#2a1b00}
+.chip.trg-c i{font-style:normal;font-size:10px;margin-left:5px;padding:0 4px;border-radius:4px;background:rgba(255,255,255,.3)}
+.trg-more{margin-top:10px}
+.trg-more>summary{cursor:pointer;font-size:12px;font-weight:750;color:var(--amber);display:flex;flex-wrap:wrap;align-items:center;gap:6px;list-style:revert}
+.trg-more>summary b{font-size:11px;background:var(--yellow);color:#2a1b00;border-radius:6px;padding:1px 6px}
+.trg-more>summary span{font-weight:500;color:var(--dim)}
+.trg-more.tips>summary{color:var(--ink2)}
+.trg-more .trg-g:first-child{margin-top:6px}
+.trg-add{margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--blue-soft);font-size:13px;line-height:1.55;display:flex;flex-direction:column;gap:6px}
+.trg-tq{display:flex;gap:6px;align-items:flex-start}.trg-tq.warn{color:var(--amber)}.trg-tq.bad{color:var(--red);font-weight:700}
+@media (max-width:380px){.trg-vs{grid-template-columns:repeat(3,minmax(0,1fr))}}
 b.ok,span.ok{color:var(--green)}b.warn,span.warn{color:var(--amber)}b.bad,span.bad{color:var(--red2)}b.mute,span.mute{color:var(--dim)}
 .h-win{display:flex;flex-direction:column;gap:2px;margin-top:6px;font-size:13px;font-weight:700}
 .h-win span{display:inline-flex;align-items:center;gap:5px}
@@ -937,6 +971,7 @@ td.mx.off .dt{opacity:.35}
         <input id="ageInput" class="num" type="number" inputmode="decimal" min="0" max="130" placeholder="年齡（歲）" aria-label="年齡（歲）">
       </div>
       <div id="clockBox"></div>
+      <div id="traumaBox"></div>
     </div>
     <div id="panelQuick" hidden>
       <div class="sel-line" id="quickSel"></div>
@@ -1047,7 +1082,7 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "653252329719",
   appId: "1:653252329719:web:c3c9ca0891de64c69b13f2"
 };
-const APP_VERSION = 'v3.19.2';
+const APP_VERSION = 'v3.20.0';
 // 醫院即時量能（急救室、候床、ICU、滿載）：目前沒有醫院即時回報的資料來源，先關閉；之後有資料來源再改成 true
 const SHOW_CAPACITY = false;
 const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
@@ -1074,7 +1109,7 @@ const DEMO_CASES = [
   { t: '內科 OHCA', text: '急病 一名男性年約35歲 主訴內科OHCA 民眾CPR中' },
   { t: '一氧化碳', text: '火災 一名女性約60多歲 浴室燒炭 意識不清 疑似一氧化碳中毒' },
   { t: '疑似中風', text: '急病 一名男性 68歲 主訴右側無力 口齒不清 發作約40分鐘' },
-  { t: '重大創傷', text: '創傷 一名男性 25歲 機車車禍 骨盆疼痛 血壓偏低 意識混亂' },
+  { t: '重大創傷', text: '創傷 一名男性 25歲 機車車禍 騎士摔飛 骨盆疼痛 血壓偏低 82/50 心跳 128 意識混亂 GCS 13' },
   { t: '孕婦出血', text: '急病 一名女性 32歲 懷孕34週 腹痛 陰道出血' },
   { t: '兒童誤食', text: '急病 男童 4歲 誤食不明藥物 嗜睡' },
   { t: '吐血', text: '急病 一名男性 約70歲 主訴吐血 解黑便 頭暈' },
@@ -1239,6 +1274,113 @@ const RED_FLAGS = [
   { kw: ['懷孕', '孕婦'], text: '孕婦：同時考慮產科與新生兒處置能力' },
   { kw: ['插管', '呼吸器', '氣切'], text: '已插管／使用呼吸器：部分高壓氧艙不收，系統已自動排除' }
 ];
+/* ========== 重大創傷：現場檢傷（ACS-COT 2021 National Guideline for the Field Triage of Injured Patients） ==========
+ * 紅色（高風險）→ 最高等級創傷醫院（本 App：重度級＋外傷處置小組，即「重大創傷」的設定）
+ * 黃色（中風險）→ 有外傷處置能力的醫院即可（中度級以上＋外傷處置小組）
+ * add：勾選後醫院還需要的能力（例如頭部外傷 → 神經外科）；prefer：優先考慮但不排除（骨盆骨折 → 血管攝影栓塞）
+ */
+const TRG_GROUPS = [['vs', 'red', '紅色・意識與呼吸'], ['inj', 'red', '紅色・傷勢'], ['mech', 'yellow', '黃色・受傷機轉'], ['judge', 'yellow', '黃色・特殊狀況']];
+const TRG_ITEMS = [
+  { id: 'm6', g: 'vs', t: '無法遵從指令（GCS 運動 <6）', kw: ['無法遵從指令', '無法聽從指令', '叫不醒', '昏迷', '無意識'], add: ['NS'] },
+  { id: 'resp', g: 'vs', t: '呼吸窘迫或需要輔助通氣', kw: ['呼吸窘迫', '呼吸困難', '輔助通氣', 'bvm', '已插管'] },
+  { id: 'pen', g: 'inj', t: '頭頸、軀幹或上臂／大腿穿刺傷', kw: ['穿刺傷', '刀傷', '槍傷', '刺傷', '刺入'] },
+  { id: 'skull', g: 'inj', t: '顱骨變形或疑似顱骨骨折', kw: ['顱骨骨折', '頭骨骨折', '頭骨凹陷', '顱骨凹陷', '頭部變形'], add: ['NS'] },
+  { id: 'spine', g: 'inj', t: '疑似脊髓損傷，新出現肢體無力或麻木', kw: ['脊髓損傷', '下肢癱瘓', '四肢癱瘓', '下半身無力', '下半身沒感覺', '四肢無力'], add: ['NS'] },
+  { id: 'chest', g: 'inj', t: '胸廓不穩定、變形或疑似連枷胸', kw: ['連枷胸', '胸廓變形', '反常呼吸'] },
+  { id: 'pelvis', g: 'inj', t: '疑似骨盆骨折', kw: ['骨盆'], prefer: 'TAE' },
+  { id: 'long', g: 'inj', t: '兩處以上近端長骨骨折（上臂、大腿）', kw: ['雙側股骨', '兩側股骨', '多處長骨', '雙側大腿骨折', '兩側大腿骨折'] },
+  { id: 'mangled', g: 'inj', t: '肢體壓碎、脫套、毀損或摸不到脈搏', kw: ['壓碎', '脫套', '肢體毀損', '毀損傷', '輾壓傷'] },
+  { id: 'amp', g: 'inj', t: '手腕或腳踝以上截肢', kw: ['截肢', '斷肢', '斷腿', '斷臂', '斷手臂'], add: ['REPLANT'] },
+  { id: 'bleed', g: 'inj', t: '需要止血帶或傷口填塞持續加壓的出血', kw: ['止血帶', '大量出血', '大出血', '噴血', '動脈出血'] },
+  { id: 'eject', g: 'mech', t: '乘客部分或完全被拋出車外', kw: ['拋出車外', '甩出車外', '彈出車外', '被拋出'] },
+  { id: 'intrude', g: 'mech', t: '車體嚴重凹陷，或受困需破壞救出', kw: ['受困', '破壞救出', '卡在車內', '車體嚴重凹陷', '車體嚴重變形'] },
+  { id: 'death', g: 'mech', t: '同車有人死亡', kw: ['同車死亡', '同車有人死亡', '同車乘客死亡'] },
+  { id: 'seat', g: 'mech', t: '0–9 歲兒童未繫安全帶或安全座椅未固定', kw: ['安全座椅未固定', '未使用安全座椅', '沒有安全座椅'] },
+  { id: 'rider', g: 'mech', t: '機車、自行車騎士摔離車輛且撞擊大', kw: ['摔飛', '彈飛', '噴飛', '人車分離', '騎士被拋'] },
+  { id: 'ped', g: 'mech', t: '行人或自行車被撞飛、輾過或撞擊大', kw: ['行人被撞', '被撞飛', '輾過', '被車輾', '遭輾', '被輾'] },
+  { id: 'fall', g: 'mech', t: '高處墜落 >3 公尺（約一層樓以上）', kw: ['高處墜落', '高處跌落', '墜樓'], fn: t => fallHeight(t) },
+  { id: 'lowfall', g: 'judge', t: '≤5 歲或 ≥65 歲平地跌倒且頭部撞擊', kw: [],
+    fn: t => { const a = ageVal(); return a != null && (a <= 5 || a >= 65) && /跌倒|摔倒|滑倒|跌坐/.test(t) && /撞(到|擊)?頭|頭部?(撞|外傷|受傷)|頭撞/.test(t); } },
+  { id: 'anticoag', g: 'judge', t: '使用抗凝血劑', kw: ['抗凝血', 'warfarin', '可化凝', 'xarelto', '拜瑞妥', 'eliquis', '艾必克凝', 'pradaxa', '普栓達', 'lixiana', '里先安'] },
+  { id: 'abuse', g: 'judge', t: '疑似兒虐', kw: ['兒虐', '疑似受虐'] },
+  { id: 'preg', g: 'judge', t: '懷孕超過 20 週', kw: ['懷孕', '孕婦'], add: ['OBS'] },
+  { id: 'burn', g: 'judge', t: '合併燒燙傷', kw: ['燒燙傷', '燒傷', '燙傷', '氣爆'], add: ['BURN'] }
+];
+const TRG_LV = id => (TRG_GROUPS.find(g => g[0] === (TRG_ITEMS.find(i => i.id === id) || {}).g) || [])[1] || 'red';
+// 「從二樓墜落」「約 4 公尺高處跌落」：一層樓以上（>3 公尺）
+function fallHeight(t) {
+  if (!/墜落|跌落|摔落|掉落|墜樓/.test(t)) return false;
+  let m = t.match(/(\d+(?:\.\d+)?|[一二兩三四五六七八九十]+)(?:層)?樓/);
+  if (m) { const n = /\d/.test(m[1]) ? Number(m[1]) : cnNum(m[1]); if (n >= 2) return true; }
+  m = t.match(/(\d+(?:\.\d+)?)(?:公尺|米|m(?![a-z]))/);
+  return !!(m && Number(m[1]) > 3);
+}
+const negated = (t, k) => new RegExp('(?:無|沒有|否認|未|不)' + k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).test(t);
+const hasKw = (t, k) => t.includes(k) && !negated(t, k);
+// 從派遣內容抓生命徵象：「血壓 82/50」「心跳128」「SpO2 88%」「GCS 13」「E2V2M4」
+function parseVitals(raw) {
+  const t = normText(raw), out = {};
+  let m;
+  if ((m = t.match(/(?:血壓|bp|sbp)(?:偏低|偏高|約)?[:：]?(\d{2,3})(?:[\/／](\d{2,3}))?/))) out.sbp = Number(m[1]);
+  if ((m = t.match(/(?:心跳|脈搏|心率|hr|pulse)(?:約|偏快|偏慢)?[:：]?(\d{2,3})/))) out.hr = Number(m[1]);
+  if ((m = t.match(/(?:呼吸(?:次數|速率)?|rr)(?:約)?[:：]?(\d{1,2})(?!\d)/))) out.rr = Number(m[1]);
+  if ((m = t.match(/(?:spo2|血氧(?:濃度)?|sat)(?:約)?[:：]?(\d{2,3})/))) out.spo2 = Number(m[1]);
+  if ((m = t.match(/e([1-4])v([1-5]|t|e)m([1-6])/))) { out.m = Number(m[3]); out.gcs = Number(m[1]) + (/\d/.test(m[2]) ? Number(m[2]) : 1) + out.m; }
+  else if ((m = t.match(/(?:gcs|昏迷指數)[:：]?(\d{1,2})(?!\d)/)) && Number(m[1]) >= 3 && Number(m[1]) <= 15) out.gcs = Number(m[1]);
+  return out;
+}
+const TRG_VS = [['sbp', '收縮壓', 'mmHg'], ['hr', '心跳', '次／分'], ['rr', '呼吸', '次／分'], ['spo2', 'SpO₂', '%'], ['gcs', 'GCS', '3–15']];
+function trgVitals() {
+  const p = parseVitals(state.caseText), out = { m: p.m != null ? p.m : null, src: {} };
+  TRG_VS.forEach(([k]) => {
+    const man = state.trg.vs[k];
+    const v = man != null ? (String(man).trim() === '' ? null : Number(man)) : (p[k] != null ? p[k] : null);
+    out[k] = v != null && isFinite(v) && v >= 0 ? v : null;
+    out.src[k] = man != null ? 'manual' : p[k] != null ? 'auto' : '';
+  });
+  if (state.trg.vs.gcs != null) out.m = null; // 手動改 GCS 總分後，摘要裡的 M 分數不再採用
+  return out;
+}
+const isTraumaRule = r => !!r && r.protocol === 'TRAUMA';
+function trgEval() {
+  const t = normText(state.caseText).replace(/昏迷指數/g, 'gcs'), age = ageVal(), v = trgVitals();
+  const auto = new Set(TRG_ITEMS.filter(i => i.kw.some(k => hasKw(t, normText(k))) || (i.fn && i.fn(t))).map(i => i.id));
+  if ((v.m != null && v.m < 6) || (v.gcs != null && v.gcs <= 8)) auto.add('m6');
+  if (age != null && age > 9) auto.delete('seat');
+  const on = new Set(TRG_ITEMS.map(i => i.id).filter(id => (auto.has(id) || state.trg.on.includes(id)) && !state.trg.off.includes(id)));
+  // 生命徵象（依年齡）：0–9 歲 收縮壓 <70＋2×年齡；10–64 歲 <90 或心跳 > 收縮壓；65 歲以上 <110 或心跳 > 收縮壓
+  const vsRed = [], child = age != null && age < 10, elder = age != null && age >= 65;
+  if (v.sbp != null) {
+    const lim = child ? 70 + 2 * Math.floor(age) : elder ? 110 : 90;
+    if (v.sbp < lim) vsRed.push(`收縮壓 ${v.sbp}（${child ? '兒童' : elder ? '65 歲以上' : '成人'} <${lim}）`);
+    else if (!child && v.hr != null && v.hr > v.sbp) vsRed.push(`心跳 ${v.hr} > 收縮壓 ${v.sbp}`);
+  }
+  if (v.rr != null && (v.rr < 10 || (v.rr > 29 && !child))) vsRed.push(`呼吸 ${v.rr} 次／分（<10 或 >29）`);
+  if (v.spo2 != null && v.spo2 < 90) vsRed.push(`SpO₂ ${v.spo2}%（<90%）`);
+  const items = TRG_ITEMS.filter(i => on.has(i.id));
+  const red = items.filter(i => TRG_LV(i.id) === 'red').map(i => i.t).concat(vsRed);
+  const yellow = items.filter(i => TRG_LV(i.id) === 'yellow').map(i => i.t);
+  const add = new Map();
+  items.forEach(i => (i.add || []).forEach(c => { if (!add.has(c)) add.set(c, i.t); }));
+  if (v.gcs != null && v.gcs <= 13 && !add.has('NS')) add.set('NS', `GCS ${v.gcs}`);
+  if (age != null && age < 18) add.set('PICU', `${fmtAge(age)}兒童`);
+  const si = v.sbp && v.hr ? Math.round(v.hr / v.sbp * 10) / 10 : null;
+  const shock = vsRed.some(x => /收縮壓|心跳/.test(x)) || (si != null && si >= 1) || /休克|血壓偏低|低血壓/.test(t);
+  const tbi = on.has('skull') || on.has('m6') || (v.gcs != null && v.gcs <= 13) || /頭部外傷|頭部撞擊|顱內出血/.test(t);
+  return { auto, on, red, yellow, level: red.length ? 'red' : yellow.length ? 'yellow' : '', add, v, si, shock, tbi, child, elder, age,
+    pelvis: on.has('pelvis'), bleed: on.has('bleed') || on.has('amp') || on.has('mangled'), pen: on.has('pen'), preg: on.has('preg'), anticoag: on.has('anticoag') };
+}
+// 依檢傷調整醫院條件：黃色改為中度級以上；需要的能力加進每一組條件
+function trgGroups(groups, ev) {
+  const base = ev.level === 'yellow' ? [normGroup({ label: '中度級以上＋外傷處置小組', caps: ['TRAUMA'], minLevel: '中度級' })] : groups;
+  if (!ev.add.size) return base;
+  const extra = [...ev.add.keys()];
+  return base.map(g => ({ ...g, caps: [...new Set(g.caps.concat(extra))], label: (g.label || groupLabel(g)) + '＋' + extra.map(capName).join('＋') }));
+}
+function effGroups(rule) {
+  const res = applicableGroups(rule, state.patient.sex, ageVal());
+  return isTraumaRule(rule) ? { ...res, groups: trgGroups(res.groups, trgEval()) } : res;
+}
 function redFlags(text) {
   const t = normText(text);
   if (!t) return [];
@@ -1272,9 +1414,9 @@ const PROTOCOLS = {
     { min: 60, label: '第三線：麻醉藥物、插管、加護病房（40 分以上）', short: '第三線' }],
     ref: 'American Epilepsy Society 2016 痙攣性重積處置流程' },
   TRAUMA: { name: '重大創傷', start: '受傷時間', arrest: true, marks: [
-    { min: 60, label: '黃金一小時', short: '黃金 1 小時' },
-    { min: 180, label: 'TXA 止血藥（3 小時內，愈早愈好）', short: 'TXA' }],
-    ref: 'CRASH-2：受傷 3 小時內給 TXA，1 小時內效果最好，超過 3 小時可能有害' },
+    { min: 60, label: '黃金一小時（儘快到可止血的醫院）', short: '黃金 1 小時' },
+    { min: 180, label: 'TXA 止血藥（3 小時內，1 小時內最好；依醫療指導流程）', short: 'TXA' }],
+    ref: 'CRASH-2：受傷 3 小時內給 TXA，1 小時內效果最好，超過 3 小時可能有害；PATCH-Trauma 2023：到院前 TXA 降低 24 小時與 28 天死亡率' },
   TCA: { name: '外傷性心跳停止（復甦性開胸）', start: '心跳停止時間', marks: [
     { min: 10, label: '鈍傷：CPR 10 分內到院才考慮復甦性開胸', short: '鈍傷 10', caps: ['TRAUMA'] },
     { min: 15, label: '穿刺傷：CPR 15 分內到院才考慮復甦性開胸', short: '穿刺 15', caps: ['TRAUMA'] }],
@@ -1618,7 +1760,7 @@ function isDark() {
 const EMPTY_P = { sex: '', age: null, ruleId: '', alts: [], onset: '' };
 const state = {
   caps: [], hospitals: [], rules: [], settings: normSettings(SEED_SETTINGS),
-  dataSource: '', cachedAt: null, syncing: false, caseOpen: false, run: { events: [], dest: '' }, reroute: null, runOpen: false, runPick: '',
+  dataSource: '', cachedAt: null, syncing: false, caseOpen: false, run: { events: [], dest: '' }, trg: { on: [], off: [], vs: {} }, reroute: null, runOpen: false, runPick: '',
   tab: 'patient', quickCaps: new Set(), patient: { sex: '', age: '', ruleId: '' }, onlyMatch: false,
   caseText: '', lastParsed: null, parsed: null, kwParsed: null,
   clock: { onsetAt: null, src: '', unknown: false, fmcAt: null }, // 時間窗：發作時間、首次接觸病人時間
@@ -2171,7 +2313,7 @@ function getHighlight() {
   }
   const rule = state.rules.find(r => r.id === state.patient.ruleId);
   if (!rule) return { active: false, hint: '選擇求救原因，或貼上派遣內容自動帶入' };
-  const { groups, skipped } = applicableGroups(rule, state.patient.sex, ageVal());
+  const { groups, skipped } = effGroups(rule);
   if (!groups.length) {
     return { active: false, warn: true, hint: skipped ? '此主訴的條件需要性別／年齡，請先填寫' : '此主訴對目前性別／年齡沒有設定條件，僅依距離排序' };
   }
@@ -2486,6 +2628,92 @@ function renderClockBox() {
     <div class="tw-ref">${esc(pr.ref)}・僅供決策輔助　<button class="linkish" data-act="refsGo" data-k="${esc(Object.keys(PROTOCOLS).find(k => PROTOCOLS[k] === pr))}">完整出處</button></div>
   </div>`;
 }
+/* ========== 重大創傷：現場檢傷面板（勾選與生命徵象會即時調整建議醫院） ========== */
+// 依勾選內容顯示的處置重點（ATLS 第 11 版、歐洲創傷出血指引 2023、BTF 到院前頭部外傷指引 2023、SMR 聯合聲明 2018）
+function trgTips(ev) {
+  const out = ['xABCDE：先控制致命性大出血（x），再處理呼吸道與頸椎（A）、呼吸（B）、循環（C）',
+    '縮短現場時間：止血、呼吸道、固定完成就上車，其他處置在途中做；提早通知醫院啟動外傷團隊'];
+  if (ev.bleed || ev.shock || ev.pelvis) {
+    if (ev.bleed) out.push('肢體大出血：直接加壓止不住就立即上止血帶，記下時間（途中紀錄 → 創傷處置 → 止血帶），交班時告知');
+    if (ev.pelvis) out.push('疑似骨盆骨折合併休克：骨盆固定帶綁在大轉子（股骨頭）高度，不要反覆擠壓骨盆檢查');
+    if (!ev.tbi) out.push('沒有頭部外傷的出血性休克：允許性低血壓，收縮壓維持 80–90 mmHg 即可，避免大量輸液');
+    out.push('TXA：受傷 3 小時內、愈早愈好（依各隊醫療指導流程）');
+  }
+  if (ev.tbi) {
+    out.push('頭部外傷：收縮壓維持 ≥110 mmHg、SpO₂ >90%；低血壓或缺氧即使只發生一次，預後也會變差');
+    out.push('通氣約每分鐘 10 次、EtCO₂ 35–45 mmHg，避免過度換氣；每 30 分鐘或意識改變時重評 GCS 與瞳孔');
+  }
+  if (ev.shock || ev.bleed || ev.level === 'red') out.push('保暖：移除濕衣物、覆蓋保溫毯，低體溫會讓凝血功能更差');
+  out.push(ev.pen && !ev.on.has('spine') ? '單純穿刺傷且沒有神經學症狀：不需要脊椎限制（SMR），不要因固定延誤送醫'
+    : '脊椎限制（SMR）：鈍傷合併意識改變或酒醉、頸背中線疼痛或壓痛、肢體無力麻木、脊椎變形、或有其他劇痛傷害干擾評估時才需要；可用鏟式擔架或真空墊，不一定要長背板');
+  if (ev.elder || ev.anticoag) out.push('長者或使用抗凝血劑：生命徵象可能「看起來正常」，頭部撞擊即使輕微也可能顱內出血，送有神經外科的醫院');
+  if (ev.preg) out.push('懷孕超過 20 週：病人向左傾斜 15–30 度（或徒手把子宮推向左側），避免仰臥低血壓');
+  if (ev.child) out.push('兒童：優先送有兒科加護的醫院；收縮壓 <70＋2×年齡即視為休克，呼吸次數依年齡判斷');
+  return out;
+}
+const TRG_LV_TXT = {
+  red: ['紅色・高風險', '送最高等級創傷醫院（重度級＋外傷處置小組）'],
+  yellow: ['黃色・中風險', '送有外傷處置能力的醫院即可（中度級以上＋外傷處置小組）；有疑慮就送重度級'],
+  '': ['尚未檢傷', '先以重度級＋外傷處置小組建議；勾選下面項目或輸入生命徵象後會自動調整']
+};
+function trgTqText() {
+  const tq = state.run.events.filter(e => e.type === 'trauma' && /^止血帶/.test(e.text));
+  if (!tq.length) return '';
+  const min = (Date.now() - tq[0].t) / 60e3;
+  return `<div class="trg-tq ${min >= 120 ? 'bad' : min >= 60 ? 'warn' : ''}">${ic('clock', 'sm')}<span>止血帶 ${fmtClock(tq[0].t)} 綁上，已 <b class="num">${fmtDur(min)}</b>${tq.length > 1 ? `（共 ${tq.length} 條）` : ''}，交班時請告知時間</span></div>`;
+}
+function renderTraumaBox() {
+  const box = $('#traumaBox'); if (!box) return;
+  if (!isTraumaRule(activeRule())) { if (box.dataset.on) { box.innerHTML = ''; box.dataset.on = ''; } return; }
+  if (!box.dataset.on) {
+    box.dataset.on = '1';
+    box.innerHTML = `<section class="trg">
+      <div class="trg-h"><b>${ic('alert', 'sm')} 創傷現場檢傷</b><button class="linkish" data-act="trgClear">清除</button></div>
+      <div id="trgLv"></div>
+      <div class="trg-vs">${TRG_VS.map(([k, t, u]) => `<label class="vs"><span>${t}</span><input id="trg_${k}" data-trg="${k}" class="num" type="number" inputmode="numeric" min="0" placeholder="${u}" aria-label="${t}（${u}）"></label>`).join('')}</div>
+      <div id="trgSi"></div>
+      <div id="trgRed"></div>
+      <details id="trgMore" class="trg-more"><summary id="trgMoreS"></summary><div id="trgYellow"></div></details>
+      <div id="trgAdd"></div>
+      <details class="trg-more tips" open><summary>處置重點</summary><ul id="trgTips" class="tw-tips"></ul></details>
+      <div class="tw-ref">依 ACS-COT 2021 現場檢傷指引，對應新北／臺北急救責任醫院分級・僅供決策輔助　<button class="linkish" data-act="refsGo" data-k="TRIAGE">完整出處</button></div>
+    </section>`;
+  }
+  const ev = trgEval(), v = ev.v;
+  TRG_VS.forEach(([k]) => {
+    const inp = $('#trg_' + k); if (!inp) return;
+    if (document.activeElement !== inp) inp.value = v[k] != null ? v[k] : (state.trg.vs[k] != null ? state.trg.vs[k] : '');
+    inp.classList.toggle('auto', v.src[k] === 'auto');
+  });
+  const [lt, ld] = TRG_LV_TXT[ev.level];
+  const why = ev.level === 'red' ? ev.red : ev.level === 'yellow' ? ev.yellow : [];
+  $('#trgLv').innerHTML = `<div class="trg-lv ${ev.level || 'none'}"><b>${lt}</b><span>${ld}</span>${why.length ? `<em>依據：${esc(why.slice(0, 3).join('、'))}${why.length > 3 ? ` 等 ${why.length} 項` : ''}</em>` : ''}</div>`;
+  const siTxt = ev.si != null ? `<span class="${ev.si >= 1 ? 'bad' : ev.si >= 0.9 ? 'warn' : ''}">休克指數 <b class="num">${ev.si.toFixed(1)}</b>${ev.si >= 1 ? '（≥1：出血性休克、需大量輸血的風險高）' : ev.si >= 0.9 ? '（0.9–1：注意）' : ''}</span>` : '';
+  const vsAuto = TRG_VS.some(([k]) => v.src[k] === 'auto');
+  $('#trgSi').innerHTML = siTxt || vsAuto ? `<div class="trg-si">${siTxt}${vsAuto ? '<span class="mute">藍字是從派遣內容自動帶入，可直接修改</span>' : ''}</div>` : '';
+  const grp = lv => TRG_GROUPS.filter(x => x[1] === lv).map(([g, , title]) => `<div class="trg-g ${lv}"><div class="trg-gh">${title}</div><div class="chips">${
+    TRG_ITEMS.filter(i => i.g === g).map(i => `<button class="chip trg-c ${ev.on.has(i.id) ? 'on ' + lv : ''}" data-act="trg" data-id="${i.id}" aria-pressed="${ev.on.has(i.id)}">${esc(i.t)}${ev.auto.has(i.id) && ev.on.has(i.id) ? '<i>自動</i>' : ''}</button>`).join('')}</div></div>`).join('');
+  $('#trgRed').innerHTML = grp('red');
+  $('#trgYellow').innerHTML = grp('yellow');
+  const ny = ev.yellow.length, more = $('#trgMore');
+  $('#trgMoreS').innerHTML = `黃色・受傷機轉與特殊狀況${ny ? `<b>已勾 ${ny} 項</b>` : '<span>沒有紅色項目時，依這裡判斷</span>'}`;
+  if (ny && !more.dataset.auto) { more.open = true; more.dataset.auto = '1'; }
+  const add = [...ev.add.entries()].map(([c, why2]) => `${capName(c)}（${esc(why2)}）`);
+  let pref = '';
+  if (ev.pelvis && state.searched && state.pos) {
+    const hl = getHighlight();
+    const tae = computeList(hl).filter(x => x.m && availCaps(x.h).has('TAE')).sort((a, b) => etaOf(a) - etaOf(b))[0];
+    pref = tae ? `<div>骨盆骨折：最近可做<b>血管攝影栓塞</b>的適合醫院是 <b>${esc(tae.h.short || tae.h.name)}</b>（約 ${etaOf(tae)} 分）；合併休克時優先考慮</div>` : '';
+  }
+  $('#trgAdd').innerHTML = (add.length || pref || trgTqText()) ? `<div class="trg-add">${add.length ? `<div>依檢傷，醫院還需要：<b>${add.join('、')}</b></div>` : ''}${pref}${trgTqText()}</div>` : '';
+  $('#trgTips').innerHTML = trgTips(ev).map(t => `<li>${esc(t)}</li>`).join('');
+}
+// 交班用：機轉、傷勢與生命徵象（MIST）
+function trgVitalsText(v = trgVitals()) {
+  const si = v.sbp && v.hr ? Math.round(v.hr / v.sbp * 10) / 10 : null;
+  return [v.gcs != null ? `GCS ${v.gcs}` : '', v.sbp != null ? `收縮壓 ${v.sbp}` : '', v.hr != null ? `HR ${v.hr}` : '', v.rr != null ? `RR ${v.rr}` : '',
+    v.spo2 != null ? `SpO2 ${v.spo2}%` : '', si != null ? `休克指數 ${si.toFixed(1)}` : ''].filter(Boolean).join('、');
+}
 function bestMatch() {
   if (!state.searched || !state.pos) return null;
   const hl = getHighlight(); if (!hl.active) return null;
@@ -2740,7 +2968,9 @@ async function fetchEta(origin, list) {
 
 /* ========== 地圖（Leaflet） ========== */
 let lmap = null, lmapLayer = null, leafletP = null, lmapFitKey = '', lmapTiles = null;
-const tileUrl = () => `https://{s}.basemaps.cartocdn.com/${isDark() ? 'dark_all' : 'rastertiles/voyager'}/{z}/{x}/{y}{r}.png`;
+// 底圖：OpenStreetMap（免金鑰；CARTO 已改成要申請金鑰，會出現「API KEY REQUIRED」）。夜間模式用 CSS 把底圖調暗
+const tileUrl = () => 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+const TILE_OPTS = { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> 貢獻者', maxZoom: 19, className: 'osm-tiles' };
 const extraMaps = {};
 function updateMapTiles() {
   if (lmapTiles && lmapTiles.setUrl) lmapTiles.setUrl(tileUrl());
@@ -2756,7 +2986,7 @@ async function renderPinsMap(boxId, pins, opts = {}) {
     box.innerHTML = '';
     const map = L.map(box, { zoomControl: false });
     m = extraMaps[boxId] = { el: box, map, fitKey: '' };
-    m.tiles = L.tileLayer(tileUrl(), { attribution: '&copy; OpenStreetMap &copy; CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(map);
+    m.tiles = L.tileLayer(tileUrl(), TILE_OPTS).addTo(map);
     m.layer = L.layerGroup().addTo(map);
     map.on('popupopen', ev => {
       const el = ev.popup.getElement(); if (!el) return;
@@ -2794,7 +3024,7 @@ async function renderMap(items, hl) {
   if (!lmap) {
     box.innerHTML = '';
     lmap = L.map(box, { zoomControl: false });
-    lmapTiles = L.tileLayer(tileUrl(), { attribution: '&copy; OpenStreetMap &copy; CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(lmap);
+    lmapTiles = L.tileLayer(tileUrl(), TILE_OPTS).addTo(lmap);
     lmapLayer = L.layerGroup().addTo(lmap);
     // Leaflet 會擋住彈出視窗內的點擊冒泡，這裡直接綁定按鈕
     lmap.on('popupopen', ev => {
@@ -2867,7 +3097,7 @@ function renderPatient() {
     : '<span class="hint">尚未設定求救原因，請到後台新增</span>';
 }
 function renderHint() {
-  renderClockBox();
+  renderClockBox(); renderTraumaBox();
   const hl = getHighlight(); const el = $('#hint');
   el.textContent = hl.hint || ''; el.classList.toggle('warn', !!hl.warn);
 }
@@ -3114,7 +3344,7 @@ function whyNot(x, hl) {
     if (state.tab === 'quick') out.push(...capIssue([...state.quickCaps]));
     else {
       const r = activeRule();
-      const g = r ? applicableGroups(r, state.patient.sex, ageVal()).groups[0] : null;
+      const g = r ? effGroups(r).groups[0] : null;
       if (g) {
         if (g.exclude.includes(x.h.id)) out.push('已被設定為排除');
         if (g.minLevel && levelRank(x.h.level) < levelRank(g.minLevel)) out.push(`等級不足（${x.h.level || '未分級'}）`);
@@ -3200,25 +3430,27 @@ const RUN_KEY = 'hf_run_v1';
 const RUN_TYPES = {
   arrest: { t: '心跳停止', cls: 'bad' }, shock: { t: '電擊', cls: 'bad' }, rosc: { t: 'ROSC', cls: 'ok' },
   drug: { t: '給藥', cls: 'info' }, airway: { t: '呼吸道', cls: 'info' }, tp: { t: 'TP 體外心律調節', cls: 'info' },
-  ams: { t: '意識改變', cls: 'warn' }, note: { t: '備註', cls: '' }
+  ams: { t: '意識改變', cls: 'warn' }, trauma: { t: '創傷處置', cls: 'info' }, note: { t: '備註', cls: '' }
 };
-const RUN_DRUGS = ['Epinephrine 1 mg', 'Amiodarone 300 mg', 'Amiodarone 150 mg', 'Atropine', 'Adenosine', 'NTG', 'Aspirin', '葡萄糖（D50）', 'Naloxone', 'Midazolam'];
+const RUN_TRAUMA = ['止血帶', '傷口填塞', '骨盆固定帶', '頸圈／脊椎限制', '胸部針刺減壓', '保暖'];
+const RUN_DRUGS = ['Epinephrine 1 mg', 'Amiodarone 300 mg', 'Amiodarone 150 mg', 'Atropine', 'Adenosine', 'NTG', 'Aspirin', '葡萄糖（D50）', 'Naloxone', 'Midazolam', 'TXA 1 g'];
 const RUN_AIRWAY = ['BVM', '聲門上呼吸道（i-gel／LMA）', '氣管內管', '抽吸'];
 function loadRun() {
   const r = readLS(RUN_KEY);
   return r && Array.isArray(r.events) && Date.now() - (r.at || 0) < 12 * 3600e3 ? { events: r.events, dest: r.dest || '' } : { events: [], dest: '' };
 }
 function saveRun() { writeLS(RUN_KEY, { ...state.run, at: Date.now() }); }
-function clearRun() { state.run = { events: [], dest: '' }; state.reroute = null; try { localStorage.removeItem(RUN_KEY); } catch (e) {} renderRunFab(); renderRunBar(); }
+function clearRun() { state.run = { events: [], dest: '' }; state.reroute = null; state.trg = { on: [], off: [], vs: {} }; try { localStorage.removeItem(RUN_KEY); } catch (e) {} renderRunFab(); renderRunBar(); if (isRoute('')) renderHint(); }
 const fmcSec = ts => new Date(ts).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
 const mmss = ms => { const t = Math.max(0, Math.floor(ms / 1000)); return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`; };
-function runLabel(e) { return e.text ? (e.type === 'drug' || e.type === 'airway' || e.type === 'note' ? e.text : `${RUN_TYPES[e.type].t}（${e.text}）`) : RUN_TYPES[e.type].t; }
+function runLabel(e) { return e.text ? (['drug', 'airway', 'trauma', 'note'].includes(e.type) ? e.text : `${RUN_TYPES[e.type].t}（${e.text}）`) : RUN_TYPES[e.type].t; }
 function runStats() {
   const ev = state.run.events, last = t => ev.filter(e => e.type === t).slice(-1)[0];
   const la = last('arrest'), lr = last('rosc');
   const epis = ev.filter(e => e.type === 'drug' && /^epinephrine/i.test(e.text));
   return { shock: ev.filter(e => e.type === 'shock').length, rosc: ev.filter(e => e.type === 'rosc').length, epi: epis.length,
-    inArrest: !!la && (!lr || lr.t < la.t), arrestAt: la ? la.t : null, lastEpi: epis.length ? epis[epis.length - 1].t : null };
+    inArrest: !!la && (!lr || lr.t < la.t), arrestAt: la ? la.t : null, lastEpi: epis.length ? epis[epis.length - 1].t : null,
+    tqAt: (ev.find(e => e.type === 'trauma' && /^止血帶/.test(e.text)) || {}).t || null };
 }
 // 交班用：「電擊 2 次（02:41、02:45）、Epinephrine 1 mg ×2（02:43、02:47）、ROSC 02:49」
 function runSummary() {
@@ -3239,11 +3471,12 @@ function runStatHtml() {
   const epiGap = st.lastEpi ? now - st.lastEpi : null;
   return `<div class="run-stat ${st.inArrest ? 'bad' : ''}">${st.inArrest ? `<b>CPR 中・已 <span class="num">${mmss(now - st.arrestAt)}</span></b>` : st.rosc ? '<b class="ok">ROSC</b>' : ''}
     <span>電擊 <b class="num">${st.shock}</b></span><span>ROSC <b class="num">${st.rosc}</b></span><span>Epinephrine <b class="num">${st.epi}</b></span>
-    ${st.inArrest && epiGap != null ? `<span class="${epiGap >= 180e3 ? 'warn' : ''}">距上次 Epinephrine <b class="num">${mmss(epiGap)}</b>（3–5 分一次）</span>` : ''}</div>`;
+    ${st.inArrest && epiGap != null ? `<span class="${epiGap >= 180e3 ? 'warn' : ''}">距上次 Epinephrine <b class="num">${mmss(epiGap)}</b>（3–5 分一次）</span>` : ''}
+    ${st.tqAt ? `<span class="${now - st.tqAt >= 7200e3 ? 'bad' : now - st.tqAt >= 3600e3 ? 'warn' : ''}">止血帶 ${fmtClock(st.tqAt)} 綁上・已 <b class="num">${fmtDur((now - st.tqAt) / 60e3)}</b></span>` : ''}</div>`;
 }
 function runBodyHtml() {
   const list = state.run.events.map((e, i) => ({ e, i })).reverse();
-  const pick = state.runPick === 'drug' ? RUN_DRUGS : state.runPick === 'airway' ? RUN_AIRWAY : null;
+  const pick = state.runPick === 'drug' ? RUN_DRUGS : state.runPick === 'airway' ? RUN_AIRWAY : state.runPick === 'trauma' ? RUN_TRAUMA : null;
   return `<div id="runStat">${runStatHtml()}</div>
     <div class="run-grid">
       <button class="run-b bad" data-act="runEv" data-t="arrest">心跳停止</button>
@@ -3253,6 +3486,7 @@ function runBodyHtml() {
       <button class="run-b ${state.runPick === 'airway' ? 'on' : ''}" data-act="runPick" data-k="airway">呼吸道…</button>
       <button class="run-b" data-act="runEv" data-t="tp">TP 體外心律調節</button>
       <button class="run-b warn" data-act="runEv" data-t="ams">意識改變</button>
+      <button class="run-b ${state.runPick === 'trauma' ? 'on' : ''}" data-act="runPick" data-k="trauma">創傷處置…</button>
       <button class="run-b" data-act="runNote">備註…</button>
     </div>
     ${pick ? `<div class="run-pick">${pick.map(t => `<button class="chip" data-act="runEv" data-t="${state.runPick}" data-x="${esc(t)}">${esc(t)}</button>`).join('')}</div>` : ''}
@@ -3344,9 +3578,25 @@ const REFS = [
   { k: 'STEMI', t: '急性心肌梗塞', items: [
     { c: 'Byrne RA, et al. 2023 ESC Guidelines for the management of acute coronary syndromes. Eur Heart J. 2023;44(38):3720–3826.', doi: '10.1093/eurheartj/ehad191', use: '首次接觸病人到打通血管 ≤90 分；需轉院 ≤120 分；12 小時內再灌流' },
     { c: 'Rao SV, O’Donoghue ML, Ruel M, et al. 2025 ACC/AHA/ACEP/NAEMSP/SCAI Guideline for the Management of Patients With Acute Coronary Syndromes. Circulation. 2025.', doi: '10.1161/CIR.0000000000001309', use: '美國急性冠心症指引（含到院前與轉院時間目標）' }] },
+  { k: 'TRIAGE', t: '重大創傷（現場檢傷與處置）', items: [
+    { c: 'Newgard CD, Fischer PE, Gestring M, et al. National guideline for the field triage of injured patients: Recommendations of the National Expert Panel on Field Triage, 2021. J Trauma Acute Care Surg. 2022;93(2):e49–e60.', url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC9323557/',
+      use: '紅色／黃色檢傷條件、依年齡的生命徵象門檻；紅色送最高等級創傷醫院、黃色送創傷醫院（App 對應為重度級／中度級以上＋外傷處置小組）' },
+    { c: 'American College of Surgeons Committee on Trauma. Advanced Trauma Life Support (ATLS), 11th edition. 2025.', url: 'https://www.facs.org/for-medical-professionals/news-publications/news-and-articles/acs-brief/september-16-2025-issue/trauma-care-gets-major-upgrade-with-launch-of-atls-11/',
+      use: 'xABCDE：先控制致命性大出血；止血帶、傷口填塞、骨盆固定帶' },
+    { c: 'Rossaint R, et al. The European guideline on management of major bleeding and coagulopathy following trauma: sixth edition. Crit Care. 2023;27:80.', doi: '10.1186/s13054-023-04327-7',
+      use: '縮短到止血的時間；無頭部外傷時允許性低血壓（收縮壓 80–90 mmHg）；預防低體溫；骨盆固定帶；TXA' },
+    { c: 'Lulla A, et al. Prehospital Guidelines for the Management of Traumatic Brain Injury – 3rd Edition. Prehosp Emerg Care. 2023;27(5):507–538.', doi: '10.1080/10903127.2023.2187905',
+      use: '頭部外傷：收縮壓 ≥110 mmHg、SpO₂ >90%、EtCO₂ 35–45 mmHg、避免過度換氣、每 30 分鐘重評 GCS' },
+    { c: 'Fischer PE, Perina DG, Delbridge TR, et al. Spinal Motion Restriction in the Trauma Patient – A Joint Position Statement. Prehosp Emerg Care. 2018;22(6):659–661.', doi: '10.1080/10903127.2018.1481476',
+      use: '脊椎限制（SMR）的適應症；單純穿刺傷不需要 SMR；不一定要用長背板' },
+    { c: '休克指數（Shock Index）＝心跳 ÷ 收縮壓；≥1 常用來提示出血性休克與大量輸血風險（多篇觀察性研究）', use: '檢傷面板的休克指數提醒' }] },
   { k: 'TRAUMA', t: '重大創傷（TXA）', items: [
     { c: 'CRASH-2 collaborators. Effects of tranexamic acid on death, vascular occlusive events, and blood transfusion in trauma patients with significant haemorrhage (CRASH-2). Lancet. 2010;376:23–32.', doi: '10.1016/S0140-6736(10)60835-5', use: '受傷 3 小時內給 TXA' },
-    { c: 'CRASH-2 collaborators. The importance of early treatment with tranexamic acid in bleeding trauma patients: an exploratory analysis of the CRASH-2 randomised controlled trial. Lancet. 2011;377:1096–1101.', doi: '10.1016/S0140-6736(11)60278-X', use: '1 小時內效果最好、超過 3 小時可能有害' }] },
+    { c: 'CRASH-2 collaborators. The importance of early treatment with tranexamic acid in bleeding trauma patients: an exploratory analysis of the CRASH-2 randomised controlled trial. Lancet. 2011;377:1096–1101.', doi: '10.1016/S0140-6736(11)60278-X', use: '1 小時內效果最好、超過 3 小時可能有害' },
+    { c: 'PATCH-Trauma Investigators and the ANZICS Clinical Trials Group. Prehospital Tranexamic Acid for Severe Trauma. N Engl J Med. 2023;389(2):127–136.', doi: '10.1056/NEJMoa2215457',
+      use: '到院前 TXA：24 小時與 28 天死亡率較低，6 個月功能預後沒有差異' },
+    { c: 'CRASH-3 trial collaborators. Effects of tranexamic acid on death, disability, vascular occlusive events and other morbidities in patients with acute traumatic brain injury (CRASH-3). Lancet. 2019;394(10210):1713–1723.', doi: '10.1016/S0140-6736(19)32233-0',
+      use: '頭部外傷 3 小時內 TXA：輕中度（GCS 9–15）頭部外傷相關死亡較少' }] },
   { k: 'TCA', t: '外傷性心跳停止（復甦性開胸）', items: [
     { c: 'Seamon MJ, et al. An evidence-based approach to patient selection for emergency department thoracotomy: A practice management guideline from the Eastern Association for the Surgery of Trauma. J Trauma Acute Care Surg. 2015;79(1):159–173.', doi: '10.1097/TA.0000000000000648', use: '依受傷機轉與生命跡象決定是否開胸' },
     { c: 'Burlew CC, et al. Western Trauma Association critical decisions in trauma: resuscitative thoracotomy. J Trauma Acute Care Surg. 2012;73(6):1359–1363.', doi: '10.1097/TA.0b013e318270d2df', use: '穿刺傷 CPR ≤15 分、鈍傷 ≤10 分' }] },
@@ -3365,7 +3615,7 @@ const REFS = [
     { c: 'Levy MM, Evans LE, Rhodes A. The Surviving Sepsis Campaign Bundle: 2018 update. Crit Care Med. 2018;46(6):997–1000.', doi: '10.1097/CCM.0000000000003119', use: 'Hour-1 Bundle：1 小時內抗生素與輸液' }] },
   { k: 'MAP', t: '車程與地圖', items: [
     { c: 'OSRM（Open Source Routing Machine）公開路線服務', url: 'https://project-osrm.org/', use: '道路通暢時的車程與距離' },
-    { c: '地圖資料 © OpenStreetMap 貢獻者；底圖 © CARTO', url: 'https://www.openstreetmap.org/copyright', use: '地圖與圖磚' },
+    { c: '地圖資料與底圖 © OpenStreetMap 貢獻者', url: 'https://www.openstreetmap.org/copyright', use: '地圖與底圖圖磚' },
     { c: '車流係數：本 App 依時段估算（非即時路況），管理者可在後台調整', use: '尖峰、深夜等時段的車程換算' }] }
 ];
 function renderRefs() {
@@ -3482,16 +3732,23 @@ function handoverFacts(h) {
     unit: $('#n_unit').value.trim() || localCfg.unit, eta: $('#n_eta').value, patient: $('#n_patient').value.trim(),
     summary: $('#n_summary').value.trim(), vitals: $('#n_vitals').value.trim(), tx: [$('#n_tx').value.trim(), state.run.events.length ? '途中 ' + runSummary() : ''].filter(Boolean).join('；'),
     complaint: r ? r.name : '', onset, severity: ai ? SEV_TXT[ai.severity] : '',
-    findings: ai ? ai.keyFindings.join('、') : '', need: ai && ai.suggestedCaps.length ? ai.suggestedCaps.map(capName).join('、') : (r ? r.groups.map(groupLabel).join('、') : ''),
-    hospital: h.short || h.name, flags: redFlags(state.caseText).map(x => x.split('：')[0]).join('、')
+    findings: ai ? ai.keyFindings.join('、') : '', need: ai && ai.suggestedCaps.length ? ai.suggestedCaps.map(capName).join('、') : (r ? effGroups(r).groups.map(groupLabel).join('、') : ''),
+    hospital: h.short || h.name, flags: redFlags(state.caseText).map(x => x.split('：')[0]).join('、'), trauma: isTraumaRule(r) ? trgHandover() : null
   };
 }
 // 沒有 AI 也能用：依欄位組成 ISBAR
+// 創傷交班（MIST）：機轉 M、傷勢 I、檢傷等級
+function trgHandover() {
+  const ev = trgEval(), names = g => TRG_ITEMS.filter(i => i.g === g && ev.on.has(i.id)).map(i => i.t);
+  return { level: ev.level === 'red' ? '紅色（高風險）' : ev.level === 'yellow' ? '黃色（中風險）' : '', mech: names('mech').concat(names('judge')).join('、'),
+    inj: names('inj').concat(names('vs')).join('、') };
+}
 function templateHandover(f) {
+  const tr = f.trauma;
   return [
     `I 身分：${f.unit || '救護車'}，病患${f.patient ? ' ' + f.patient : ''}`,
-    `S 狀況：${f.complaint || '急症'}${f.onset ? '，' + f.onset : ''}${f.summary ? '。派遣內容：' + f.summary : ''}`,
-    `B 背景：${[f.flags, f.findings].filter(Boolean).join('；') || '詳見派遣內容'}`,
+    `S 狀況：${f.complaint || '急症'}${tr && tr.level ? '，現場檢傷' + tr.level : ''}${f.onset ? '，' + f.onset : ''}${f.summary ? '。派遣內容：' + f.summary : ''}`,
+    `B 背景：${[tr && tr.mech ? '機轉 ' + tr.mech : '', tr && tr.inj ? '傷勢 ' + tr.inj : '', f.flags, f.findings].filter(Boolean).join('；') || '詳見派遣內容'}`,
     `A 評估：${f.vitals ? '生命徵象 ' + f.vitals : '生命徵象待補'}${f.severity ? '；嚴重度 ' + f.severity : ''}${f.tx ? '；已處置 ' + f.tx : ''}`,
     `R 請求：預計 ${f.eta || '?'} 分鐘到院${f.need ? '，請預備' + f.need : ''}`
   ].join('\n');
@@ -3714,7 +3971,7 @@ function renderMciResult() {
     <div class="foot">分配原則：由危急到輕傷逐一指派到「車程＋已分配人數×5 分」最小的醫院；危急傷患需中度級以上（創傷需重度級＋創傷團隊）。僅供示範與討論。</div>`;
   renderMciNotices();
   const pins = [{ lat: state.pos.lat, lng: state.pos.lng, cls: 'me-pin', html: '<span></span>', size: [18, 18], z: 1000, popup: '事故現場' }]
-    .concat(r.used.map((x, i) => ({ lat: x.h.lat, lng: x.h.lng, cls: 'h-pin match', html: `<b>${i + 1}</b>`,
+    .concat(r.used.map((x, i) => ({ lat: x.h.lat, lng: x.h.lng, cls: 'h-pin match', html: `<b>${i + 1}</b><em class="pin-lab">${esc((x.h.short || x.h.name).replace(/醫院$/, '').slice(0, 6))}</em>`,
       popup: `<div class="pop"><b>${esc(x.h.short || x.h.name)}</b><div class="m">${x.eta} 分，${MCI_COLORS.filter(([c]) => x.got[c]).map(([c, t]) => `${t} ${x.got[c]}`).join('、')}</div></div>` })));
   renderPinsMap('mciMap', pins);
 }
@@ -3811,6 +4068,7 @@ function openNoticeModal(hid) {
       ...(navigator.share ? [{ text: '分享', onClick: () => hoShare(h) }] : []),
       { text: '完成', cls: 'primary', onClick: () => closeModal() }]
   });
+  const vt = trgVitalsText(); if (vt) $('#n_vitals').value = vt;
   $('#n_handover').value = templateHandover(handoverFacts(h));
 }
 function hoSaveUnit() { const u = $('#n_unit') ? $('#n_unit').value.trim() : ''; if (u && u !== localCfg.unit) { localCfg.unit = u; saveLocalCfg(); } }
@@ -5365,7 +5623,7 @@ const ACTIONS = {
   clearCase: () => {
     AI.cancel(); if (Speech.on) Speech.stop();
     state.caseText = ''; state.lastParsed = null; state.parsed = null; state.kwParsed = null; state.ai = { state: 'idle' };
-    state.patient = { sex: '', age: '', ruleId: '' };
+    state.patient = { sex: '', age: '', ruleId: '' }; state.trg = { on: [], off: [], vs: {} };
     resetClock();
     $('#caseText').value = ''; state.caseOpen = false; renderCaseCard();
     if (state.run.events.length || state.run.dest) clearRun();
@@ -5414,10 +5672,20 @@ const ACTIONS = {
   qrClose: () => { $('#qrFull').hidden = true; },
   refsGo: el => { $('#menu').hidden = true; state.refFocus = REFS.some(g => g.k === el.dataset.k) ? el.dataset.k : ''; if (location.hash === '#refs') renderRefs(); else location.hash = '#refs'; },
   refsJump: el => { state.refFocus = el.dataset.k; renderRefs(); },
+  trg: el => {
+    const id = el.dataset.id, ev = trgEval(), T = state.trg;
+    const drop = (k, x) => { T[k] = T[k].filter(y => y !== x); };
+    if (ev.on.has(id)) { if (T.on.includes(id)) drop('on', id); if (ev.auto.has(id) && !T.off.includes(id)) T.off.push(id); }
+    else { if (T.off.includes(id)) drop('off', id); if (!ev.auto.has(id) && !T.on.includes(id)) T.on.push(id); }
+    renderResults();
+  },
+  trgClear: () => { state.trg = { on: [], off: [], vs: {} }; renderResults(); toast('已清除檢傷勾選與生命徵象（派遣內容帶入的仍會保留）'); },
   runPick: el => { state.runPick = state.runPick === el.dataset.k ? '' : el.dataset.k; renderRunModal(); },
   runEv: el => {
     const t = el.dataset.t, e = runAdd(t, el.dataset.x || '');
-    if (t === 'drug' || t === 'airway') { state.runPick = ''; renderRunModal(); }
+    if (t === 'drug' || t === 'airway' || t === 'trauma') { state.runPick = ''; renderRunModal(); }
+    if (t === 'trauma' && /^止血帶/.test(e.text)) toast(`止血帶 ${fmtClock(e.t)}：已開始計時，交班時告知綁上時間`, 4000);
+    if (t === 'trauma' && isRoute('')) renderHint();
     if (t === 'arrest' && isRoute('')) onArrest(e.t);
     else if (t === 'ams' && isRoute('')) onAms(e.t);
     else if (t === 'rosc') toast(`ROSC ${fmtClock(e.t)}：12 導程心電圖若為 STEMI，考慮送可做心導管的醫院`, 4500);
@@ -5555,6 +5823,7 @@ document.addEventListener('change', e => {
 document.addEventListener('input', e => {
   const t = e.target;
   if (t.id === 'ageInput') { state.patient.age = t.value; renderParse(); renderResults(); }
+  if (t.dataset && t.dataset.trg) { state.trg.vs[t.dataset.trg] = t.value; renderResults(); }
   if (t.id === 'caseText') { state.caseText = t.value; onCaseInput(); }
   if (t.id === 'hSearch') { state.hSearch = t.value; renderHospList(); }
   if (t.id === 'hpNote' && state.hp.draft) { state.hp.draft.note = t.value; hpChanged(false); }
