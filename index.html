@@ -104,7 +104,7 @@ body{min-height:100vh;padding-bottom:calc(36px + env(safe-area-inset-bottom))}
 .refs-g .ru{font-size:12.5px;color:var(--muted);margin-top:3px}
 .tw-tips{margin:10px 0 0;padding:10px 12px 10px 28px;border-radius:12px;background:var(--field);font-size:13px;line-height:1.6;color:var(--ink2)}
 .tw-tips li+li{margin-top:4px}
-.btn.tw-arrest{width:100%;margin-top:10px;border-color:var(--red);color:var(--red);font-weight:700}
+.btn.tw-arrest{width:100%;margin-top:10px;border-color:var(--red);color:var(--red);font-weight:700;white-space:normal;height:auto;min-height:44px;line-height:1.4;text-align:center;padding:8px 12px}
 .run-fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:36;display:flex;align-items:center;gap:6px;padding:10px 14px;border-radius:999px;border:1px solid var(--line2);background:var(--ink);color:var(--on-ink);font-weight:750;font-size:14px;box-shadow:0 6px 20px rgba(0,0,0,.25)}
 .run-fab em{font-style:normal;background:var(--red);color:#fff;border-radius:999px;padding:0 7px;font-size:12px}
 .run-fab.alarm{background:var(--red);color:#fff;animation:fabPulse 1.2s ease-in-out infinite}
@@ -128,6 +128,7 @@ body{min-height:100vh;padding-bottom:calc(36px + env(safe-area-inset-bottom))}
 .rr .ok{color:var(--green)}.rr .bad{color:var(--red)}.rr .go .btn{margin-left:auto}
 .rr .hint{display:block;font-size:12px;color:var(--muted)}.opt-h small{font-weight:500;color:var(--muted);margin-left:8px;font-size:12px}
 #caseCard.collapsed .sec-h{margin-bottom:0}
+#caseCard .sec-h{flex-wrap:wrap;row-gap:8px}
 #caseCard.collapsed #caseText,#caseCard.collapsed #parseResult,#caseCard.collapsed #aiBox,#caseCard.collapsed .case-clear{display:none}
 #caseCard:not(.collapsed) .case-type,body:not(.formal) .case-opt{display:none}
 .case-opt{color:var(--muted);font-size:12px;margin-left:6px}
@@ -537,6 +538,8 @@ summary{cursor:pointer;font-size:14px;color:var(--ink)}
 .jump{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom));z-index:35;display:flex;align-items:center;gap:6px;
   border:0;border-radius:999px;padding:12px 18px;background:var(--ink);color:var(--on-ink);font:inherit;font-size:15px;font-weight:650;box-shadow:var(--shadow-lg);cursor:pointer;white-space:nowrap;max-width:92vw}
 .jump b{font-weight:800}
+/* 「建議送往」出現時，途中紀錄移到它上方（兩個都完整顯示，不並排擠在一起） */
+body.jump-on .run-fab{bottom:calc(74px + env(safe-area-inset-bottom))}
 /* ---------- 危險徵象 ---------- */
 .flags{width:100%;display:flex;flex-direction:column;gap:6px;margin-top:6px}
 .flag{display:flex;align-items:flex-start;gap:6px;padding:8px 10px;border-radius:10px;background:var(--red-soft);color:var(--red2);font-size:14px;font-weight:700}
@@ -547,9 +550,10 @@ summary{cursor:pointer;font-size:14px;color:var(--ink)}
 .tw-h b{display:flex;align-items:center;gap:6px;font-size:15px}
 .tw-el{font-family:var(--num);font-size:20px;font-weight:700;color:var(--red2);white-space:nowrap;flex:none}
 .tw-el.mute{font-family:var(--sans);font-size:13px;color:var(--muted);font-weight:600}
-.tw-in{display:grid;grid-template-columns:auto 1fr;gap:8px 10px;align-items:center;margin-top:10px}
+.tw-in{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;align-items:center;margin-top:10px;min-width:0}
 .tw-lbl{font-size:13px;color:var(--muted);font-weight:650}
-.tw-in input{width:auto;max-width:100%;min-width:0;font-family:var(--num);font-size:18px;padding:7px 10px}
+.tw-in input{flex:1 1 0;width:100%;max-width:100%;min-width:0;box-sizing:border-box;-webkit-appearance:none;appearance:none;display:block;font-family:var(--num);font-size:17px;padding:8px 12px;text-align:left}
+.tw-in input::-webkit-date-and-time-value{text-align:left}
 .fb-dev{margin:8px 0 0;padding:10px 12px;border-radius:10px;background:var(--field);color:var(--muted);font:12px/1.6 var(--sans);white-space:pre-wrap;word-break:break-all}
 .fb-type{display:grid;grid-template-columns:repeat(4,1fr)}.fb-type button{padding:8px 2px;white-space:nowrap}
 .fb-hosp{display:inline-flex;align-items:center;gap:6px;margin-top:12px;font-size:13px}
@@ -558,7 +562,7 @@ summary{cursor:pointer;font-size:14px;color:var(--ink)}
 .pin-card{max-width:420px;margin:24px auto}
 .pin-card input{font-size:22px;letter-spacing:6px;text-align:center}
 .pin-card input::placeholder{font-size:16px;letter-spacing:1px}
-.tw-dt{display:flex;align-items:center;gap:8px;min-width:0;flex-wrap:wrap}
+.tw-dt{display:flex;align-items:center;gap:8px;min-width:0;flex-wrap:nowrap}
 .tw-day{font-size:13px;font-weight:800;padding:4px 10px;border-radius:999px;background:var(--field);color:var(--muted);white-space:nowrap}
 .tw-day.other{background:var(--amber-soft);color:var(--amber)}
 .tw-quick{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap}
@@ -1028,7 +1032,7 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "653252329719",
   appId: "1:653252329719:web:c3c9ca0891de64c69b13f2"
 };
-const APP_VERSION = 'v3.18.0';
+const APP_VERSION = 'v3.18.1';
 // 醫院即時量能（急救室、候床、ICU、滿載）：目前沒有醫院即時回報的資料來源，先關閉；之後有資料來源再改成 true
 const SHOW_CAPACITY = false;
 const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
@@ -2456,7 +2460,7 @@ function renderClockBox() {
     <ul class="tw-list">${list}</ul>`}
     ${fmc}
     ${pr.base === 'fmc' && c.onsetAt != null ? `<div class="tw-fmc">胸痛開始（派遣內容）<b class="num">${fmtDayClock(c.onsetAt)}</b></div>` : ''}
-    ${pr.arrest ? `<button class="btn tw-arrest" data-act="runArrest">${ic('alert', 'sm')}途中心跳停止 → 改為外傷 OHCA，開始復甦性開胸計時</button>` : ''}
+    ${pr.arrest ? `<button class="btn tw-arrest" data-act="runArrest">${ic('alert', 'sm')}途中心跳停止 → 改外傷 OHCA（開胸計時）</button>` : ''}
     ${pr.tips ? `<ul class="tw-tips">${pr.tips.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}
     <div class="tw-ref">${esc(pr.ref)}・僅供決策輔助　<button class="linkish" data-act="refsGo" data-k="${esc(Object.keys(PROTOCOLS).find(k => PROTOCOLS[k] === pr))}">完整出處</button></div>
   </div>`;
@@ -3153,6 +3157,7 @@ function renderJump() {
   const r = state.rec, card = $('#recCard') || $('#resultsHead');
   const show = isRoute('') && state.searched && card && window.innerWidth < 1100 && card.getBoundingClientRect().top > window.innerHeight - 40;
   pill.hidden = !show;
+  document.body.classList.toggle('jump-on', !!show);
   if (show) pill.innerHTML = r ? `${ic('ambu', 'sm')}建議送往 <b>${esc(r.h.short || r.h.name)}</b> ${etaOf(r)} 分 ↓` : `${ic('list', 'sm')}看查詢結果 ↓`;
 }
 /* ========== 自動查詢：辨識出主訴後直接幫你找 ========== */
@@ -4385,7 +4390,7 @@ function route() {
   renderSide();
   renderNet();
   if (r !== '#hospital') document.body.classList.remove('board');
-  if (!ems && $('#jumpPill')) $('#jumpPill').hidden = true;   // 「建議送往」浮動提示只在後送建議頁
+  if (!ems && $('#jumpPill')) { $('#jumpPill').hidden = true; document.body.classList.remove('jump-on'); }   // 「建議送往」浮動提示只在後送建議頁
   if (r === '#admin') renderAdmin();
   else if (r === '#hospital') { renderHospital(); prepareHospital(); }
   else if (r === '#mci') renderMci();
