@@ -752,6 +752,7 @@ body.board .bd-m b{font-size:22px}body.board .bd-m span{font-size:18px}body.boar
 .app-foot .disc{display:inline-flex;align-items:flex-start;gap:6px;text-align:left;max-width:36em}
 .app-foot .disc .ic{margin-top:2px;flex:none}
 .app-foot .credit{margin-top:6px;color:var(--dim);letter-spacing:.5px}
+.app-foot .disc{font-size:11.5px;color:var(--dim)}
 .app-foot .ver{margin-top:4px;color:var(--dim)}
 .foot-stats{display:inline-flex;align-items:center;gap:14px;margin:12px auto 2px;padding:9px 18px 9px 14px;border:1px solid var(--line2);border-radius:999px;background:var(--card);box-shadow:0 1px 0 rgba(255,255,255,.04) inset}
 .foot-stats .fs-it{display:flex;align-items:baseline;gap:5px;white-space:nowrap}
@@ -765,6 +766,22 @@ body.board .bd-m b{font-size:22px}body.board .bd-m span{font-size:18px}body.boar
 @media (prefers-reduced-motion:reduce){.foot-stats .fs-live i::after{animation:none}}
 .qr-wrap .foot-stats{margin:4px auto 10px}
 .foot-stats.compact{padding:7px 14px 7px 12px;gap:12px}.foot-stats.compact .fs-it b{font-size:18px}
+/* 頁尾卡片：QR Code＋使用統計 */
+.app-foot{border-top:1px solid var(--line);padding-top:22px}
+.foot-card{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:center;max-width:380px;margin:0 auto 18px;padding:14px 18px 14px 14px;border:1px solid var(--line2);border-radius:20px;background:var(--card);text-align:left;box-shadow:var(--shadow)}
+.foot-card .foot-qr{display:flex;flex-direction:column;align-items:center;gap:6px;margin:0;padding:9px 9px 7px;border:0;border-radius:14px;background:#fff;color:#4A5562;font-size:11px;font-weight:600;line-height:1.2;white-space:nowrap}
+.foot-card .foot-qr svg{width:92px;border-radius:4px}
+.foot-side{min-width:0}
+.foot-stats.stack{display:flex;flex-direction:column;align-items:stretch;gap:0;margin:0;padding:0;border:0;border-radius:0;background:none;box-shadow:none}
+.foot-stats.stack .fs-h{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.5px;margin-bottom:4px}
+.foot-stats.stack .fs-it{display:flex;align-items:baseline;gap:7px;padding:7px 0}
+.foot-stats.stack .fs-it+.fs-it{border-top:1px solid var(--line)}
+.foot-stats.stack .fs-it{flex-wrap:wrap}.foot-stats.stack .fs-it b{font-size:32px;line-height:1;white-space:nowrap}
+@media (max-width:360px){.foot-stats.stack .fs-it b{font-size:26px}.foot-card{gap:14px;padding:12px 14px 12px 12px}.foot-card .foot-qr svg{width:80px}}
+.foot-stats.stack .fs-it span{font-size:13px}
+.foot-share{display:flex;flex-direction:column;gap:6px}
+.foot-share b{font-size:16px;color:var(--ink)}.foot-share span{font-size:12.5px;color:var(--muted);line-height:1.55}
+.app-foot .ver i{font-style:normal;margin:0 4px;color:var(--line2)}
 .linkish{border:0;background:none;color:var(--blue);font:inherit;font-size:12px;cursor:pointer;padding:0;text-decoration:underline}
 .ack{display:flex;align-items:center;gap:12px;margin:14px 0 4px;padding:12px 14px;border-radius:14px;background:var(--blue-soft);color:var(--blue)}
 .ack p{margin:0;color:var(--ink);font-size:15px}
@@ -1095,7 +1112,7 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "653252329719",
   appId: "1:653252329719:web:c3c9ca0891de64c69b13f2"
 };
-const APP_VERSION = 'v3.22.0';
+const APP_VERSION = 'v3.22.1';
 // 醫院即時量能（急救室、候床、ICU、滿載）：目前沒有醫院即時回報的資料來源，先關閉；之後有資料來源再改成 true
 const SHOW_CAPACITY = false;
 const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
@@ -4699,6 +4716,8 @@ async function startStatsWatch() {
   if (first) animateStats();
 }
 const fmtN = n => Number(n).toLocaleString('en-US');
+// 頁尾統計：10 萬以上改用「萬」（例：123.5萬），窄螢幕也放得下
+const fmtStat = n => n >= 1e5 ? (n / 1e4).toFixed(n >= 1e6 ? 0 : 1).replace(/\.0$/, '') + '萬' : fmtN(n);
 function statsHtml(compact) {
   const st = state.stats; if (!st) return '';
   return `<div class="foot-stats${compact ? ' compact' : ''}" role="group" aria-label="瀏覽統計">
@@ -4715,13 +4734,26 @@ function animateStats() {
   const els = $$('.foot-stats b[data-n]'); if (!els.length) return;
   const t0 = performance.now(), D = 900;
   const step = t => { const k = Math.min(1, (t - t0) / D), e = 1 - Math.pow(1 - k, 3);
-    $$('.foot-stats b[data-n]').forEach(b => { b.textContent = fmtN(Math.round(Number(b.dataset.n) * e)); });
+    $$('.foot-stats b[data-n]').forEach(b => { b.textContent = fmtStat(Math.round(Number(b.dataset.n) * e)); });
     if (k < 1) requestAnimationFrame(step); };
   requestAnimationFrame(step);
 }
+// 頁尾：上方一張卡片（左 QR Code、右使用統計），下方免責、署名、版本與連結
+function footCardHtml() {
+  const st = state.stats;
+  const side = st ? `<div class="foot-stats stack" role="group" aria-label="瀏覽統計">
+      <div class="fs-h"><span class="fs-live" title="雲端統計（開啟 App 時更新）"><i></i></span>使用統計</div>
+      <div class="fs-it"><b class="num" data-n="${st.views}" title="${fmtN(st.views)}">${fmtStat(st.views)}</b><span>次開啟</span></div>
+      <div class="fs-it"><b class="num" data-n="${st.devices}" title="${fmtN(st.devices)}">${fmtStat(st.devices)}</b><span>支手機使用</span></div>
+    </div>`
+    : `<div class="foot-share"><b>分享給同仁</b><span>請對方用手機相機掃描左邊的 QR Code，點一下可以放大</span></div>`;
+  return `<div class="foot-card">
+    <button class="foot-qr" data-act="qrFull" aria-label="放大 App 的 QR Code">${QR_SVG}<span>掃描分享・點我放大</span></button>
+    <div class="foot-side">${side}</div>
+  </div>`;
+}
 function renderFoots() {
-  $$('.app-foot').forEach(el => { el.innerHTML = footHtml() + statsHtml() + `<div class="ver">${APP_VERSION}　<button class="linkish" data-act="showNotice">使用須知</button>　<button class="linkish" data-act="go" data-to="#refs">參考文獻</button>　<button class="linkish" data-act="feedback">意見回饋</button></div>
-    <button class="foot-qr" data-act="qrFull" aria-label="放大 App 的 QR Code">${QR_SVG}<span>掃描分享<br>點我放大</span></button>`; });
+  $$('.app-foot').forEach(el => { el.innerHTML = footCardHtml() + footHtml() + `<div class="ver">${APP_VERSION}<i>・</i><button class="linkish" data-act="showNotice">使用須知</button><i>・</i><button class="linkish" data-act="go" data-to="#refs">參考文獻</button><i>・</i><button class="linkish" data-act="feedback">意見回饋</button></div>`; });
 }
 
 /* ========== 開場介紹（可略過）→ 使用須知與創作者 → 開始使用 ========== */
