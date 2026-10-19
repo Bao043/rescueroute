@@ -4,7 +4,7 @@
  * - 地圖圖磚（OpenStreetMap）：看過的區域會留著，沒網路時還看得到
  * - Gemini、車程、Firebase 資料：一律走網路（資料另存在瀏覽器裡）
  */
-const VERSION = 'v3.23.0';
+const VERSION = 'v3.23.1';
 const SHELL = 'shell-' + VERSION;
 const LIBS = 'libs-v1';
 const TILES = 'tiles-v2';   // v2：改用 OpenStreetMap，舊的 CARTO 圖磚（含 API KEY 字樣）一併清掉
