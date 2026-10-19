@@ -1112,7 +1112,7 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "653252329719",
   appId: "1:653252329719:web:c3c9ca0891de64c69b13f2"
 };
-const APP_VERSION = 'v3.23.0';
+const APP_VERSION = 'v3.23.1';
 // 醫院即時量能（急救室、候床、ICU、滿載）：目前沒有醫院即時回報的資料來源，先關閉；之後有資料來源再改成 true
 const SHOW_CAPACITY = false;
 const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
@@ -1146,7 +1146,8 @@ const DEMO_CASES = [
   { t: '斷指', text: '創傷 一名男性 42歲 工廠機台 右手食指斷指 斷指已冰存 約30分鐘前受傷' },
   { t: '化學物質外洩', text: '其他 一名男性 約38歲 工廠氨氣外洩 呼吸困難 眼睛灼痛' },
   { t: '主動脈剝離', text: '急病 一名男性 63歲 突發胸背部撕裂痛 冒冷汗 有高血壓病史' },
-  { t: '潛水減壓症', text: '其他 一名女性 約30歲 潛水後 關節疼痛 下肢麻木 疑似減壓症' }
+  { t: '潛水減壓症', text: '其他 一名女性 約30歲 潛水後 關節疼痛 下肢麻木 疑似減壓症' },
+  { t: '油鍋起火', text: '火災 一名女性 炸豬油時油鍋起火 自行滅火失敗 由消防人員帶出 意識清醒 左臂與頭頸一度燒燙傷 口鼻有碳粒 喉嚨怪怪的 頭有點暈' }
 ];
 
 /* ========== 預設資料 ==========
@@ -1298,7 +1299,10 @@ const SEED_RULES = [
 ];
 /* ========== 危險徵象：派遣內容出現這些字就提醒 ========== */
 const RED_FLAGS = [
-  { kw: ['碳粒', '鼻毛燒焦', '聲音沙啞', '喉頭水腫', '吸入濃煙', '嗆傷', '喘鳴', '臉部燒傷'], text: '吸入性傷害：呼吸道可能快速水腫，需能插管的醫院' },
+  { kw: ['碳粒', '鼻毛燒焦', '聲音沙啞', '喉頭水腫', '吸入濃煙', '嗆傷', '喘鳴', '臉部燒傷', '喉嚨怪怪', '喉嚨不舒服', '喉嚨痛', '吞嚥困難', '黑痰', '咳出黑色'], text: '吸入性傷害：呼吸道可能快速水腫，需能插管的醫院' },
+  // 火場／濃煙＋頭暈頭痛噁心：一氧化碳中毒的早期症狀；一般血氧機會把 CO 當成氧氣
+  { kw: ['頭暈', '頭有點暈', '頭痛', '噁心', '想吐', '嘔吐'], need: ['火災', '火場', '濃煙', '碳粒', '起火', '燒金紙', '燒炭', '一氧化碳', 'co中毒'],
+    text: '疑似一氧化碳中毒：頭暈、頭痛、噁心是早期症狀；一般血氧機會把一氧化碳當成氧氣，SpO₂ 正常不能排除' },
   { kw: ['意識不清', '昏迷', '叫不醒', '意識改變', '意識混亂', '嗜睡'], text: '意識改變：注意呼吸道，並考慮一氧化碳或中毒' },
   { kw: ['血壓偏低', '低血壓', '休克', '脈搏微弱'], text: '休克徵象：優先重度級醫院' },
   { kw: ['懷孕', '孕婦'], text: '孕婦：同時考慮產科與新生兒處置能力' },
@@ -1414,7 +1418,8 @@ function effGroups(rule) {
 function redFlags(text) {
   const t = normText(text);
   if (!t) return [];
-  return RED_FLAGS.filter(f => f.kw.some(k => t.includes(normText(k)) && !new RegExp('(?:無|沒有|否認)' + normText(k)).test(t))).map(f => f.text);
+  const hit = k => t.includes(normText(k)) && !new RegExp('(?:無|沒有|否認)' + normText(k)).test(t);
+  return RED_FLAGS.filter(f => f.kw.some(hit) && (!f.need || f.need.some(hit))).map(f => f.text);
 }
 /* ========== 時間窗（依國際指引，僅供決策輔助） ==========
  * start：計時起點的名稱；marks：從起點算起的分鐘數與治療
@@ -2455,7 +2460,7 @@ const SPEECH_FIX = [
   [/西批阿|西皮阿/g, 'CPR']
 ];
 const fixSpeech = s => SPEECH_FIX.reduce((t, [re, to]) => t.replace(re, to), String(s || '').normalize('NFKC'));
-const normText = s => fixSpeech(s).toLowerCase().replace(/\s+/g, '');
+const normText = s => fixSpeech(s).toLowerCase().replace(/\s+/g, '').replace(/炭(?=粒|渣|灰|痰)/g, '碳');
 function cnNum(s) {
   const D = { 零: 0, 〇: 0, 一: 1, 二: 2, 兩: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9 };
   let total = 0, num = 0;
