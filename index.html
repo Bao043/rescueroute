@@ -1112,7 +1112,7 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "653252329719",
   appId: "1:653252329719:web:c3c9ca0891de64c69b13f2"
 };
-const APP_VERSION = 'v3.22.1';
+const APP_VERSION = 'v3.23.0';
 // 醫院即時量能（急救室、候床、ICU、滿載）：目前沒有醫院即時回報的資料來源，先關閉；之後有資料來源再改成 true
 const SHOW_CAPACITY = false;
 const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
@@ -1442,7 +1442,7 @@ const PROTOCOLS = {
     { min: 20, label: '第一線：Benzodiazepine（5–20 分）', short: '第一線' },
     { min: 40, label: '第二線抗癲癇藥（20–40 分）', short: '第二線' },
     { min: 60, label: '第三線：麻醉藥物、插管、加護病房（40 分以上）', short: '第三線' }],
-    ref: 'American Epilepsy Society 2016 痙攣性重積處置流程' },
+    ref: 'American Epilepsy Society 2016 痙攣性重積處置流程；NICE NG217（2022）；ESETT 2019：第二線三種藥效果相近' },
   TRAUMA: { name: '重大創傷', start: '受傷時間', arrest: true, marks: [
     { min: 60, label: '黃金一小時（儘快到可止血的醫院）', short: '黃金 1 小時' },
     { min: 180, label: 'TXA 止血藥（3 小時內，1 小時內最好；依醫療指導流程）', short: 'TXA' }],
@@ -1459,16 +1459,18 @@ const PROTOCOLS = {
     { min: 60, label: '葉克膜 ECPR（倒下 60 分內上機）', short: 'ECPR', caps: ['ECMO'] }],
     ref: '常見 ECPR 收案條件：倒下到葉克膜上機 60 分內（各院標準不同）' },
   CO: { name: '一氧化碳中毒', start: '暴露時間', marks: [
-    { min: 360, label: '高壓氧（6 小時內效果較好）', short: '高壓氧 6h', caps: ['HBO'] },
+    { min: 360, label: '高壓氧（愈早愈好；6 小時內延遲性神經後遺症最少）', short: '高壓氧 6h', caps: ['HBO'] },
     { min: 1440, label: '高壓氧（24 小時內建議）', short: '高壓氧 24h', caps: ['HBO'] }],
-    ref: '回溯研究：6 小時內接受高壓氧預後較佳；一般建議 24 小時內' },
+    tips: ['意識改變、曾昏迷、神經學異常、懷孕或心肌缺血等有症狀的病人，最可能從高壓氧受益', '依症狀嚴重度與多快能到高壓氧決定；途中持續給高濃度氧氣', '火場傷患同時考慮氰化物中毒'],
+    ref: 'ACEP 2025、UHMS 2024：有症狀的急性一氧化碳中毒考慮高壓氧；Weaver 2002 隨機試驗：24 小時內；台灣林口長庚 2019、韓國 2024 世代研究：愈早愈好' },
   REPLANT: { name: '斷肢再接', start: '斷離時間', marks: [
     { min: 360, label: '肢體（含肌肉）熱缺血 6 小時', short: '肢體 6h', caps: ['REPLANT'] },
     { min: 720, label: '手指熱缺血 12 小時（正確冷藏可延長）', short: '手指 12h', caps: ['REPLANT'] }],
     ref: '斷肢再接一般原則：大肢體熱缺血約 6 小時、手指約 12 小時，冷藏可延長' },
   SEPSIS: { name: '敗血症', start: '發現時間', marks: [
-    { min: 60, label: '1 小時內抗生素與輸液', short: 'Hour-1' }],
-    ref: 'Surviving Sepsis Campaign：Hour-1 Bundle' }
+    { min: 60, label: '休克或很可能敗血症：1 小時內給抗生素', short: 'Hour-1' },
+    { min: 180, label: '可能敗血症（無休克）：3 小時內決定是否給抗生素', short: '3 小時' }],
+    ref: 'Surviving Sepsis Campaign 2026：休克或很可能敗血症 1 小時內抗生素；可能敗血症且無休克，3 小時內' }
 };
 // 顯示文字：管理後台「設定／資料」可以修改
 const DEFAULT_TEXTS = {
@@ -3718,20 +3720,34 @@ const REFS = [
       use: '頭部外傷 3 小時內 TXA：輕中度（GCS 9–15）頭部外傷相關死亡較少' }] },
   { k: 'TCA', t: '外傷性心跳停止（復甦性開胸）', items: [
     { c: 'Seamon MJ, et al. An evidence-based approach to patient selection for emergency department thoracotomy: A practice management guideline from the Eastern Association for the Surgery of Trauma. J Trauma Acute Care Surg. 2015;79(1):159–173.', doi: '10.1097/TA.0000000000000648', use: '依受傷機轉與生命跡象決定是否開胸' },
+    { c: 'Moore EE, Knudson MM, Burlew CC, et al. Defining the limits of resuscitative emergency department thoracotomy: a contemporary Western Trauma Association perspective. J Trauma. 2011;70(2):334–339.', doi: '10.1097/TA.0b013e3182077c35', use: '18 家創傷中心前瞻性研究：鈍傷存活者 CPR 最長 9 分、穿刺傷最長 15 分（10／15 分的數據來源）' },
     { c: 'Burlew CC, et al. Western Trauma Association critical decisions in trauma: resuscitative thoracotomy. J Trauma Acute Care Surg. 2012;73(6):1359–1363.', doi: '10.1097/TA.0b013e318270d2df', use: '穿刺傷 CPR ≤15 分、鈍傷 ≤10 分' }] },
   { k: 'OHCA', t: '到院前心跳停止（ECPR）', items: [
+    { c: 'American Heart Association. 2025 American Heart Association Guidelines for Cardiopulmonary Resuscitation and Emergency Cardiovascular Care（Highlights；含 Part 9 Adult Advanced Life Support. Circulation. 2025）', url: 'https://cpr.heart.org/en/resuscitation-science/cpr-and-ecc-guidelines/adult-advanced-life-support',
+      use: 'ECPR 用於經過篩選的病人、區域化轉送；到院前為了 ECPR 快速轉送只適用於少數高度篩選的病人' },
     { c: 'Richardson ASC, et al. Extracorporeal Cardiopulmonary Resuscitation in Adults. Interim Guideline Consensus Statement From the Extracorporeal Life Support Organization. ASAIO J. 2021.', doi: '10.1097/MAT.0000000000001344', use: 'ECPR 收案條件參考（倒下到上機 60 分內；各院標準不同）' }] },
   { k: 'SE', t: '癲癇重積', items: [
-    { c: 'Glauser T, et al. Evidence-Based Guideline: Treatment of Convulsive Status Epilepticus in Children and Adults: Report of the Guideline Committee of the American Epilepsy Society. Epilepsy Curr. 2016;16(1):48–61.', doi: '10.5698/1535-7597-16.1.48', use: '0–5、5–20、20–40、40 分以上的分期處置' }] },
+    { c: 'Glauser T, et al. Evidence-Based Guideline: Treatment of Convulsive Status Epilepticus in Children and Adults: Report of the Guideline Committee of the American Epilepsy Society. Epilepsy Curr. 2016;16(1):48–61.', doi: '10.5698/1535-7597-16.1.48', use: '0–5、5–20、20–40、40 分以上的分期處置' },
+    { c: 'National Institute for Health and Care Excellence. Epilepsies in children, young people and adults (NG217), Chapter 7: Treating status epilepticus. 2022.', url: 'https://www.nice.org.uk/guidance/NG217/chapter/7-Treating-status-epilepticus', use: '抽搐 5 分鐘即開始治療；5–10 分鐘未停給第二劑 benzodiazepine；再來是第二線藥物' },
+    { c: 'Kapur J, et al. Randomized Trial of Three Anticonvulsant Medications for Status Epilepticus (ESETT). N Engl J Med. 2019;381:2103–2113.', doi: '10.1056/NEJMoa1905795', use: '第二線 levetiracetam、fosphenytoin、valproate 效果相近' }] },
   { k: 'CO', t: '一氧化碳中毒', items: [
-    { c: 'Weaver LK, et al. Hyperbaric oxygen for acute carbon monoxide poisoning. N Engl J Med. 2002;347:1057–1067.', doi: '10.1056/NEJMoa013121', use: '24 小時內高壓氧可降低認知後遺症' },
-    { c: 'Rose JJ, et al. Carbon Monoxide Poisoning: Pathogenesis, Management, and Future Directions of Therapy. Am J Respir Crit Care Med. 2017;195(5):596–606.', doi: '10.1164/rccm.201606-1275CI', use: '高壓氧適應症與時機（回顧文章）' },
-    { c: 'Goulon M, et al. 一氧化碳中毒與高壓氧（1969，英譯本刊於 J Hyperbaric Med. 1986;1:23–41）', use: '「6 小時內效果較好」來自早期回溯性觀察，證據等級較低' }] },
+    { c: 'American College of Emergency Physicians. Clinical Policy: A Critical Issue in the Management of Adult Patients Presenting to the Emergency Department With Acute Carbon Monoxide Poisoning. Ann Emerg Med. 2025;85(4):e45–e59.', doi: '10.1016/j.annemergmed.2024.12.005',
+      use: '最新急診指引（2025）：有症狀的 CO 中毒，經過選擇的病人可從高壓氧受益，依症狀嚴重度與多快能到高壓氧決定（Level C）' },
+    { c: 'Weaver LK. Carbon Monoxide Poisoning. In: UHMS Hyperbaric Oxygen Therapy Indications. Undersea Hyperb Med. 2024;51(3):253–276.', url: 'https://www.uhms.org/uhm-search/uhm-journal-volume-51-2024/number-3/indications-chapter.html',
+      use: '高壓氧醫學會（2024）：有症狀的急性 CO 中毒都應考慮高壓氧；合併氰化物中毒（火場濃煙）也適用' },
+    { c: 'Weaver LK, et al. Hyperbaric oxygen for acute carbon monoxide poisoning. N Engl J Med. 2002;347:1057–1067.', doi: '10.1056/NEJMoa013121', use: '隨機對照試驗：24 小時內接受 3 次高壓氧，6 週認知後遺症較少（目前各指引的主要依據）' },
+    { c: 'Liao SC, Mao YC, Yang KJ, et al. Targeting optimal time for hyperbaric oxygen therapy following carbon monoxide poisoning for prevention of delayed neuropsychiatric sequelae: A retrospective study. J Neurol Sci. 2019;396:187–192.', doi: '10.1016/j.jns.2018.11.025',
+      use: '台灣林口長庚 279 例：愈晚接受高壓氧，延遲性神經精神後遺症愈多；6 小時內最少，建議至遲 22.5 小時內' },
+    { c: 'Choi S, Nah S, Han S. Correlation between Time to Hyperbaric Oxygen Therapy and Delayed Neurological Sequelae in Acute Carbon Monoxide Poisoning Patients. Diagnostics. 2024;14(2):186.', doi: '10.3390/diagnostics14020186',
+      use: '韓國前瞻性登錄 167 例：暴露到高壓氧超過約 3.3 小時（200 分），延遲性後遺症風險明顯增加' },
+    { c: 'Rose JJ, et al. Carbon Monoxide Poisoning: Pathogenesis, Management, and Future Directions of Therapy. Am J Respir Crit Care Med. 2017;195(5):596–606.', doi: '10.1164/rccm.201606-1275CI', use: '高壓氧適應症與時機（回顧文章）' }] },
   { k: 'REPLANT', t: '斷肢再接', items: [
-    { c: 'Maricevich M, Carlsen B, Mardini S, Moran S. Upper extremity and digital replantation. Hand (N Y). 2011;6(4):356–363.', doi: '10.1007/s11552-011-9353-5', use: '熱缺血：大肢體 6 小時、手指 12 小時（冷藏可延長）' }] },
+    { c: 'Maricevich M, Carlsen B, Mardini S, Moran S. Upper extremity and digital replantation. Hand (N Y). 2011;6(4):356–363.', doi: '10.1007/s11552-011-9353-5', use: '熱缺血：大肢體 6 小時、手指 12 小時（冷藏可延長）' },
+    { c: 'Chang MK, Lim JX, Sebastin SJ. Current trends in digital replantation: a narrative review. Ann Transl Med. 2024;12(4):66.', doi: '10.21037/atm-23-1515', use: '近年回顧：手指沒有肌肉、較能耐受缺血，冷藏後超過 12 小時仍有成功案例；仍應儘快送醫' }] },
   { k: 'SEPSIS', t: '敗血症', items: [
-    { c: 'Evans L, et al. Surviving Sepsis Campaign: International Guidelines for Management of Sepsis and Septic Shock 2021. Crit Care Med. 2021;49(11):e1063–e1143.', doi: '10.1097/CCM.0000000000005337', use: '敗血症處置指引' },
-    { c: 'Levy MM, Evans LE, Rhodes A. The Surviving Sepsis Campaign Bundle: 2018 update. Crit Care Med. 2018;46(6):997–1000.', doi: '10.1097/CCM.0000000000003119', use: 'Hour-1 Bundle：1 小時內抗生素與輸液' }] },
+    { c: 'Prescott HC, Antonelli M, Alhazzani W, et al. Surviving Sepsis Campaign: International Guidelines for Management of Sepsis and Septic Shock 2026. Crit Care Med. 2026;54(4):725–812.', doi: '10.1097/CCM.0000000000007075',
+      use: '最新版（2026）：休克或很可能敗血症 1 小時內給抗生素；可能敗血症且無休克，3 小時內' },
+    { c: 'Evans L, et al. Surviving Sepsis Campaign: International Guidelines for Management of Sepsis and Septic Shock 2021. Crit Care Med. 2021;49(11):e1063–e1143.', doi: '10.1097/CCM.0000000000005337', use: '前一版指引（2021）' }] },
   { k: 'MAP', t: '車程與地圖', items: [
     { c: 'OSRM（Open Source Routing Machine）公開路線服務', url: 'https://project-osrm.org/', use: '道路通暢時的車程與距離' },
     { c: '地圖資料與底圖 © OpenStreetMap 貢獻者', url: 'https://www.openstreetmap.org/copyright', use: '地圖與底圖圖磚' },
