@@ -308,6 +308,7 @@ input:disabled{opacity:.6}
 .pos-near{font-size:13px;color:var(--muted)}
 .geo-row{display:flex;gap:10px;align-items:flex-start;padding:10px 2px;border-bottom:1px solid var(--line);font-size:13.5px;line-height:1.5}
 .geo-row input{margin-top:4px;flex:none}
+.c-when-w{display:flex;flex-direction:column;gap:6px;min-width:0}.c-when-w select,.c-when-w input{width:100%;min-width:0}
 .geo-row .g-main{flex:1;min-width:0}.geo-row small{display:block;color:var(--muted);word-break:break-all}
 .geo-row .g-d{flex:none;font-weight:700}.geo-row small.g-ok{color:var(--green)}.geo-row small.g-bad{color:var(--red);font-weight:700}.geo-row small.g-q{color:var(--amber)}.geo-row .g-d.bad{color:var(--red)}.geo-row .g-d.ok{color:var(--green)}.geo-row .g-d.mute{color:var(--dim)}
 
@@ -887,6 +888,7 @@ td.mx.off .dt{opacity:.35}
 .tc-sum{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .cap-ed{display:grid;grid-template-columns:minmax(110px,1fr) 1.2fr 1.6fr auto;gap:8px;align-items:center;margin:6px 0}
 .cap-ed input:not([type]){margin:0;padding:8px 10px;font-size:13px}
+.cap-ed select{margin:0;padding:8px 26px 8px 10px;font-size:13px}
 .cap-ed .chk{margin:0!important;justify-self:start}
 .cap-ed .c-cap{font-weight:700!important}
 .tc-marks{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:8px 0 6px}
@@ -1137,7 +1139,7 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "653252329719",
   appId: "1:653252329719:web:c3c9ca0891de64c69b13f2"
 };
-const APP_VERSION = 'v3.25.0';
+const APP_VERSION = 'v3.25.1';
 // 醫院即時量能（急救室、候床、ICU、滿載）：目前沒有醫院即時回報的資料來源，先關閉；之後有資料來源再改成 true
 const SHOW_CAPACITY = false;
 const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
@@ -5467,10 +5469,17 @@ function capCheckGroups(name, sel, only) {
 }
 
 /* ----- 醫院編輯 ----- */
+// 時段：下拉選單（原本是輸入框＋建議清單，填了「有條件」後清單只剩「有條件」，看起來改不動）
+const WHEN_OPTS = [['', '24 小時'], ['ask', '有條件（請先電話確認）'], ['一至五 08:00-17:00', '平日上班時間（一至五 08–17）'], ['一至五 08:00-17:00；六 08:00-12:00', '門診時段（含週六上午）'], ['一至五', '週一至週五']];
+function whenSelect(c, when) {
+  const w = when || '', known = WHEN_OPTS.some(([v]) => v === w);
+  return `<span class="c-when-w"><select class="c-when-sel" data-whensel="${esc(c)}" aria-label="${esc(capName(c))} 時段">${WHEN_OPTS.map(([v, t]) => `<option value="${esc(v)}" ${known && v === w ? 'selected' : ''}>${esc(t)}</option>`).join('')}<option value="__custom" ${known ? '' : 'selected'}>自訂時段…</option></select>
+    <input class="c-when" data-when="${esc(c)}" placeholder="例：一至五 08:00-17:00" value="${esc(w === 'ask' ? '有條件' : w)}" ${known ? 'hidden' : ''} aria-label="${esc(capName(c))} 自訂時段"></span>`;
+}
 function capEditRow(d, c) {
   const l = d.limits[c] || { when: '', note: '' };
   return `<div class="cap-ed"><label class="chk c-cap"><input type="checkbox" name="cap" value="${esc(c)}" ${d.caps.includes(c) ? 'checked' : ''}>${esc(capName(c))}</label>
-    <input class="c-when" data-when="${esc(c)}" list="whenList" placeholder="24 小時" value="${esc(l.when === 'ask' ? '有條件' : l.when)}" aria-label="${esc(capName(c))} 時段">
+    ${whenSelect(c, l.when)}
     <input class="c-note" data-note="${esc(c)}" placeholder="限制說明，例：不收呼吸器病人" value="${esc(l.note)}" aria-label="${esc(capName(c))} 說明">
     <label class="chk sm c-pause"><input type="checkbox" name="paused" value="${esc(c)}" ${d.paused.includes(c) ? 'checked' : ''}>停用</label></div>`;
 }
@@ -6242,6 +6251,11 @@ document.addEventListener('change', e => {
   if (t.id === 'mtSel') mtSwitch(t.value);
   if (t.dataset && t.dataset.mt === 'lv') mtSetLevel(Number(t.dataset.gi), t.value);
   if (t.id === 'onsetTime' && t.value) onsetInput(t.value);
+  if (t.dataset && t.dataset.whensel) {
+    const inp = t.parentElement.querySelector('.c-when'); if (!inp) return;
+    if (t.value === '__custom') { inp.hidden = false; if (inp.value === '有條件') inp.value = ''; inp.focus(); }
+    else { inp.hidden = true; inp.value = t.value === 'ask' ? '有條件' : t.value; }
+  }
   if (t.dataset && t.dataset.geo) { const r = geoAudit.rows.find(x => x.id === t.dataset.geo); if (r) r.use = t.checked; renderGeoAudit(); }
   if (t.id === 'hpSelect') {
     state.hp.hid = t.value; try { localStorage.setItem(HP_HID_KEY, t.value); } catch (er) { /* ignore */ }
