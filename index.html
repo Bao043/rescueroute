@@ -581,7 +581,7 @@ summary{cursor:pointer;font-size:14px;color:var(--ink)}
 .rec-why-ok .ok{color:var(--green)}.rec-why-ok .warn{color:var(--amber)}.rec-why-ok .bad{color:var(--red2)}
 .rec-why{margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--field);font-size:13px;color:var(--ink2)}
 .rec-why b{display:block;font-size:13px;margin-bottom:2px;color:var(--ink)}
-.rec-act{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:8px;margin-top:12px}
+.rec-act{display:grid;grid-template-columns:1.4fr 1fr;gap:8px;margin-top:12px}
 .rec-act .btn{padding:12px 6px}
 .rec-alt{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:10px;font-size:13px;color:var(--muted)}
 .rec-alt button{border:1px solid var(--line2);background:var(--surface);color:var(--ink2);border-radius:999px;padding:4px 10px;font:inherit;font-size:13px;font-weight:650;cursor:pointer}
@@ -689,7 +689,10 @@ body.jump-on .run-fab{bottom:calc(74px + env(safe-area-inset-bottom))}
 .h-ecpr{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px}
 .ecpr-ed{display:grid;grid-template-columns:minmax(84px,auto) 1fr;gap:8px 12px;align-items:center}
 .ecpr-ed label{margin:0!important;font-weight:700}.ecpr-ed input{margin:0}
-.rec-ecpr{margin-top:8px}.rec-ecpr .btn{width:100%;min-height:46px;font-size:15px}
+.rec-ecpr{margin-top:8px}
+.rec-ecpr .btn.big{width:100%;min-height:52px;font-size:16px;font-weight:800;border:0;color:#fff;background:linear-gradient(135deg,#0E9F8A,#12B886);box-shadow:0 4px 14px rgba(18,184,134,.35)}
+.rec-ecpr .btn.big.ecpr-119{background:linear-gradient(135deg,#0E7F8F,#1497A8)}
+.rec-ecpr .btn.big b{font-size:17px;letter-spacing:.5px}
 .trg-tq{display:flex;gap:6px;align-items:flex-start}.trg-tq.warn{color:var(--amber)}.trg-tq.bad{color:var(--red);font-weight:700}
 @media (max-width:380px){.trg-vs{grid-template-columns:repeat(3,minmax(0,1fr))}}
 b.ok,span.ok{color:var(--green)}b.warn,span.warn{color:var(--amber)}b.bad,span.bad{color:var(--red2)}b.mute,span.mute{color:var(--dim)}
@@ -709,6 +712,12 @@ b.ok,span.ok{color:var(--green)}b.warn,span.warn{color:var(--amber)}b.bad,span.b
 .ix-seg em{font-style:normal;font-size:11px;font-weight:700;color:#fff;white-space:nowrap;padding:0 4px}
 .ix-seg.go{background:var(--blue)}.ix-seg.go2{background:#6F8FC9}.ix-seg.wait{background:repeating-linear-gradient(-45deg,var(--yellow) 0 6px,#E8A800 6px 12px)}
 .ix-seg.wait em{color:#2a1b00}
+.ix-seg.wait.open{-webkit-mask-image:linear-gradient(90deg,#000 55%,transparent);mask-image:linear-gradient(90deg,#000 55%,transparent);justify-content:flex-start}
+.ix-seg.ready{background:var(--green)}
+.ix-seg.none{background:repeating-linear-gradient(-45deg,var(--sunken) 0 6px,var(--line) 6px 12px)}.ix-seg.none em{color:var(--muted)}
+.ix-row.dim .ix-l,.ix-row.dim > b{color:var(--muted)}
+.ecpr-ix .ix-h span{font-size:13px}
+.ix-sub .ok{color:var(--green)}.ix-sub .warn{color:var(--amber)}.ix-sub .bad{color:var(--red2)}
 .ix-sub{font-size:12px;font-weight:650;margin-top:3px;min-height:0}
 .ix-sub:empty{display:none}
 .ix-note{font-size:12px;color:var(--muted);margin-top:10px}
@@ -1167,7 +1176,7 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "653252329719",
   appId: "1:653252329719:web:c3c9ca0891de64c69b13f2"
 };
-const APP_VERSION = 'v3.27.2';
+const APP_VERSION = 'v3.28.0';
 // 醫院即時量能（急救室、候床、ICU、滿載）：目前沒有醫院即時回報的資料來源，先關閉；之後有資料來源再改成 true
 const SHOW_CAPACITY = false;
 const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
@@ -3044,10 +3053,11 @@ function ecprNearest(n = 3) {
   if (!state.searched || !state.pos) return [];
   return computeList(getHighlight()).filter(x => availCaps(x.h).has('ECPR')).sort((a, b) => etaOf(a) - etaOf(b)).slice(0, n);
 }
-function ecprCallHtml(h, small = true) {
-  const t = ecprTelOf(h);
-  return t ? `<a class="btn ${small ? 'sm ' : ''}ecpr-tel" href="tel:${esc(t)}" data-dest="${esc(h.id)}">${ic('phone', 'sm')}葉克膜專線 ${esc(h.ecprTel)}</a>`
-    : `<a class="btn ${small ? 'sm ' : ''}ecpr-119" href="tel:119" data-dest="${esc(h.id)}">${ic('phone', 'sm')}請 119 轉報（葉克膜）</a>`;
+// size：'sm' 卡片用小按鈕；'big' 建議送往用的醒目大按鈕
+function ecprCallHtml(h, size = 'sm') {
+  const t = ecprTelOf(h), cls = size === 'big' ? 'big' : 'sm';
+  return t ? `<a class="btn ${cls} ecpr-tel" href="tel:${esc(t)}" data-dest="${esc(h.id)}">${ic('phone', 'sm')}<span>葉克膜專線 <b class="num">${esc(h.ecprTel)}</b></span></a>`
+    : `<a class="btn ${cls} ecpr-119" href="tel:119" data-dest="${esc(h.id)}">${ic('phone', 'sm')}<span>119 轉報（院前葉克膜）</span></a>`;
 }
 function renderEcprBox() {
   const box = $('#ecprBox'); if (!box) return;
@@ -3095,6 +3105,33 @@ function bestMatch() {
   const all = computeList(hl).filter(x => x.m).sort((a, b) => etaOf(a) - etaOf(b));
   return all.find(x => x.load !== 'full' && x.load !== 'high') || all[0] || null;
 }
+/* 院前啟動葉克膜：送哪裡差在哪
+ * 院前啟動＝救護車還在路上，醫院葉克膜團隊就先到急診集結，病人一到就裝機。
+ * 送有葉克膜、但沒有院前啟動的醫院：不用轉院，只是到院後才集結團隊（時間依各院而定，不估數字）。
+ * 送沒有葉克膜的醫院：心跳停止中無法再轉院做葉克膜。 */
+function ecprInsight(byEta, B, el) {
+  if (!B || !B.m) return '';
+  const tB = etaOf(B);
+  const E = byEta.find(x => x !== B && etaOf(x) < tB && !availCaps(x.h).has('ECPR') && availCaps(x.h).has('ECMO'));
+  const N = byEta.find(x => x !== B && etaOf(x) < tB && !availCaps(x.h).has('ECMO') && (!E || etaOf(x) < etaOf(E)));
+  if (!E && !N) return '';
+  const nm = x => esc(x.h.short || x.h.name);
+  const max = Math.max(tB, E ? etaOf(E) : 0, N ? etaOf(N) : 0) * 1.7;
+  const seg = (min, cls, label) => `<span class="ix-seg ${cls}" style="width:${min / max * 100}%" title="${esc(label)}">${min / max > 0.14 ? `<em>${esc(label)}</em>` : ''}</span>`;
+  const arr = t => el == null ? '' : `到院時倒下已 ${fmtDur(el + t)}`;
+  const row = (x, segs, right, sub, cls = '') => `<div class="ix-row ${cls}"><div class="ix-l">${x}</div><div class="ix-track">${segs}</div><b class="num">${right}</b></div>${sub ? `<div class="ix-sub">${sub}</div>` : ''}`;
+  let out = row(`院前啟動 ${nm(B)}`, seg(tB, 'go', `車程 ${tB}`) + seg(max * 0.16, 'ready', '團隊已待命'), `${tB} 分`,
+    `<span class="ok">到院即可裝機${el != null ? `（${arr(tB)}）` : ''}</span>`);
+  if (E) out += row(`送較近的 ${nm(E)}（有葉克膜，未院前啟動）`, seg(etaOf(E), 'go', `車程 ${etaOf(E)}`) + seg(max - etaOf(E), 'wait open', '到院後才集結團隊'), `${etaOf(E)} 分＋集結`,
+    `<span class="warn">不用轉院，但團隊要等病人到院才開始集結${el != null ? `（${arr(etaOf(E))}）` : ''}</span>`);
+  if (N) out += row(`送最近的 ${nm(N)}（沒有葉克膜）`, seg(etaOf(N), 'go2', `車程 ${etaOf(N)}`) + seg(max - etaOf(N), 'none', '無法裝葉克膜'), `${etaOf(N)} 分`,
+    `<span class="bad">心跳停止中無法再轉院做葉克膜</span>`, 'dim');
+  return `<section class="ix ecpr-ix">
+    <div class="ix-h"><b>院前啟動的差別</b><span>${E ? '送有葉克膜的醫院都不用轉院' : ''}</span></div>
+    ${out}
+    <div class="ix-note">院前啟動＝救護車還在路上時，醫院葉克膜團隊就先到急診集結準備，病人一到就能裝機；目標倒下到上機 60 分鐘內。集結需要的時間各院不同，這裡不估數字。實際送哪間依現場判斷與 119 指示。</div>
+  </section>`;
+}
 // 洞察：送錯一次的代價＋各治療最近可到的醫院
 function renderInsights(all, hl) {
   if (!hl.active || !all.length) return '';
@@ -3104,6 +3141,7 @@ function renderInsights(all, hl) {
     || byEta.find(x => x.m && x.load !== 'full' && x.load !== 'high' && !(x.win && x.win.closed)) || byEta.find(x => x.m);
   const pr = activeProtocol(), el = elapsedMin();
   let html = '';
+  if (isEcprRule(activeRule())) return ecprInsight(byEta, B, el) + '';
   if (A && B && A !== B && !A.m) {
     const prep = localCfg.transferPrep;
     const tAB = estMin(distKm(A.h, B.h));
@@ -3732,7 +3770,10 @@ function whyNot(x, hl) {
       if (g) {
         if (g.exclude.includes(x.h.id)) out.push('已被設定為排除');
         if (g.minLevel && levelRank(x.h.level) < levelRank(g.minLevel)) out.push(`等級不足（${x.h.level || '未分級'}）`);
-        out.push(...capIssue(g.caps));
+        if (isEcprRule(r) && !av.has('ECPR')) {
+          out.push(...capIssue(g.caps.filter(c => c !== 'ECPR')));
+          out.push(av.has('ECMO') ? '有葉克膜、不用轉院，但沒有院前啟動：到院後才集結葉克膜團隊' : '沒有葉克膜：無法做 ECPR');
+        } else out.push(...capIssue(g.caps));
       }
     }
   } else {
@@ -3752,7 +3793,7 @@ function renderRecommend(ordered, hl) {
   const rc = pickRecommend(ordered, hl);
   state.rec = rc ? rc.best : null;
   if (!rc) return hl.active ? `<section class="rec none"><b>附近沒有適合的醫院</b><span>請擴大範圍、改選主訴，或聯繫勤務中心</span></section>` : '';
-  const x = rc.best, h = x.h, tel = h.tel.replace(/[^\d+#]/g, '');
+  const x = rc.best, h = x.h;
   const busy = x.load === 'full' || x.load === 'high', crowded = busy || x.cond;
   const reasons = [`<li class="ok">${ic('check', 'sm')}適合：${x.m.map(esc).join('、')}</li>`];
   if (x.st && SHOW_CAPACITY) reasons.push(`<li class="${busy ? 'warn' : 'ok'}">${ic(busy ? 'alert' : 'check', 'sm')}${LOAD_TXT[x.load]}${x.st.resus != null ? `，急救室 ${x.st.resus}${x.st.resusMax != null ? '/' + x.st.resusMax : ''}` : ''}${x.st.source === 'sim' ? '（模擬）' : ''}</li>`);
@@ -3774,10 +3815,9 @@ function renderRecommend(ordered, hl) {
     ${why}
     <div class="rec-act">
       <a class="btn primary" href="${esc(navUrl(h))}" target="_blank" rel="noopener" data-dest="${esc(h.id)}">${ic('nav', 'sm')}開始導航</a>
-      <button class="btn" data-act="notify" data-id="${esc(h.id)}">${ic('list', 'sm')}交班</button>
-      <a class="btn ${tel ? '' : 'disabled'}" href="${tel ? 'tel:' + esc(tel) : '#'}" data-dest="${esc(h.id)}">${ic('phone', 'sm')}撥打</a>
+      <a class="btn" href="tel:119" data-dest="${esc(h.id)}">${ic('phone', 'sm')}撥打 119</a>
     </div>
-    ${h.caps.includes('ECPR') && isEcprRule(activeRule()) ? `<div class="rec-ecpr">${ecprCallHtml(h, false)}</div>` : ''}
+    ${h.caps.includes('ECPR') && isEcprRule(activeRule()) ? `<div class="rec-ecpr">${ecprCallHtml(h, 'big')}</div>` : ''}
     ${(() => { const nc = ordered.filter(y => y.m && y.cond && y !== x && etaOf(y) < etaOf(x)).sort((a, b) => etaOf(a) - etaOf(b))[0];
       return nc ? `<div class="rec-alt cond">較近、但有條件：<button data-act="focusCard" data-id="${esc(nc.h.id)}">${esc(nc.h.short || nc.h.name)} ${etaOf(nc)} 分</button><span>先電話確認可收再改送</span></div>` : ''; })()}
     ${(() => { // 車程相近（2 分鐘內）而且一樣適合：估算有誤差，提醒救護員依路況自行判斷
