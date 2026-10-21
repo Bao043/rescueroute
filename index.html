@@ -404,14 +404,16 @@ input:disabled{opacity:.6}
 .unv{font-size:12px;color:var(--dim)}
 .h-note{font-size:13px;color:var(--amber);margin-top:6px;display:flex;gap:6px;align-items:flex-start}
 .h-note.plain{color:var(--muted)}
-.h-actions{display:flex;gap:8px;margin-top:12px;align-items:center;flex-wrap:wrap}
-.h-actions .srcline{margin-left:auto}
+.h-actions{grid-column:1/-1;display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:8px;margin-top:12px}
+.h-actions .btn{justify-content:center;padding:8px 4px;min-width:0;white-space:nowrap;min-height:40px}
+.h-actions .ho-btn{grid-column:1/-1}
+.h-body .srcline{margin-top:6px}
 .srcline{font-size:12px;color:var(--dim)}
 .h-dist{text-align:right;min-width:62px}
 .h-dist b{font-family:var(--num);font-size:34px;font-weight:700;line-height:.95;letter-spacing:.3px}
 .h-dist small{font-size:14px;color:var(--muted);margin-left:2px;font-weight:650}
 .h-dist .sub{display:block;font-size:12px;color:var(--muted);margin-top:3px;white-space:nowrap}
-.h-dist .go{display:inline-flex;align-items:center;gap:2px;font-size:12px;color:var(--blue);font-weight:650;margin-top:8px;white-space:nowrap}
+
 .extra-note{font-size:14px;color:var(--amber);margin:6px 4px 8px;display:flex;gap:6px;align-items:center}
 .empty{text-align:center;color:var(--muted);padding:28px 10px;font-size:14px}
 .foot{font-size:12px;color:var(--dim);text-align:center;margin-top:20px;line-height:1.8}
@@ -608,6 +610,7 @@ body.jump-on .run-fab{bottom:calc(74px + env(safe-area-inset-bottom))}
 .fb-type{display:grid;grid-template-columns:repeat(4,1fr)}.fb-type button{padding:8px 2px;white-space:nowrap}
 .fb-hosp{display:inline-flex;align-items:center;gap:6px;margin-top:12px;font-size:13px}
 .ho-call{text-decoration:none;margin:4px 0 6px}
+.ho-tel{font-size:13px;color:var(--muted);text-align:center;margin:0 0 8px}.ho-tel a,.ht-head a{color:var(--blue);font-weight:650}
 .ho-call.disabled{opacity:.5;pointer-events:none}
 .pin-card{max-width:420px;margin:24px auto}
 .pin-card input{font-size:22px;letter-spacing:6px;text-align:center}
@@ -1176,7 +1179,7 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "653252329719",
   appId: "1:653252329719:web:c3c9ca0891de64c69b13f2"
 };
-const APP_VERSION = 'v3.28.0';
+const APP_VERSION = 'v3.29.0';
 // 醫院即時量能（急救室、候床、ICU、滿載）：目前沒有醫院即時回報的資料來源，先關閉；之後有資料來源再改成 true
 const SHOW_CAPACITY = false;
 const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
@@ -1568,7 +1571,7 @@ const DEFAULT_TEXTS = {
     '本 App 是送醫決策的「輔助」工具，不取代救護人員的專業判斷、勤務中心的指示，以及醫院的實際回覆。',
     '醫院能力與車程可能有誤差；App 不顯示醫院即時滿床情形，送醫前請以現場評估為準，必要時先電話確認。',
     '關鍵字辨識、危險徵象與時間窗僅供參考，不構成醫療診斷或處置建議。',
-    '「交班」只在手機上整理交班摘要，不會自動傳給醫院；請撥打急診電話或自行分享。示範版本中，救護車位置為模擬數據。',
+    '「交班」（OHCA 時使用）只在手機上整理交班摘要，不會自動傳給醫院；請透過 119 轉報、葉克膜專線或自行分享。App 裡的醫院電話是總機，不是急診專線。示範版本中，救護車位置為模擬數據。',
     '請勿輸入病患姓名、身分證字號、病歷號等個人資料。'
   ].join('\n'),
   credit: '板橋救護義消 尤崧保／新板警消 尤偉檁 共同製作',
@@ -1577,6 +1580,12 @@ const DEFAULT_TEXTS = {
 };
 // v3.6.0 以前的預設須知（提到即時量能）：存著舊預設的裝置自動換成新版
 const OLD_NOTICES = [[
+  '本 App 是送醫決策的「輔助」工具，不取代救護人員的專業判斷、勤務中心的指示，以及醫院的實際回覆。',
+  '醫院能力與車程可能有誤差；App 不顯示醫院即時滿床情形，送醫前請以現場評估為準，必要時先電話確認。',
+  '關鍵字辨識、危險徵象與時間窗僅供參考，不構成醫療診斷或處置建議。',
+  '「交班」只在手機上整理交班摘要，不會自動傳給醫院；請撥打急診電話或自行分享。示範版本中，救護車位置為模擬數據。',
+  '請勿輸入病患姓名、身分證字號、病歷號等個人資料。'
+].join('\n'), [
   '本 App 是送醫決策的「輔助」工具，不取代救護人員的專業判斷、勤務中心的指示，以及醫院的實際回覆。',
   '醫院能力與車程可能有誤差；App 不顯示醫院即時滿床情形，送醫前請以現場評估為準，必要時先電話確認。',
   'AI 辨識、危險徵象與時間窗僅供參考，不構成醫療診斷或處置建議。',
@@ -3457,8 +3466,8 @@ async function renderMap(items, hl) {
     L.marker([x.h.lat, x.h.lng], { icon }).addTo(lmapLayer).bindPopup(`<div class="pop"><b>${esc(x.h.short || x.h.name)}</b>${x.h.level ? `（${esc(x.h.level)}）` : ''}
       <div class="m">${eta}${distTxt(x)}${x.load ? '，' + LOAD_TXT[x.load] : ''}${x.m ? '，適合' : ''}</div>
       <button class="btn sm" data-act="focusCard" data-id="${esc(x.h.id)}">看詳細</button>
-      <button class="btn sm" data-act="openMap" data-id="${esc(x.h.id)}">Google 地圖</button>
-      <button class="btn sm primary" data-act="notify" data-id="${esc(x.h.id)}">交班／撥打</button></div>`);
+      <a class="btn sm primary" href="${esc(navUrl(x.h))}" target="_blank" rel="noopener" data-dest="${esc(x.h.id)}">開始導航</a>
+      ${handoverOn() ? `<button class="btn sm" data-act="notify" data-id="${esc(x.h.id)}">交班</button>` : ''}</div>`);
     pts.push([x.h.lat, x.h.lng]);
   });
   // 只有醫院清單或位置改變時才重新縮放，即時量能更新不打斷使用者拖曳地圖
@@ -3569,9 +3578,10 @@ function capsLine(h, st, hl, x) {
     ? `<button class="more" data-act="moreCaps" data-id="${esc(h.id)}">${open ? '收合' : `…等 ${items.length} 項`}</button>` : '';
   return `<div class="h-caps"><span class="k">特殊處置：</span>${shown.map(t => t.html).join('、')}${more}</div>`;
 }
+// 交班只留給 OHCA（內科、外傷、符合葉克膜啟動）
+function handoverOn() { const r = activeRule(); return !!r && (r.protocol === 'OHCA' || r.protocol === 'TCA' || isEcprRule(r)); }
 function hospCard(x, hl) {
   const h = x.h, st = x.st;
-  const tel = h.tel.replace(/[^\d+#]/g, '');
   const crowded = x.load === 'full' || x.load === 'high';
   const cls = hl.active ? (x.m ? 'match' + (crowded || x.cond ? ' full' : '') : 'dim') : '';
   const lr = levelRank(h.level);
@@ -3591,7 +3601,7 @@ function hospCard(x, hl) {
     x.load && !(x.m && crowded) ? `<span class="load ${x.load}"><i></i>${LOAD_TXT[x.load]}</span>` : ''
   ].filter(Boolean).join('');
   const src = [st ? (st.source === 'real' ? `醫院回報 ${fmtAgo(st.updatedAt)}` : '模擬量能') : '', h.verified ? '' : '資料未驗證'].filter(Boolean).join('，');
-  return `<div class="h-card ${cls}" id="card-${esc(h.id)}" data-act="openMap" data-id="${esc(h.id)}" role="link" tabindex="0" aria-label="在 Google 地圖開啟 ${esc(h.short || h.name)}">
+  return `<div class="h-card ${cls}" id="card-${esc(h.id)}">
     <div class="h-rank">${x.rank}</div>
     <div class="h-body">
       <div class="h-name"><b>${esc(h.short || h.name)}</b>${lv}</div>
@@ -3603,14 +3613,15 @@ function hospCard(x, hl) {
       ${st && st.note ? `<div class="h-note">${ic('alert', 'sm')}<span>${esc(st.note)}</span></div>` : ''}
       ${h.note ? `<div class="h-note plain">${esc(h.note)}</div>` : ''}
       ${h.caps.includes('ECPR') && isEcprRule(activeRule()) ? `<div class="h-ecpr">${ecprCallHtml(h)}</div>` : ''}
-      <div class="h-actions">
-        <button class="btn sm ${x.m && !crowded ? 'primary' : ''}" data-act="notify" data-id="${esc(h.id)}">${ic('list', 'sm')}交班</button>
-        <a class="btn sm ${tel ? '' : 'disabled'}" href="${tel ? 'tel:' + esc(tel) : '#'}" data-dest="${esc(h.id)}">${ic('phone', 'sm')}${tel ? '撥打' : '無電話'}</a>
-        <button class="btn sm ghost" data-act="hospTable" data-id="${esc(h.id)}">${ic('list', 'sm')}能力表</button>
-        ${src ? `<span class="srcline">${src}</span>` : ''}
-      </div>
+      ${src ? `<div class="srcline">${src}</div>` : ''}
     </div>
-    <div class="h-dist num">${dist}<span class="go">${ic('pin', 'sm')}地圖</span></div>
+    <div class="h-dist num">${dist}</div>
+    <div class="h-actions">
+      <a class="btn sm ${x.m && !crowded ? 'primary' : ''}" href="${esc(navUrl(h))}" target="_blank" rel="noopener" data-dest="${esc(h.id)}">${ic('nav', 'sm')}開始導航</a>
+      <a class="btn sm" href="tel:119" data-dest="${esc(h.id)}">${ic('phone', 'sm')}撥打 119</a>
+      <button class="btn sm" data-act="hospTable" data-id="${esc(h.id)}">${ic('list', 'sm')}能力表</button>
+      ${handoverOn() ? `<button class="btn sm ho-btn" data-act="notify" data-id="${esc(h.id)}">${ic('list', 'sm')}交班（OHCA）</button>` : ''}
+    </div>
   </div>`;
 }
 // 排序用的距離：有車程用車程分鐘，沒有就用直線距離
@@ -4504,7 +4515,7 @@ function mciText() {
   const note = state.mci.note.trim();
   return [`【大量傷病患分流】${MCI_TYPES[r.input.type]}・共 ${r.total} 人・${fmtClock(Date.now())}${localCfg.unit ? '・' + localCfg.unit : ''}`,
     note ? `現場：${note}` : '',
-    ...r.used.map((x, i) => `${i + 1}. ${x.h.short || x.h.name}（${x.eta} 分）：${MCI_COLORS.filter(([c]) => x.got[c]).map(([c, t]) => `${t} ${x.got[c]}`).join('、')}${x.h.tel ? '　☎ ' + x.h.tel : ''}`),
+    ...r.used.map((x, i) => `${i + 1}. ${x.h.short || x.h.name}（${x.eta} 分）：${MCI_COLORS.filter(([c]) => x.got[c]).map(([c, t]) => `${t} ${x.got[c]}`).join('、')}${x.h.tel ? '　☎ 總機 ' + x.h.tel : ''}`),
     MCI_COLORS.some(([c]) => r.unassigned[c]) ? `尚未分配：${MCI_COLORS.filter(([c]) => r.unassigned[c]).map(([c, t]) => `${t} ${r.unassigned[c]}`).join('、')}` : ''
   ].filter(Boolean).join('\n');
 }
@@ -4545,7 +4556,7 @@ function patientText() {
   const p = state.patient, r = state.rules.find(x => x.id === p.ruleId);
   return [p.sex === 'M' ? '男' : p.sex === 'F' ? '女' : '', fmtAge(p.age), r ? r.name : ''].filter(Boolean).join('・');
 }
-// 交班／撥打：在手機上整理 ISBAR 交班摘要，撥打急診電話念給醫院，或複製、分享（LINE 等）；不會自動傳給醫院
+// 交班（OHCA）：在手機上整理 ISBAR 交班摘要，透過 119 轉報或葉克膜專線念給醫院，或複製、分享（LINE 等）；不會自動傳給醫院
 function openNoticeModal(hid) {
   const h = hospById(hid); if (!h) return;
   const x = state.pos ? { d: distKm(state.pos, h), eta: state.eta[hid] } : null;
@@ -4554,7 +4565,10 @@ function openNoticeModal(hid) {
   state.hoHid = h.id; state.hoEdited = false;
   openModal({
     title: `交班・${h.short || h.name}`,
-    body: `<a class="btn-cta ho-call ${tel ? '' : 'disabled'}" href="${tel ? 'tel:' + esc(tel) : '#'}">${ic('phone')}<span>${tel ? `撥打急診　${esc(h.tel)}` : '這間醫院沒有電話資料'}</span></a>
+    body: `${(() => { const et = h.caps.includes('ECPR') && isEcprRule(activeRule()) ? ecprTelOf(h) : '';
+        return et ? `<a class="btn-cta ho-call" href="tel:${esc(et)}">${ic('phone')}<span>葉克膜專線　${esc(h.ecprTel)}</span></a>`
+          : `<a class="btn-cta ho-call" href="tel:119">${ic('phone')}<span>撥打 119（請 119 轉報醫院）</span></a>`; })()}
+      ${tel ? `<div class="ho-tel">醫院總機（非急診）：<a href="tel:${esc(tel)}">${esc(h.tel)}</a></div>` : ''}
       <div class="row2"><div><label for="n_unit">出勤單位</label><input id="n_unit" value="${esc(localCfg.unit)}" placeholder="例：新板91"></div>
         <div><label for="n_eta">預計到院（分鐘）</label><input id="n_eta" class="num" type="number" inputmode="numeric" value="${eta}"></div></div>
       <label for="n_patient">病患（性別・年齡・主訴）</label><input id="n_patient" value="${esc(patientText())}">
@@ -4564,7 +4578,7 @@ function openNoticeModal(hid) {
       <div class="ho-h"><label for="n_handover">交班摘要（ISBAR）・電話中可以照著念</label>
         <button class="btn sm ${aiReady() ? 'ai' : ''}" data-act="makeHandover" data-id="${esc(h.id)}">${ic('spark', 'sm')}${aiReady() ? 'AI 整理' : '重新整理'}</button></div>
       <textarea id="n_handover" rows="7"></textarea>
-      <div class="hint">交班摘要只在這支手機上整理，<b>不會自動傳給醫院</b>：請撥打急診電話念給醫院，或用「分享」傳送。上面的欄位改了，摘要會跟著更新。⚠ 請勿輸入病患姓名、身分證字號等個資。</div>`,
+      <div class="hint">交班摘要只在這支手機上整理，<b>不會自動傳給醫院</b>：請透過 119 轉報或葉克膜專線念給醫院，或用「分享」傳送。上面的欄位改了，摘要會跟著更新。⚠ 請勿輸入病患姓名、身分證字號等個資。</div>`,
     buttons: [{ text: '複製', onClick: () => hoCopy(h) },
       ...(navigator.share ? [{ text: '分享', onClick: () => hoShare(h) }] : []),
       { text: '完成', cls: 'primary', onClick: () => closeModal() }]
@@ -4955,7 +4969,7 @@ function openHospTable(id) {
   const d = capNow();
   openModal({
     title: h.short || h.name,
-    body: `<div class="ht-head"><b>${esc(h.name)}</b><span><span class="h-lv l${levelRank(h.level)}">${esc(h.level || '未分級')}</span>${h.tel ? '・' + esc(h.tel) : ''}</span><span>${esc(h.addr)}</span></div>
+    body: `<div class="ht-head"><b>${esc(h.name)}</b><span><span class="h-lv l${levelRank(h.level)}">${esc(h.level || '未分級')}</span>${h.tel ? `・總機 <a href="tel:${esc(h.tel.replace(/[^\d+#]/g, ''))}">${esc(h.tel)}</a>` : ''}</span><span>${esc(h.addr)}</span></div>
       <div class="ht-legend">${tableLegend(d, h)}</div>
       ${hospTableRows(h, d).html}
       <div class="ht-src">資料來源：${esc(hospSrcText(h))}${h.note ? '<br>備註：' + esc(h.note) : ''}</div>`,
@@ -5006,12 +5020,12 @@ function renderLookupBody() {
   box.innerHTML = `<section class="card">
       <div class="lk-head"><h2>${esc(h.short || h.name)} <span class="h-lv l${levelRank(h.level)}">（${esc(h.level || '未分級')}）</span></h2>
         ${h.short && h.short !== h.name ? `<span class="full">${esc(h.name)}</span>` : ''}
-        <span class="addr">${esc(h.addr || '（無地址）')}</span>${h.tel ? `<span class="addr">電話 ${esc(h.tel)}</span>` : ''}</div>
+        <span class="addr">${esc(h.addr || '（無地址）')}</span>${h.tel ? `<span class="addr">總機（非急診）${esc(h.tel)}</span>` : ''}</div>
       <div class="lk-sum"><div class="ok"><b>${cnt.ok}</b><span>24 小時可做</span></div><div class="lim"><b>${cnt.lim}</b><span>有時段或條件</span></div><div class="off"><b>${cnt.off}</b><span>${state.scn ? '情境時間' : '現在'}不能做</span></div></div>
       ${live}
       <div class="lk-act">
         <a class="btn primary" href="${esc(nav)}" target="_blank" rel="noopener">${ic('nav', 'sm')}導航</a>
-        <a class="btn ${tel ? '' : 'disabled'}" href="${tel ? 'tel:' + esc(tel) : '#'}">${ic('phone', 'sm')}撥打</a>
+        <a class="btn ${tel ? '' : 'disabled'}" href="${tel ? 'tel:' + esc(tel) : '#'}">${ic('phone', 'sm')}撥打總機</a>
         <button class="btn" data-act="openMap" data-id="${esc(h.id)}">${ic('pin', 'sm')}地圖</button>
       </div>
     </section>
@@ -5746,7 +5760,7 @@ function openHospEditor(id) {
       <div><label>急救責任醫院等級</label><select id="f_level"><option value="">未設定</option>
         ${LEVELS.map(l => `<option ${d.level === l ? 'selected' : ''}>${l}</option>`).join('')}</select></div></div>
     <label>地址</label><input id="f_addr" value="${esc(d.addr)}">
-    <div class="row2"><div><label>急診電話</label><input id="f_tel" type="tel" value="${esc(d.tel)}"></div>
+    <div class="row2"><div><label>醫院總機（不是急診專線）</label><input id="f_tel" type="tel" value="${esc(d.tel)}"></div>
       <div><label>座標 *（緯度, 經度）${h && h.lat != null ? `　<a class="linkish" href="${esc(gmapsPin(h.lat, h.lng))}" target="_blank" rel="noopener">在 Google 地圖查看</a>` : ''}</label><input id="f_coord" inputmode="decimal" placeholder="25.0143, 121.4635"
         value="${d.lat != null && d.lng != null ? d.lat + ', ' + d.lng : ''}"></div></div>
     <label>院前葉克膜專線（有「院前葉克膜（ECPR）」能力才會顯示；留白＝請 119 轉報）</label><input id="f_ecpr" type="tel" value="${esc(d.ecprTel)}" placeholder="例：09xx-xxx-xxx">
@@ -6537,7 +6551,7 @@ document.addEventListener('input', e => {
   if (t.dataset && t.dataset.mt === 'label') mtSetLabel(Number(t.dataset.gi), t.value);
 });
 $('#btnSearch').addEventListener('click', doSearch);
-// 交班視窗的「撥打急診」：讓 tel: 連結照常撥號，只順便記一筆（不含病患資料）
+// 交班視窗的撥號鍵（119／葉克膜專線）：讓 tel: 連結照常撥號，只順便記一筆（不含病患資料）
 document.addEventListener('click', e => { const a = e.target.closest('.ho-call'); if (!a) return; if (a.classList.contains('disabled')) { e.preventDefault(); return; } const h = hospById(state.hoHid); if (h) { hoSaveUnit(); hoLog(h, 'call'); } });
 // 隱藏入口：長按左上角標誌 2 秒進後台（在後台長按則回前台）
 bindLongPress($('#brand .logo'), () => { location.hash = isBackRoute() ? '' : '#admin'; });
