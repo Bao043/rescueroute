@@ -404,9 +404,12 @@ input:disabled{opacity:.6}
 .unv{font-size:12px;color:var(--dim)}
 .h-note{font-size:13px;color:var(--amber);margin-top:6px;display:flex;gap:6px;align-items:flex-start}
 .h-note.plain{color:var(--muted)}
-.h-actions{grid-column:1/-1;display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:8px;margin-top:12px}
-.h-actions .btn{justify-content:center;padding:8px 4px;min-width:0;white-space:nowrap;min-height:40px}
-.h-actions .ho-btn{grid-column:1/-1}
+.h-actions{grid-column:2/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px}
+.h-actions .btn{justify-content:center;gap:5px;height:40px;padding:0 4px;min-width:0;white-space:nowrap;font-size:13.5px;border-radius:11px}
+.h-actions .btn .ic{flex:none}
+@media(min-width:900px){.h-actions{grid-template-columns:repeat(3,minmax(0,170px))}}
+@media(max-width:360px){.h-actions{gap:6px}.h-actions .btn{font-size:13px;gap:3px}.h-actions .btn:not(.ho-btn) .ic{display:none}}
+.h-actions .ho-btn{grid-column:1/-1;height:36px;background:var(--field);border-color:var(--line);color:var(--ink2);font-weight:650}
 .h-body .srcline{margin-top:6px}
 .srcline{font-size:12px;color:var(--dim)}
 .h-dist{text-align:right;min-width:62px}
@@ -735,24 +738,60 @@ b.ok,span.ok{color:var(--green)}b.warn,span.warn{color:var(--amber)}b.bad,span.b
 .ho-h label{margin-bottom:5px}
 .ho{margin-top:8px;padding:10px 12px;border-radius:12px;background:var(--surface);border:1px solid var(--line);font-size:14px;line-height:1.6;white-space:pre-wrap}
 /* ---------- 大量傷病患 ---------- */
-.mci-counts{display:flex;flex-direction:column;gap:8px}
-.mci-c{display:grid;grid-template-columns:14px 28px 1fr auto;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:var(--field);border:1px solid var(--line)}
-.mci-c b{font-size:17px}.mci-c small{color:var(--muted);font-size:13px}
-.mci-dot{width:14px;height:14px;border-radius:4px}
-.mci-c.red .mci-dot{background:#D3302A}.mci-c.yellow .mci-dot{background:#F4B400}.mci-c.green .mci-dot{background:#0C9A4C}
-.mci-c .step{align-items:center}
-.mci-c .step span{min-width:44px;text-align:center;font-size:30px;font-weight:700}
-.mci-sum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.mci-sum div{background:var(--field);border-radius:12px;padding:10px;text-align:center}
-.mci-sum b{display:block;font-family:var(--num);font-size:30px;line-height:1.1}
-.mci-sum small{font-size:12px;color:var(--muted)}
-.mci-row{display:grid;grid-template-columns:26px minmax(0,1fr) auto;gap:2px 12px;padding:14px 16px 14px 12px;border-top:1px solid var(--line)}
-.mci-row:first-child{border-top:0}
-.mci-main b{font-size:17px}
-.mci-main small{display:block;font-size:12px;color:var(--muted);margin-top:4px}
 .mci-got{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
 .mci-pill{font-size:13px;font-weight:750;padding:2px 9px;border-radius:7px}
-.mci-pill.red{background:#D3302A;color:#fff}.mci-pill.yellow{background:#F4B400;color:#2a1b00}.mci-pill.green{background:#0C9A4C;color:#fff}
+.mci-pill.red{background:#D3302A;color:#fff}.mci-pill.yellow{background:#F4B400;color:#2a1b00}.mci-pill.green{background:#0C9A4C;color:#fff}.mci-pill.black{background:#1E2329;color:#fff;border:1px solid #555}
+.mci-live{margin-left:auto;font-size:11px;font-weight:800;color:#fff;background:var(--red);border-radius:999px;padding:2px 8px}
+.mci-how{margin:14px 0 0;padding-left:20px;font-size:13.5px;line-height:1.7;color:var(--ink2)}
+.mci-stat{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:14px}
+.ms{border-radius:12px;padding:8px 4px 9px;text-align:center;background:var(--field);border-top:4px solid var(--line2);display:flex;flex-direction:column;gap:1px;min-width:0}
+.ms b{font-size:14px}.ms strong{font-family:var(--num);font-size:30px;line-height:1.05}
+.ms small{font-size:11.5px;color:var(--ink2);white-space:nowrap}.ms em{font-style:normal;font-size:11px;color:var(--muted);white-space:nowrap}
+.ms.red{border-top-color:#D3302A}.ms.red b{color:#E5484D}.ms.yellow{border-top-color:#F4B400}.ms.yellow b{color:var(--amber)}
+.ms.green{border-top-color:#0C9A4C}.ms.green b{color:var(--green)}.ms.black{border-top-color:#1E2329}
+.mci-tot{margin-top:8px;font-size:13px;color:var(--ink2);text-align:center}.mci-tot b{font-family:var(--num);font-size:16px;color:var(--ink)}.mci-tot b.bad{color:var(--red2)}
+.tri-seg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.tri{height:44px;border-radius:12px;border:2px solid transparent;font-size:17px;font-weight:800;cursor:pointer;opacity:.45;font-family:inherit}
+.tri.red{background:#D3302A;color:#fff}.tri.yellow{background:#F4B400;color:#2a1b00}.tri.green{background:#0C9A4C;color:#fff}.tri.black{background:#1E2329;color:#fff;border-color:#555}
+.tri.on{opacity:1;box-shadow:0 0 0 3px var(--surface),0 0 0 5px var(--ink)}
+.mci-add-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;margin-top:10px;align-items:center}
+.mci-add-row .seg.sex button{padding:9px 14px}
+.mci-add-row input{height:44px;font-size:18px;text-align:center}
+.mci-add .btn.primary{height:44px;padding:0 16px;font-weight:800}
+.mci-add .hint{margin:6px 0 0}
+.mci-grp{margin-top:14px}
+.mci-gh{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;color:var(--ink2);margin-bottom:6px}
+.mci-gh i{width:12px;height:12px;border-radius:3px}.mci-gh span{margin-left:auto;font-family:var(--num);font-size:16px}
+.mci-grp.red .mci-gh i{background:#D3302A}.mci-grp.yellow .mci-gh i{background:#F4B400}.mci-grp.green .mci-gh i{background:#0C9A4C}.mci-grp.black .mci-gh i{background:#1E2329;border:1px solid #555}
+.mci-pts{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:6px}
+.mpt{display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:7px 9px;border-radius:11px;border:1px solid var(--line2);border-left-width:4px;background:var(--surface);color:var(--ink);font-family:inherit;cursor:pointer;text-align:left;min-width:0}
+.mpt b{font-size:17px}.mpt small{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.mpt em{font-style:normal;font-size:12px;font-weight:700;color:var(--red2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.mpt.sent em{color:var(--green)}
+.mci-grp.red .mpt{border-left-color:#D3302A}.mci-grp.yellow .mpt{border-left-color:#F4B400}.mci-grp.green .mpt{border-left-color:#0C9A4C}.mci-grp.black .mpt{border-left-color:#1E2329}
+.mh-list{display:flex;flex-direction:column}
+.mh{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.mh:first-child{border-top:0}.mh.full .mh-main b{color:var(--muted)}
+.mh-main b{font-size:16px}.mh-main .h-lv{font-size:12px;margin-left:4px}.mh-main small{display:block;font-size:11.5px;color:var(--muted);margin-top:2px}
+.mh-cap{display:flex;flex-direction:column;align-items:center;gap:2px}
+.mh-cap .step button{width:36px;height:36px}.mh-cap .step span{min-width:32px;text-align:center;font-size:20px;font-weight:700;align-self:center}
+.mh-cap small{font-size:11.5px;color:var(--ink2);font-weight:700}.mh-cap small.bad{color:var(--red2)}
+.btn.mci-end{width:100%;margin-top:18px}
+.mci-units{margin-top:6px}
+.mci-inj{display:grid;grid-template-columns:120px minmax(0,1fr);gap:12px;align-items:start}
+.mci-body{width:120px;height:240px}
+.mci-body .br{cursor:pointer}.mci-body .br *{fill:var(--sunken);stroke:var(--line2);stroke-width:1.5}
+.mci-body .br.on *{fill:#E5484D;stroke:#D3302A}
+.mci-body text{font-size:11px;fill:var(--muted)}
+.mci-injr{display:flex;flex-direction:column;gap:8px}
+.mci-injr .chip.on.bad{background:#E5484D;border-color:#E5484D;color:#fff}
+.mci-injtxt{font-size:12.5px;color:var(--ink2)}
+.mpd{display:flex;flex-direction:column;gap:6px}
+.mpd-r{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:2px 8px;align-items:center;padding:9px 12px;border-radius:12px;border:1px solid var(--line2);background:var(--surface);color:var(--ink);font-family:inherit;text-align:left;cursor:pointer}
+.mpd-r b{font-size:15px}.mpd-r .h-lv{font-size:12px}.mpd-r em{font-style:normal;font-size:14px;font-weight:700}
+.mpd-r small{grid-column:1/-1;font-size:11.5px;color:var(--muted)}.mpd-r small.bad{color:var(--red2)}.mpd-r small .warn{color:var(--amber)}
+.mpd-r.on{border-color:var(--green);background:var(--green-soft);box-shadow:inset 0 0 0 1px var(--green)}
+.mpd-r.full{opacity:.6}
 #mciMapWrap{border-radius:var(--r-sheet);overflow:hidden;border:1px solid var(--line);margin-bottom:12px;box-shadow:var(--shadow)}
 #mciMap{height:40vh;min-height:260px;background:var(--sunken)}
 .ix-note.bad{color:var(--red2);font-weight:650}
@@ -1179,7 +1218,7 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "653252329719",
   appId: "1:653252329719:web:c3c9ca0891de64c69b13f2"
 };
-const APP_VERSION = 'v3.29.0';
+const APP_VERSION = 'v3.30.0';
 // 醫院即時量能（急救室、候床、ICU、滿載）：目前沒有醫院即時回報的資料來源，先關閉；之後有資料來源再改成 true
 const SHOW_CAPACITY = false;
 const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
@@ -1905,7 +1944,7 @@ const state = {
   pos: null, posLabel: '', posAcc: null, posAt: 0, posAddr: null, posAddrKey: '', locSource: 'gps', searched: false,
   eta: {}, etaState: '', etaKey: '',
   status: {}, simStatus: {}, myNotices: [], expanded: new Set(), rec: null,
-  mci: { type: 'general', red: 3, yellow: 5, green: 8, note: '', result: null, batch: '' },
+  mci: null, mciMore: false,
   hp: { hid: '', draft: null, dirty: false, timer: null, sync: '', syncErr: '', notices: [], seenPending: null, allowed: null, unsub: null, audio: null, board: false },
   adminTab: 'match', mtId: '', mtDraft: null, hSearch: '', statRange: 30, modalBtns: [], ruleDraft: null, presetDraft: null, hospUsers: null
 };
@@ -4380,19 +4419,48 @@ const Tracker = {
 };
 
 /* ========== 大量傷病患分流 ========== */
+/* ========== 大量傷病患分流（後送官） ==========
+ * 流程：開始大傷（定位、依車程排出鄰近醫院）→ 逐一登錄傷患（檢傷、性別、年齡）→ 設定各院可收人數 → 傷患點選後送醫院（可收人數自動減 1）
+ * 紀錄存在這支手機（localStorage），App 關掉再打開仍在；直到按「結束大傷」才清除。只記錄性別、年齡與傷情，不記姓名 */
 const MCI_TYPES = { general: '一般', trauma: '創傷', burn: '燒燙傷', co: '火災／一氧化碳' };
-const MCI_COLORS = [['red', '紅', '危急'], ['yellow', '黃', '緊急'], ['green', '綠', '輕傷']];
-// 各院可收治人數：依醫院等級估計（開啟即時量能時，才用醫院回報的急救室空位修正）
+const MCI_COLORS = [['red', '紅', '危急'], ['yellow', '黃', '緊急'], ['green', '綠', '輕傷'], ['black', '黑', '死亡／瀕死']];
+const MCI_KEY = 'hf_mci_v1', MCI_MAX_ETA = 60;
+const MCI_BODY = [['head', '頭部'], ['neck', '頸部'], ['chest', '胸部'], ['abd', '腹部'], ['pelvis', '骨盆'], ['back', '背部'], ['rua', '右上肢'], ['lua', '左上肢'], ['rll', '右下肢'], ['lll', '左下肢']];
+const MCI_INJ = ['骨折', '出血', '燒燙傷', '撕裂傷', '意識不清', '呼吸困難', '疼痛'];
+function mciBlank() { return { active: false, startedAt: null, type: 'general', note: '', pos: null, posLabel: '', eta: {}, patients: [], cap: {}, seq: 0, add: { tri: 'red', sex: 'M' } }; }
+function loadMci() {
+  const m = readLS(MCI_KEY);
+  if (!m || !m.active) return mciBlank();
+  const b = mciBlank();
+  return { ...b, ...m, eta: m.eta || {}, cap: m.cap || {}, add: { ...b.add, ...(m.add || {}) },
+    patients: (Array.isArray(m.patients) ? m.patients : []).map(p => ({ unit: '', cond: '', inj: [], injT: [], dest: '', sex: '', age: '', ...p })) };
+}
+function saveMci() {
+  const m = state.mci;
+  if (m.active) writeLS(MCI_KEY, m); else { try { localStorage.removeItem(MCI_KEY); } catch (e) { /* ignore */ } }
+  mciMenuBadge();
+}
+function mciMenuBadge() {
+  const b = document.querySelector('#menu [data-to="#mci"]'); if (!b) return;
+  const m = state.mci, on = !!(m && m.active);
+  let s = b.querySelector('.mci-live');
+  if (on && !s) { s = document.createElement('span'); s.className = 'mci-live'; b.appendChild(s); }
+  if (s) { if (on) s.textContent = `進行中 ${m.patients.length} 人`; else s.remove(); }
+}
+const mciLabel = p => `${p.sex === 'M' ? '男' : p.sex === 'F' ? '女' : '?'}${p.age !== '' && p.age != null ? p.age : '?'}`;
+const mciEta = h => { const m = state.mci; return m.eta[h.id] != null ? m.eta[h.id] : estMin(distKm(m.pos, h)); };
+// 鄰近醫院（依車程）
+function mciHosps() {
+  const m = state.mci; if (!m.pos) return [];
+  return state.hospitals.filter(h => h.lat != null && h.lng != null && h.level)
+    .map(h => ({ h, eta: mciEta(h) })).filter(x => x.eta <= MCI_MAX_ETA).sort((a, b) => a.eta - b.eta);
+}
+const mciAssigned = hid => state.mci.patients.filter(p => p.dest === hid);
+function mciLeft(hid) { const c = state.mci.cap[hid]; return c == null ? null : c - mciAssigned(hid).length; }
+// 依醫院等級估計（給後送官參考，不會自動套用）
 function mciCapacity(h) {
-  const st = SHOW_CAPACITY ? liveStatus(h.id) : null, lr = levelRank(h.level);
-  let red = st && st.resusMax != null ? Math.max(0, st.resusMax - (st.resus || 0)) : [1, 2, 3][lr] ?? 0;
-  let yellow = [2, 4, 6][lr] ?? 1, green = [6, 8, 10][lr] ?? 4;
-  if (st) {
-    yellow = Math.max(0, yellow - Math.floor((st.waitBed || 0) / 5));
-    if (st.icuBeds === 0) red = Math.min(red, 1);
-    if (st.erFull) { red = 0; yellow = Math.min(yellow, 1); green = Math.min(green, 2); }
-  }
-  return { red, yellow, green };
+  const lr = levelRank(h.level);
+  return { red: [1, 2, 3][lr] ?? 0, yellow: [2, 4, 6][lr] ?? 1, green: [6, 8, 10][lr] ?? 4 };
 }
 function mciEligible(h, color, type) {
   const lr = levelRank(h.level);
@@ -4406,117 +4474,223 @@ function mciPreferred(h, color, type) {
   if (type === 'co' && color !== 'green') return av.has('HBO');
   return true;
 }
-// 分配演算法（貪婪法）：由重到輕逐一指派到「成本」最低的醫院
-// 成本 = 車程 + 已分配人數 × 分散係數（避免全部送同一間）＋ 沒有專科能力的懲罰
-function mciAllocate(input) {
-  const SPREAD = 5, NOPREF = 20, MAX_ETA = 60;
-  const pool = state.hospitals.filter(h => h.lat != null && h.lng != null && h.level)
-    .map(h => { const d = distKm(state.pos, h); const e = state.eta[h.id]; return { h, d, eta: e ? e.min : estMin(d), cap: mciCapacity(h), got: { red: 0, yellow: 0, green: 0 }, n: 0 }; })
-    .filter(x => x.eta <= MAX_ETA).sort((a, b) => a.eta - b.eta);
-  const unassigned = { red: 0, yellow: 0, green: 0 };
-  MCI_COLORS.forEach(([c]) => {
-    for (let i = 0; i < input[c]; i++) {
-      let best = null, bestCost = Infinity;
-      pool.forEach(x => {
-        if (!mciEligible(x.h, c, input.type) || x.got[c] >= x.cap[c]) return;
-        const cost = x.eta + x.n * SPREAD + (mciPreferred(x.h, c, input.type) ? 0 : NOPREF);
-        if (cost < bestCost) { bestCost = cost; best = x; }
-      });
-      if (best) { best.got[c]++; best.n++; } else unassigned[c]++;
-    }
-  });
-  const used = pool.filter(x => x.n > 0);
-  // 對照：全部送最近一間能收危急傷患的醫院
-  const nearest = pool.find(x => mciEligible(x.h, 'red', input.type)) || pool[0] || null;
-  const total = input.red + input.yellow + input.green;
-  const nearCap = nearest ? nearest.cap.red + nearest.cap.yellow + nearest.cap.green : 0;
-  const lastRed = used.filter(x => x.got.red).reduce((m, x) => Math.max(m, x.eta), 0);
-  return { used, unassigned, nearest, total, nearCap, lastRed, at: Date.now(), input: { ...input } };
+function mciWarn(p, h) {
+  if (!p || p.tri === 'black' || p.tri === 'green') return '';
+  const t = state.mci.type;
+  if (!mciEligible(h, p.tri, t)) return p.tri === 'red' ? (t === 'trauma' ? '紅色創傷建議重度級＋外傷小組' : '紅色建議中度級以上') : '黃色創傷建議中度級以上';
+  if (!mciPreferred(h, p.tri, t)) return t === 'burn' ? '沒有燒燙傷收治' : '沒有高壓氧';
+  return '';
+}
+function mciStats() {
+  const s = {}; MCI_COLORS.forEach(([c]) => { s[c] = { n: 0, M: 0, F: 0, sent: 0 }; });
+  state.mci.patients.forEach(p => { const x = s[p.tri]; if (!x) return; x.n++; if (p.sex === 'M') x.M++; if (p.sex === 'F') x.F++; if (p.dest) x.sent++; });
+  return s;
 }
 function renderMci() {
   const p = $('#mciPanel'); if (!p) return;
+  if (!state.mci) state.mci = loadMci();
   const m = state.mci;
-  p.innerHTML = `<section class="card">
-      <div class="sec-h"><b>大量傷病患分流</b><span class="sub">依醫院等級與能力把傷患分散送醫</span></div>
+  mciMenuBadge();
+  if (!m.active) {
+    p.innerHTML = `<section class="card">
+      <div class="sec-h"><b>大量傷病患分流</b><span class="sub">後送官登錄傷患、分配後送醫院</span></div>
       <div class="label">事故類型</div>
       <div class="seg">${Object.entries(MCI_TYPES).map(([k, v]) => `<button class="${m.type === k ? 'on' : ''}" data-act="mciType" data-v="${k}">${v}</button>`).join('')}</div>
-      <div class="label">傷患人數（檢傷分類）</div>
-      <div class="mci-counts">${MCI_COLORS.map(([c, t, d]) => `<div class="mci-c ${c}"><span class="mci-dot"></span><b>${t}</b><small>${d}</small>
-        <div class="step"><button data-act="mciStep" data-c="${c}" data-d="-1" aria-label="${t}減一">−</button><span class="num">${m[c]}</span><button data-act="mciStep" data-c="${c}" data-d="1" aria-label="${t}加一">＋</button></div></div>`).join('')}</div>
-      <label class="label" for="mciNote">事故描述（選填，會附在通知裡）</label>
+      <label class="label" for="mciNote">事故描述（選填）</label>
       <input id="mciNote" value="${esc(m.note)}" placeholder="例：遊覽車翻覆、國道 3 號南下 30K">
       <div class="loc-row">${ic('pin', 'sm')}<span>${state.pos ? esc(state.posLabel) : '尚未定位（會使用 GPS）'}</span></div>
-      <button class="btn-cta" data-act="mciRun">${ic('ambu')}<span>計算分流</span></button>
-    </section>
-    <div id="mciOut"></div>`;
-  renderMciResult();
-}
-function renderMciResult() {
-  const box = $('#mciOut'); if (!box) return;
-  const r = state.mci.result;
-  if (!r) { box.innerHTML = ''; return; }
-  const un = r.unassigned.red + r.unassigned.yellow + r.unassigned.green;
-  const over = Math.max(0, r.total - r.nearCap);
-  const rows = r.used.map((x, i) => `<div class="mci-row">
-      <div class="h-rank">${i + 1}</div>
-      <div class="mci-main"><b>${esc(x.h.short || x.h.name)}</b><span class="h-lv l${levelRank(x.h.level)}">（${esc(x.h.level)}）</span>
-        <div class="mci-got">${MCI_COLORS.filter(([c]) => x.got[c]).map(([c, t]) => `<span class="mci-pill ${c}">${t} ${x.got[c]}</span>`).join('')}</div>
-        <small>可收約 紅 ${x.cap.red}、黃 ${x.cap.yellow}、綠 ${x.cap.green}${liveStatus(x.h.id) ? '' : '（依等級估計）'}</small></div>
-      <div class="h-dist num"><b>${x.eta}</b><small>分</small></div>
-    </div>`).join('');
-  const batchNotices = state.myNotices.filter(n => n.batch && n.batch === state.mci.batch);
-  box.innerHTML = `<section class="ix">
-      <div class="ix-h"><b>分流結果</b><span>${r.used.length} 間醫院</span></div>
-      <div class="mci-sum">
-        <div><b class="num">${r.total - un}</b><small>已分配</small></div>
-        <div><b class="num ${un ? 'bad' : ''}">${un}</b><small>無法分配</small></div>
-        <div><b class="num">${r.lastRed || '–'}</b><small>危急傷患最晚到院（分）</small></div>
+      <button class="btn-cta" data-act="mciStart">${ic('ambu')}<span>開始大傷</span></button>
+      <ol class="mci-how"><li>依目前位置排出鄰近醫院（依車程）</li><li>逐一登錄傷患：檢傷顏色、性別、年齡（例：男 17）</li><li>設定各院可收治人數，點傷患選後送醫院，可收人數自動減 1</li><li>紀錄存在這支手機，App 關掉再開仍在，直到按「結束大傷」</li></ol>
+    </section>`;
+    return;
+  }
+  const st = mciStats(), tot = m.patients.length, sent = m.patients.filter(x => x.dest).length;
+  const statHtml = `<div class="mci-stat">${MCI_COLORS.map(([c, t]) => `<div class="ms ${c}"><b>${t}</b><strong class="num">${st[c].n}</strong><small>男 ${st[c].M}・女 ${st[c].F}</small><em>已後送 ${st[c].sent}</em></div>`).join('')}</div>
+    <div class="mci-tot">共 <b class="num">${tot}</b> 人・已指定醫院 <b class="num">${sent}</b>・未指定 <b class="num ${tot - sent ? 'bad' : ''}">${tot - sent}</b></div>`;
+  const a = m.add;
+  const addHtml = `<div class="mci-add">
+      <div class="tri-seg">${MCI_COLORS.map(([c, t]) => `<button class="tri ${c} ${a.tri === c ? 'on' : ''}" data-act="mciAddSet" data-k="tri" data-v="${c}">${t}</button>`).join('')}</div>
+      <div class="mci-add-row">
+        <div class="seg sex">${[['M', '男'], ['F', '女']].map(([k, t]) => `<button class="${a.sex === k ? 'on' : ''}" data-act="mciAddSet" data-k="sex" data-v="${k}">${t}</button>`).join('')}</div>
+        <input id="mciAge" class="num" type="number" inputmode="numeric" min="0" max="120" placeholder="年齡" aria-label="年齡">
+        <button class="btn primary" data-act="mciAdd">＋ 新增</button>
       </div>
-      ${r.nearest ? `<div class="ix-note">對照：如果 ${r.total} 人全部送最近的 ${esc(r.nearest.h.short || r.nearest.h.name)}，該院約可收 ${r.nearCap} 人${over ? `，會超收 <b class="bad">${over}</b> 人` : '，量能足夠'}。</div>` : ''}
-      ${un ? `<div class="ix-note bad">60 分鐘車程內的醫院估計收不下，${un} 人尚未分配。建議請求跨區支援。</div>` : ''}
+      <div class="hint">只記錄檢傷、性別、年齡與傷情，請勿輸入姓名</div></div>`;
+  const ptHtml = MCI_COLORS.map(([c, t, d]) => {
+    const list = m.patients.filter(x => x.tri === c); if (!list.length) return '';
+    return `<div class="mci-grp ${c}"><div class="mci-gh"><i></i>${t}・${d}<span>${list.length}</span></div><div class="mci-pts">${list.map(x => {
+      const h = x.dest ? hospById(x.dest) : null;
+      return `<button class="mpt ${x.dest ? 'sent' : ''}" data-act="mciPt" data-id="${esc(x.id)}"><b>${esc(mciLabel(x))}</b><small>#${x.no}${x.unit ? '・' + esc(x.unit) : ''}</small><em>${h ? esc(h.short || h.name) : '未指定醫院'}</em></button>`; }).join('')}</div></div>`;
+  }).join('') || '<div class="empty">還沒有傷患，用上面的列新增</div>';
+  const hs = mciHosps(), more = state.mciMore, shown = more ? hs : hs.slice(0, 12);
+  const hHtml = shown.map(x => {
+    const cap = m.cap[x.h.id], left = mciLeft(x.h.id), got = mciAssigned(x.h.id), est = mciCapacity(x.h);
+    const cnt = MCI_COLORS.map(([c, t]) => { const n = got.filter(p => p.tri === c).length; return n ? `<span class="mci-pill ${c}">${t} ${n}</span>` : ''; }).join('');
+    return `<div class="mh ${left != null && left <= 0 ? 'full' : ''}">
+      <div class="mh-main"><b>${esc(x.h.short || x.h.name)}</b><span class="h-lv l${levelRank(x.h.level)}">${esc(x.h.level)}</span>
+        <small>${x.eta} 分・參考：紅 ${est.red}／黃 ${est.yellow}／綠 ${est.green}</small>${cnt ? `<div class="mci-got">${cnt}</div>` : ''}</div>
+      <div class="mh-cap"><div class="step"><button data-act="mciCap" data-h="${esc(x.h.id)}" data-d="-1" aria-label="可收減一">−</button><span class="num">${cap == null ? '–' : cap}</span><button data-act="mciCap" data-h="${esc(x.h.id)}" data-d="1" aria-label="可收加一">＋</button></div>
+        <small class="${left != null && left <= 0 ? 'bad' : ''}">${cap == null ? '未設定可收' : `剩 ${left}`}</small></div></div>`;
+  }).join('');
+  p.innerHTML = `<section class="card">
+      <div class="sec-h"><b>大傷進行中</b><span class="sub">${MCI_TYPES[m.type]}・${fmtDayClock(m.startedAt)} 開始</span></div>
+      <label class="label" for="mciNote">事故描述（選填）</label>
+      <input id="mciNote" value="${esc(m.note)}" placeholder="例：遊覽車翻覆、國道 3 號南下 30K">
+      <div class="loc-row">${ic('pin', 'sm')}<span>${esc(m.posLabel || '事故現場')}</span><button class="btn sm" data-act="mciRelocate">重新定位</button></div>
+      ${statHtml}
+    </section>
+    <section class="card"><div class="sec-title">新增傷患</div>${addHtml}${ptHtml}</section>
+    <section class="card"><div class="sec-title">鄰近醫院・可收治人數</div>
+      <div class="hint" style="margin:0 0 8px">依車程排序；請依醫院回覆設定可收人數，傷患選了醫院就自動減 1。</div>
+      <div class="mh-list">${hHtml || '<div class="empty">60 分鐘車程內沒有醫院</div>'}</div>
+      ${hs.length > 12 ? `<button class="btn ghost" style="width:100%;margin-top:8px" data-act="mciMore">${more ? '收合' : `顯示全部 ${hs.length} 間`}</button>` : ''}
+      <button class="btn" style="width:100%;margin-top:10px" data-act="mciAuto">${ic('spark', 'sm')}幫未指定的傷患建議醫院</button>
     </section>
     <div id="mciMapWrap"><div id="mciMap"></div></div>
-    <div class="hlist">${rows || '<div class="empty">附近沒有可收治的醫院</div>'}</div>
-    ${r.used.length ? `<button class="btn-cta" data-act="mciNotify">${ic('paste')}<span>${navigator.share ? '分享' : '複製'}分流結果（${r.used.length} 間醫院）</span></button>
-      <div class="hint">分流結果只在這支手機上整理，不會自動傳給醫院；請傳給勤務中心或指揮官，再由各車撥打醫院電話交班。</div>` : ''}
-    <div class="nbar" id="mciNotices" style="margin-top:12px"></div>
-    <div class="foot">分配原則：由危急到輕傷逐一指派到「車程＋已分配人數×5 分」最小的醫院；危急傷患需中度級以上（創傷需重度級＋創傷團隊）。僅供示範與討論。</div>`;
-  renderMciNotices();
-  const pins = [{ lat: state.pos.lat, lng: state.pos.lng, cls: 'me-pin', html: '<span></span>', size: [18, 18], z: 1000, popup: '事故現場' }]
-    .concat(r.used.map((x, i) => ({ lat: x.h.lat, lng: x.h.lng, cls: 'h-pin match', html: `<b>${i + 1}</b><em class="pin-lab">${esc((x.h.short || x.h.name).replace(/醫院$/, '').slice(0, 6))}</em>`,
-      popup: `<div class="pop"><b>${esc(x.h.short || x.h.name)}</b><div class="m">${x.eta} 分，${MCI_COLORS.filter(([c]) => x.got[c]).map(([c, t]) => `${t} ${x.got[c]}`).join('、')}</div></div>` })));
+    <button class="btn-cta" data-act="mciNotify">${ic('paste')}<span>${navigator.share ? '分享' : '複製'}分流結果</span></button>
+    <div class="hint">分流結果只在這支手機上整理，不會自動傳給醫院；請傳給勤務中心或指揮官。</div>
+    <button class="btn danger mci-end" data-act="mciEnd">結束大傷（清除這支手機的紀錄）</button>
+    <div class="foot">建議醫院：由紅到綠，指派到「車程＋已分配人數×5 分」最小、且還有可收名額的醫院；紅色需中度級以上（創傷需重度級＋外傷小組）。僅供參考，以後送官判斷為準。</div>`;
+  const used = hs.filter(x => mciAssigned(x.h.id).length || m.cap[x.h.id] != null);
+  const pins = [{ lat: m.pos.lat, lng: m.pos.lng, cls: 'me-pin', html: '<span></span>', size: [18, 18], z: 1000, popup: '事故現場' }]
+    .concat(used.map((x, i) => ({ lat: x.h.lat, lng: x.h.lng, cls: 'h-pin match', html: `<b>${mciAssigned(x.h.id).length}</b><em class="pin-lab">${esc((x.h.short || x.h.name).replace(/醫院$/, '').slice(0, 6))}</em>`,
+      popup: `<div class="pop"><b>${esc(x.h.short || x.h.name)}</b><div class="m">${x.eta} 分・已分 ${mciAssigned(x.h.id).length} 人${m.cap[x.h.id] != null ? `・剩 ${mciLeft(x.h.id)}` : ''}</div></div>` })));
   renderPinsMap('mciMap', pins);
 }
-function renderMciNotices() {
-  const box = $('#mciNotices'); if (!box) return;
-  const list = state.myNotices.filter(n => n.batch && n.batch === state.mci.batch && n.status !== 'cancelled');
-  box.innerHTML = list.map(n => {
-    const st = { pending: '等待回覆', accepted: '可收治', declined: '請改送' }[n.status];
-    return `<div class="nrow ${n.status}">${ic('hosp')}<div class="t"><b>${esc(n.hospitalName)}</b><small>${esc(n.patient)}${n.reply ? '，' + esc(n.reply) : ''}</small></div><span class="nst ${n.status}">${st}</span></div>`;
-  }).join('');
-}
-async function mciRun() {
-  const btn = document.querySelector('[data-act="mciRun"]');
+function renderMciNotices() { /* 舊版「到院前通知」批次：已改為分享分流結果 */ }
+async function mciStart() {
+  const btn = document.querySelector('[data-act="mciStart"]');
   const m = state.mci;
-  if (m.red + m.yellow + m.green === 0) throw new Error('請輸入傷患人數');
   setRunning(true);
   try {
-    if (!state.pos || state.locSource === 'gps') { if (btn) btn.querySelector('span').textContent = '定位中…'; await locate(); }
-    await fetchEta(state.pos, state.hospitals.filter(h => h.lat != null).map(h => ({ h, d: distKm(state.pos, h) })).sort((a, b) => a.d - b.d));
-    m.result = mciAllocate(m); m.batch = '';
-    logEvent({ type: 'mci', total: m.result.total, hospitals: m.result.used.length });
-    renderMci();
-    const o = $('#mciOut'); if (o) window.scrollTo({ top: o.getBoundingClientRect().top + window.scrollY - 70, behavior: 'smooth' });
-  } finally { setRunning(false); if (btn && document.body.contains(btn)) btn.querySelector('span').textContent = '計算分流'; }
+    if (!state.pos || state.locSource === 'gps') { if (btn) btn.querySelector('span').textContent = '定位中…'; await locate(true); }
+    await mciEtaFor(state.pos);
+    Object.assign(m, { active: true, startedAt: Date.now(), pos: { ...state.pos }, posLabel: state.posLabel, patients: [], cap: {}, seq: 0 });
+    saveMci();
+    logEvent({ type: 'mci', mciType: m.type, hospitals: mciHosps().length });
+    renderMci(); toast('已開始大傷：紀錄會保留在這支手機，直到按「結束大傷」');
+  } finally { setRunning(false); if (btn && document.body.contains(btn)) btn.querySelector('span').textContent = '開始大傷'; }
+}
+async function mciEtaFor(pos) {
+  state.eta = {}; state.etaState = ''; state.etaKey = '';
+  await fetchEta(pos, state.hospitals.filter(h => h.lat != null).map(h => ({ h, d: distKm(pos, h) })).sort((a, b) => a.d - b.d));
+  state.mci.eta = Object.fromEntries(Object.entries(state.eta).map(([k, v]) => [k, v.min]));
+}
+async function mciRelocate() {
+  setRunning(true);
+  try {
+    if (state.locSource === 'gps') await locate(true);
+    if (!state.pos) throw new Error('尚未取得位置');
+    await mciEtaFor(state.pos);
+    state.mci.pos = { ...state.pos }; state.mci.posLabel = state.posLabel; saveMci(); renderMci(); toast('已重新定位，醫院依新的車程排序');
+  } finally { setRunning(false); }
+}
+function mciAdd() {
+  const m = state.mci, inp = $('#mciAge');
+  const age = inp ? inp.value.trim() : '';
+  if (age !== '' && (!/^\d{1,3}$/.test(age) || Number(age) > 120)) throw new Error('年齡請填 0–120 的數字');
+  const p = { id: 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), no: ++m.seq, tri: m.add.tri, sex: m.add.sex, age, unit: '', cond: '', inj: [], injT: [], dest: '', at: Date.now() };
+  m.patients.push(p); saveMci(); renderMci();
+  toast(`已新增 ${MCI_COLORS.find(c => c[0] === p.tri)[1]}・${mciLabel(p)}（#${p.no}）`, 1800);
+  const ni = $('#mciAge'); if (ni) ni.focus();
+}
+// 傷患詳細：檢傷、性別年齡、後送單位、傷情（人圖）、後送醫院
+let mciPtId = '';
+function mciUnits() { return [...new Set([localCfg.unit, ...state.mci.patients.map(p => p.unit)].map(s => (s || '').trim()).filter(Boolean))].slice(0, 8); }
+function mciBodySvg(p) {
+  const on = r => p.inj.includes(r) ? 'on' : '';
+  const R = (r, el) => el.replace('<', `<g class="br ${on(r)}" data-act="mciInj" data-r="${r}"><title>${MCI_BODY.find(b => b[0] === r)[1]}</title><`).replace(/\/>$/, '/></g>');
+  return `<svg class="mci-body" viewBox="0 0 120 240" role="img" aria-label="人體傷情圖（面向救護員）">
+    ${R('head', '<circle cx="60" cy="20" r="15"/>')}${R('neck', '<rect x="53" y="35" width="14" height="9" rx="3"/>')}
+    ${R('chest', '<rect x="37" y="45" width="46" height="40" rx="9"/>')}${R('abd', '<rect x="39" y="86" width="42" height="30" rx="6"/>')}
+    ${R('pelvis', '<rect x="39" y="117" width="42" height="22" rx="7"/>')}
+    ${R('rua', '<rect x="17" y="47" width="17" height="86" rx="8"/>')}${R('lua', '<rect x="86" y="47" width="17" height="86" rx="8"/>')}
+    ${R('rll', '<rect x="40" y="141" width="18" height="94" rx="8"/>')}${R('lll', '<rect x="62" y="141" width="18" height="94" rx="8"/>')}
+    <text x="25" y="146" text-anchor="middle">右</text><text x="95" y="146" text-anchor="middle">左</text></svg>`;
+}
+function mciPtBody(p) {
+  const units = mciUnits(), hs = mciHosps();
+  return `<div class="label" style="margin-top:0">檢傷</div>
+    <div class="tri-seg">${MCI_COLORS.map(([c, t]) => `<button class="tri ${c} ${p.tri === c ? 'on' : ''}" data-act="mciPtSet" data-k="tri" data-v="${c}">${t}</button>`).join('')}</div>
+    <div class="mci-add-row" style="margin-top:10px">
+      <div class="seg sex">${[['M', '男'], ['F', '女']].map(([k, t]) => `<button class="${p.sex === k ? 'on' : ''}" data-act="mciPtSet" data-k="sex" data-v="${k}">${t}</button>`).join('')}</div>
+      <input id="mp_age" class="num" type="number" inputmode="numeric" min="0" max="120" placeholder="年齡" value="${esc(p.age)}" aria-label="年齡"></div>
+    <label class="label" for="mp_unit">後送單位</label>
+    <input id="mp_unit" value="${esc(p.unit)}" placeholder="例：新板91">
+    ${units.length ? `<div class="chips mci-units">${units.map(u => `<button class="chip ${p.unit === u ? 'on' : ''}" data-act="mciPtSet" data-k="unit" data-v="${esc(u)}">${esc(u)}</button>`).join('')}</div>` : ''}
+    <div class="label">傷情（點人圖標示受傷部位・人圖面向你）</div>
+    <div class="mci-inj">${mciBodySvg(p)}<div class="mci-injr">
+      <div class="chips">${MCI_BODY.filter(([r]) => r === 'back').map(([r, t]) => `<button class="chip ${p.inj.includes(r) ? 'on bad' : ''}" data-act="mciInj" data-r="${r}">${t}</button>`).join('')}</div>
+      <div class="chips">${MCI_INJ.map(t => `<button class="chip ${p.injT.includes(t) ? 'on' : ''}" data-act="mciInjT" data-v="${esc(t)}">${esc(t)}</button>`).join('')}</div>
+      <div class="mci-injtxt">${p.inj.length ? '部位：' + p.inj.map(r => MCI_BODY.find(b => b[0] === r)[1]).join('、') : '尚未標示部位'}</div></div></div>
+    <label class="label" for="mp_cond">傷病狀況</label>
+    <textarea id="mp_cond" rows="2" placeholder="例：右大腿開放性骨折、意識清楚（請勿輸入姓名）">${esc(p.cond)}</textarea>
+    <div class="label">後送醫院${p.tri === 'black' ? '<small>黑色：原則上不後送</small>' : ''}</div>
+    <div class="mpd">
+      <button class="mpd-r ${!p.dest ? 'on' : ''}" data-act="mciPtDest" data-h=""><b>未指定</b></button>
+      ${hs.map(x => { const left = mciLeft(x.h.id), w = mciWarn(p, x.h), on = p.dest === x.h.id;
+        const leftShown = left == null ? '未設定可收' : `剩 ${left}`;
+        return `<button class="mpd-r ${on ? 'on' : ''} ${left != null && left <= 0 && !on ? 'full' : ''}" data-act="mciPtDest" data-h="${esc(x.h.id)}">
+          <b>${esc(x.h.short || x.h.name)}</b><span class="h-lv l${levelRank(x.h.level)}">${esc(x.h.level)}</span><em class="num">${x.eta} 分</em>
+          <small class="${left != null && left <= 0 && !on ? 'bad' : ''}">${leftShown}${w ? `・<span class="warn">${esc(w)}</span>` : ''}</small></button>`; }).join('')}
+    </div>`;
+}
+function openMciPt(id) {
+  const p = state.mci.patients.find(x => x.id === id); if (!p) return;
+  mciPtId = id;
+  openModal({ title: `傷患 #${p.no}・${mciLabel(p)}`, body: mciPtBody(p), buttons: [
+    { text: '刪除', cls: 'danger', onClick: () => { if (!confirm(`刪除傷患 #${p.no}？`)) return; state.mci.patients = state.mci.patients.filter(x => x.id !== id); saveMci(); closeModal(); renderMci(); } },
+    { text: '完成', cls: 'primary', onClick: () => { closeModal(); renderMci(); } }] });
+}
+function mciPtRefresh() {
+  const p = state.mci.patients.find(x => x.id === mciPtId), b = $('#modalBody'); if (!p || !b) return;
+  const y = b.scrollTop; b.innerHTML = mciPtBody(p); b.scrollTop = y;
+  const t = $('#modalTitle'); if (t) t.textContent = `傷患 #${p.no}・${mciLabel(p)}`;
+  saveMci();
+}
+// 幫未指定的傷患建議醫院（由紅到綠；只用還有名額的醫院；都沒設定可收人數時，用等級估計）
+function mciAuto() {
+  const m = state.mci, hs = mciHosps();
+  const anyCap = hs.some(x => m.cap[x.h.id] != null);
+  const left = {}, n = {};
+  hs.forEach(x => { n[x.h.id] = mciAssigned(x.h.id).length; left[x.h.id] = anyCap ? (m.cap[x.h.id] == null ? 0 : m.cap[x.h.id] - n[x.h.id]) : Infinity; });
+  const estLeft = {}; if (!anyCap) hs.forEach(x => { const e = mciCapacity(x.h); estLeft[x.h.id] = { ...e }; mciAssigned(x.h.id).forEach(p => { if (estLeft[x.h.id][p.tri] != null) estLeft[x.h.id][p.tri]--; }); });
+  let done = 0, miss = 0;
+  ['red', 'yellow', 'green'].forEach(c => m.patients.filter(p => p.tri === c && !p.dest).forEach(p => {
+    let best = null, bestCost = Infinity;
+    hs.forEach(x => {
+      const id = x.h.id;
+      if (!mciEligible(x.h, c, m.type)) return;
+      if (anyCap ? left[id] <= 0 : estLeft[id][c] <= 0) return;
+      const cost = x.eta + n[id] * 5 + (mciPreferred(x.h, c, m.type) ? 0 : 20);
+      if (cost < bestCost) { bestCost = cost; best = x; }
+    });
+    if (best) { p.dest = best.h.id; n[best.h.id]++; if (anyCap) left[best.h.id]--; else estLeft[best.h.id][c]--; done++; } else miss++;
+  }));
+  saveMci(); renderMci();
+  if (!done && !miss) toast('沒有未指定醫院的傷患');
+  else toast(`已建議 ${done} 位${miss ? `，${miss} 位找不到有名額的醫院（請增加可收人數或請求支援）` : ''}；可點傷患修改${anyCap ? '' : '（尚未設定可收人數，先用醫院等級估計）'}`, 5000);
+}
+function mciEnd() {
+  const m = state.mci;
+  if (!confirm(`結束大傷會清除這支手機上的 ${m.patients.length} 位傷患紀錄。\n建議先按「分享／複製分流結果」。確定結束？`)) return;
+  logEvent({ type: 'mci_end', total: m.patients.length, sent: m.patients.filter(p => p.dest).length });
+  const keep = { type: m.type };
+  state.mci = { ...mciBlank(), ...keep }; state.mciMore = false;
+  saveMci(); renderMci(); toast('已結束大傷，紀錄已清除');
 }
 // 分流結果整理成文字（給勤務中心、指揮官或 LINE 群組）；不會自動傳給醫院
 function mciText() {
-  const r = state.mci.result; if (!r || !r.used.length) throw new Error('請先按「分配」');
-  const note = state.mci.note.trim();
-  return [`【大量傷病患分流】${MCI_TYPES[r.input.type]}・共 ${r.total} 人・${fmtClock(Date.now())}${localCfg.unit ? '・' + localCfg.unit : ''}`,
+  const m = state.mci; if (!m.active || !m.patients.length) throw new Error('還沒有傷患紀錄');
+  const st = mciStats(), note = m.note.trim();
+  const pt = p => `${MCI_COLORS.find(c => c[0] === p.tri)[1]} ${mciLabel(p)}${p.unit ? `（${p.unit}）` : ''}`;
+  const hs = mciHosps().filter(x => mciAssigned(x.h.id).length);
+  const un = m.patients.filter(p => !p.dest);
+  return [`【大量傷病患分流】${MCI_TYPES[m.type]}・共 ${m.patients.length} 人・${fmtClock(Date.now())}${localCfg.unit ? '・' + localCfg.unit : ''}`,
     note ? `現場：${note}` : '',
-    ...r.used.map((x, i) => `${i + 1}. ${x.h.short || x.h.name}（${x.eta} 分）：${MCI_COLORS.filter(([c]) => x.got[c]).map(([c, t]) => `${t} ${x.got[c]}`).join('、')}${x.h.tel ? '　☎ 總機 ' + x.h.tel : ''}`),
-    MCI_COLORS.some(([c]) => r.unassigned[c]) ? `尚未分配：${MCI_COLORS.filter(([c]) => r.unassigned[c]).map(([c, t]) => `${t} ${r.unassigned[c]}`).join('、')}` : ''
+    MCI_COLORS.map(([c, t]) => `${t} ${st[c].n}（男 ${st[c].M}・女 ${st[c].F}）`).join('、'),
+    ...hs.map((x, i) => `${i + 1}. ${x.h.short || x.h.name}（${x.eta} 分${m.cap[x.h.id] != null ? `・可收 ${m.cap[x.h.id]}・剩 ${mciLeft(x.h.id)}` : ''}）：${mciAssigned(x.h.id).map(pt).join('、')}`),
+    un.length ? `尚未指定醫院：${un.map(pt).join('、')}` : ''
   ].filter(Boolean).join('\n');
 }
 async function mciNotify() {
@@ -6325,9 +6499,28 @@ const ACTIONS = {
   onsetAgo: el => setOnset(Date.now() - Number(el.dataset.m) * 60e3, 'manual'),
   onsetUnknown: () => { state.clock.unknown = !state.clock.unknown; if (state.clock.unknown) { state.clock.onsetAt = null; state.clock.src = 'manual'; } renderClockBox(); renderResults(); },
   fmcNow: () => { state.clock.fmcAt = Date.now(); renderClockBox(); renderResults(); },
-  mciType: el => { state.mci.type = el.dataset.v; state.mci.result = null; renderMci(); },
-  mciStep: el => { const c = el.dataset.c; state.mci[c] = Math.max(0, Math.min(200, state.mci[c] + Number(el.dataset.d))); state.mci.result = null; renderMci(); },
-  mciRun: () => mciRun(),
+  mciType: el => { state.mci.type = el.dataset.v; renderMci(); },
+  mciStart: () => mciStart(),
+  mciRelocate: () => mciRelocate(),
+  mciAddSet: el => { state.mci.add[el.dataset.k] = el.dataset.v; saveMci(); const age = $('#mciAge') ? $('#mciAge').value : ''; renderMci(); if ($('#mciAge')) $('#mciAge').value = age; },
+  mciAdd: () => mciAdd(),
+  mciPt: el => openMciPt(el.dataset.id),
+  mciPtSet: el => { const p = state.mci.patients.find(x => x.id === mciPtId); if (!p) return; p[el.dataset.k] = p[el.dataset.k] === el.dataset.v && el.dataset.k === 'unit' ? '' : el.dataset.v; mciPtRefresh(); },
+  mciInj: el => { const p = state.mci.patients.find(x => x.id === mciPtId); if (!p) return; const r = el.dataset.r; p.inj = p.inj.includes(r) ? p.inj.filter(x => x !== r) : p.inj.concat(r); mciPtRefresh(); },
+  mciInjT: el => { const p = state.mci.patients.find(x => x.id === mciPtId); if (!p) return; const v = el.dataset.v; p.injT = p.injT.includes(v) ? p.injT.filter(x => x !== v) : p.injT.concat(v); mciPtRefresh(); },
+  mciPtDest: el => {
+    const p = state.mci.patients.find(x => x.id === mciPtId); if (!p) return;
+    const hid = el.dataset.h, left = hid ? mciLeft(hid) : null;
+    p.dest = hid;
+    mciPtRefresh();
+    if (hid && left != null && left <= 0) toast(`注意：${(hospById(hid) || {}).short || ''} 已超過設定的可收人數`, 3500);
+  },
+  mciCap: el => { const m = state.mci, id = el.dataset.h, d = Number(el.dataset.d), c = m.cap[id];
+    if (c == null) { if (d > 0) m.cap[id] = 1; } else { const v = c + d; if (v < 0) delete m.cap[id]; else m.cap[id] = Math.min(200, v); }
+    saveMci(); renderMci(); },
+  mciMore: () => { state.mciMore = !state.mciMore; renderMci(); },
+  mciAuto: () => mciAuto(),
+  mciEnd: () => mciEnd(),
   feedback: () => openFeedback(),
   fbType: el => { state.fbType = el.dataset.v; $$('.fb-type button').forEach(b => b.classList.toggle('on', b.dataset.v === state.fbType)); },
   fbHosp: el => { const h = hospById(el.dataset.id); openFeedback({ type: 'data', text: h ? `醫院：${h.name}\n有誤的地方：` : '' }); },
@@ -6514,6 +6707,7 @@ document.addEventListener('click', e => {
   runAction(el, e);
 });
 document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.id === 'mciAge') { e.preventDefault(); runAction($('[data-act="mciAdd"]'), e); return; }
   if (e.key === 'Enter' && e.target.id === 'adminPinInput') { e.preventDefault(); runAction($('[data-act="adminUnlock"]'), e); return; }
   if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('.h-card[data-act]')) { e.preventDefault(); runAction(e.target, e); }
 });
@@ -6545,7 +6739,12 @@ document.addEventListener('input', e => {
   if (t.id === 'caseText') { state.caseText = t.value; onCaseInput(); }
   if (t.id === 'hSearch') { state.hSearch = t.value; renderHospList(); }
   if (t.id === 'hpNote' && state.hp.draft) { state.hp.draft.note = t.value; hpChanged(false); }
-  if (t.id === 'mciNote') state.mci.note = t.value;
+  if (t.id === 'mciNote') { state.mci.note = t.value; if (state.mci.active) saveMci(); }
+  if (mciPtId && ['mp_age', 'mp_unit', 'mp_cond'].includes(t.id)) {
+    const p = state.mci.patients.find(x => x.id === mciPtId);
+    if (p) { p[{ mp_age: 'age', mp_unit: 'unit', mp_cond: 'cond' }[t.id]] = t.id === 'mp_age' ? t.value.replace(/\D/g, '').slice(0, 3) : t.value.slice(0, 300); saveMci();
+      if (t.id === 'mp_age') { const tt = $('#modalTitle'); if (tt) tt.textContent = `傷患 #${p.no}・${mciLabel(p)}`; } }
+  }
   if (['n_unit', 'n_eta', 'n_patient', 'n_vitals', 'n_tx', 'n_summary'].includes(t.id)) hoAutoUpdate();
   if (t.id === 'n_handover') state.hoEdited = true;
   if (t.dataset && t.dataset.mt === 'label') mtSetLabel(Number(t.dataset.gi), t.value);
@@ -6612,6 +6811,9 @@ async function boot() {
     useOfflineData(true); state.syncing = true;
   }
   Store._bootDone = true;
+  // 大傷進行中：App 重新開啟時回到分流畫面（紀錄在這支手機，直到按「結束大傷」）
+  state.mci = loadMci(); mciMenuBadge();
+  if (state.mci.active && (location.hash === '' || location.hash === '#')) { history.replaceState(null, '', location.pathname + location.search + '#mci'); setTimeout(() => toast(`大傷進行中（${state.mci.patients.length} 人），已回到分流畫面`, 3500), 400); }
   if (Store.mode === 'demo') startStatusWatch();
   if (SHOW_CAPACITY && localCfg.sim) Sim.start();
   Tracker.start();
