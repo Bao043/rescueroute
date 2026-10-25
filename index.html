@@ -742,6 +742,49 @@ b.ok,span.ok{color:var(--green)}b.warn,span.warn{color:var(--amber)}b.bad,span.b
 .mci-pill{font-size:13px;font-weight:750;padding:2px 9px;border-radius:7px}
 .mci-pill.red{background:#D3302A;color:#fff}.mci-pill.yellow{background:#F4B400;color:#2a1b00}.mci-pill.green{background:#0C9A4C;color:#fff}.mci-pill.black{background:#1E2329;color:#fff;border:1px solid #555}
 .mci-live{margin-left:auto;font-size:11px;font-weight:800;color:#fff;background:var(--red);border-radius:999px;padding:2px 8px}
+.cl-sub{font-size:13px;color:var(--muted);margin-bottom:8px}
+.cl{padding:10px 0;border-top:1px solid var(--line)}.cl:first-of-type{border-top:0}
+.cl-h{display:flex;align-items:baseline;gap:10px}.cl-h b{font-family:var(--num);font-size:18px;color:var(--red2)}.cl-h span{font-size:12px;color:var(--muted)}
+.cl ul{margin:6px 0 0;padding-left:20px;font-size:14px;line-height:1.65}
+.mci-types{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.mty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:64px;padding:8px 4px;border-radius:13px;border:1px solid var(--line2);background:var(--field);color:var(--ink2);font-family:inherit;font-size:13px;font-weight:750;cursor:pointer;line-height:1.2;text-align:center}
+.mty .ic{width:22px;height:22px}
+.mty.on{background:var(--red);border-color:var(--red);color:#fff;box-shadow:0 4px 14px rgba(229,72,77,.3)}
+.mci-types.compact .mty{min-height:54px;font-size:12px}
+.mci-tips{margin-top:10px;padding:11px 13px;border-radius:12px;background:var(--amber-soft);border-left:4px solid var(--yellow);font-size:13.5px;line-height:1.6}
+.mci-tips b{display:flex;align-items:center;gap:6px;font-size:14px}
+.mci-tips ul{margin:4px 0 2px;padding-left:18px}
+.mci-tips .linkish{font-size:12px}
+.mci-typebox{margin:6px 0 4px}
+.mci-typebox>summary{cursor:pointer;display:flex;align-items:center;gap:6px;font-size:14px;color:var(--ink2);padding:8px 0;list-style:none}
+.mci-typebox>summary::-webkit-details-marker{display:none}
+.mci-typebox>summary b{color:var(--ink)}.mci-typebox>summary span{font-size:12px;color:var(--muted)}
+.mh-list{display:flex;flex-direction:column}
+.mh{padding:11px 0 12px;border-top:1px solid var(--line)}
+.mh:first-child{border-top:0}
+.mh-top{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.mh-top b{font-size:16px}.mh-top .h-lv{font-size:12px}.mh-top em{font-style:normal;font-size:13px;color:var(--ink2);font-weight:700;margin-left:auto}
+.mh-top .mh-n{font-size:12px;font-weight:800;color:var(--green)}
+.mh-top .linkish{font-size:12px}
+.mh-caps{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:8px}
+.mc{border-radius:10px;background:var(--field);border-left:4px solid var(--line2);padding:5px 6px 5px 8px;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:6px;align-items:center;min-width:0}
+.mc i{font-style:normal;font-size:13px;font-weight:800;grid-row:1/3}
+.mc.red{border-left-color:#D3302A}.mc.red i{color:#E5484D}.mc.yellow{border-left-color:#F4B400}.mc.yellow i{color:var(--amber)}.mc.green{border-left-color:#0C9A4C}.mc.green i{color:var(--green)}.mc.black{border-left-color:#555}
+.mc-s{display:flex;align-items:center;justify-content:space-between;gap:2px}
+.mc-s button{flex:none;width:30px;height:30px;border-radius:9px;border:1px solid var(--line2);background:var(--surface);color:var(--ink);font-size:17px;line-height:1;padding:0;cursor:pointer;font-family:inherit}
+.mc-s .mc-v{flex:1;width:auto;min-width:0;border:0;background:transparent;font-size:17px;font-weight:800;padding:0 2px;white-space:nowrap}
+.mc small{font-size:11px;color:var(--ink2);font-weight:700;white-space:nowrap;text-align:center}
+.mc.full small{color:var(--red2)}.mc.full{background:var(--red-soft)}
+.mci-selh{font-size:13px;color:var(--ink2)}.mci-selh b{color:var(--red2)}.mci-selh span{color:var(--muted)}
+.mci-injc.off{opacity:.45}
+.mci-injr .chip.sel,.mci-body .br.sel *{outline:none}
+.mci-body .br.sel *{stroke:var(--ink);stroke-width:3}
+.mci-injr .chip.sel{box-shadow:0 0 0 2px var(--ink)}
+.mci-injlist{margin-top:10px;display:flex;flex-direction:column;gap:4px;font-size:13.5px}
+.mci-injlist div{display:flex;gap:8px;align-items:baseline;padding:6px 10px;border-radius:9px;background:var(--red-soft)}
+.mci-injlist b{flex:none}.mci-injlist span{flex:1;color:var(--ink2)}.mci-injlist .linkish{font-size:12px;flex:none}
+.label small{font-weight:500;color:var(--muted);margin-left:6px;font-size:12px}
+@media(max-width:360px){.mci-types{grid-template-columns:repeat(3,minmax(0,1fr))}.mc-s button{width:26px;height:28px}.mc-s .mc-v{font-size:15px}}
 .mci-how{margin:14px 0 0;padding-left:20px;font-size:13.5px;line-height:1.7;color:var(--ink2)}
 .mci-stat{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:14px}
 .ms{border-radius:12px;padding:8px 4px 9px;text-align:center;background:var(--field);border-top:4px solid var(--line2);display:flex;flex-direction:column;gap:1px;min-width:0}
@@ -769,13 +812,6 @@ b.ok,span.ok{color:var(--green)}b.warn,span.warn{color:var(--amber)}b.bad,span.b
 .mpt em{font-style:normal;font-size:12px;font-weight:700;color:var(--red2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .mpt.sent em{color:var(--green)}
 .mci-grp.red .mpt{border-left-color:#D3302A}.mci-grp.yellow .mpt{border-left-color:#F4B400}.mci-grp.green .mpt{border-left-color:#0C9A4C}.mci-grp.black .mpt{border-left-color:#1E2329}
-.mh-list{display:flex;flex-direction:column}
-.mh{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
-.mh:first-child{border-top:0}.mh.full .mh-main b{color:var(--muted)}
-.mh-main b{font-size:16px}.mh-main .h-lv{font-size:12px;margin-left:4px}.mh-main small{display:block;font-size:11.5px;color:var(--muted);margin-top:2px}
-.mh-cap{display:flex;flex-direction:column;align-items:center;gap:2px}
-.mh-cap .step button{width:36px;height:36px}.mh-cap .step span{min-width:32px;text-align:center;font-size:20px;font-weight:700;align-self:center}
-.mh-cap small{font-size:11.5px;color:var(--ink2);font-weight:700}.mh-cap small.bad{color:var(--red2)}
 .btn.mci-end{width:100%;margin-top:18px}
 .mci-units{margin-top:6px}
 .mci-inj{display:grid;grid-template-columns:120px minmax(0,1fr);gap:12px;align-items:start}
@@ -1029,6 +1065,10 @@ td.mx.off .dt{opacity:.35}
   <symbol id="i-paste" viewBox="0 0 24 24"><rect x="8" y="3" width="8" height="4" rx="1"/><path d="M16 5h2a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2"/></symbol>
   <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></symbol>
   <symbol id="i-chev" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+  <symbol id="i-car" viewBox="0 0 24 24"><path d="M5 16h14M6.5 16l1.5-6h8l1.5 6M4 16v3h3v-2M20 16v3h-3v-2"/><circle cx="8" cy="16" r="1"/><circle cx="16" cy="16" r="1"/></symbol>
+  <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2.5 1.5-4 2.5-5 .3 2 1.2 3 2.5 3-.8-2.6 0-5.5 0-8z"/></symbol>
+  <symbol id="i-rad" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M12 10V4a8 8 0 0 0-6.9 4l5.2 3M13.7 11l5.2-3A8 8 0 0 0 12 4M10.3 13l-5.2 3a8 8 0 0 0 13.8 0l-5.2-3"/></symbol>
+  <symbol id="i-quake" viewBox="0 0 24 24"><path d="M3 12h3l2-5 3 10 2-7 2 4h6"/><path d="M4 20h16"/></symbol>
   <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.6"/><path d="M15.5 14.2A5 5 0 0 1 21 19"/></symbol>
   <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></symbol>
   <symbol id="i-live" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M8.5 8.5a5 5 0 0 0 0 7M15.5 8.5a5 5 0 0 1 0 7M5.6 5.6a9 9 0 0 0 0 12.8M18.4 5.6a9 9 0 0 1 0 12.8"/></symbol>
@@ -1218,7 +1258,27 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "653252329719",
   appId: "1:653252329719:web:c3c9ca0891de64c69b13f2"
 };
-const APP_VERSION = 'v3.30.0';
+const APP_VERSION = 'v3.31.0';
+/* 更新紀錄：登入後台的人第一次打開新版本，會跳出「上次看過的版本之後」每一版改了什麼（可能一次上傳好幾版）
+ * 每次改版請在最上面加一筆（版本號要和 APP_VERSION 一致） */
+const CHANGELOG = [
+  { v: 'v3.31.0', d: '2026-10-25', items: [
+    '大傷：各色可收人數依醫院等級預設（重度級 紅2、黃綠不限；中度級 紅1、黃2、綠不限；一般級 黃2、綠不限），四種顏色都能用 −／＋ 調整，點數字可切換「不限」',
+    '大傷：事故類型改為 車禍、火災／爆炸、核化災、暴力攻擊、天災、群聚事故、其他，各附現場重點與文獻出處，並依類型優先建議有燒燙傷、毒化災、洗腎、外傷小組的醫院',
+    '大傷：人形圖改成「先點部位、再點傷情」，傷情標在該部位；新增擦挫傷、切割傷、穿刺傷、壓砸傷、截肢等，另有全身狀況',
+    '大傷：「後送單位」預設按鈕改為事故現場附近 6 個消防分隊的 91 車（分隊位置可在後台設定修改）',
+    '登入後台的人第一次開新版本時，會跳出這份更新紀錄'] },
+  { v: 'v3.30.0', d: '2026-10-22', items: ['大傷改成後送官流程：傷患從 0 開始逐一登錄（檢傷、性別、年齡），設定各院可收人數，選醫院自動減 1；紀錄存在手機，直到按「結束大傷」', '事故描述改為（選填）'] },
+  { v: 'v3.29.1', d: '2026-10-22', items: ['醫院卡片按鈕三等分、和醫院名稱對齊；交班（OHCA）改到第二排'] },
+  { v: 'v3.29.0', d: '2026-10-22', items: ['醫院卡片改成「開始導航｜撥打 119｜能力表」，拿掉點卡片空白處開地圖', '交班只在 OHCA 時出現；醫院電話標明是總機（非急診），能力表總機可直接撥打'] },
+  { v: 'v3.28.0', d: '2026-10-21', items: ['建議送往改成「開始導航＋撥打 119」；葉克膜模式多一顆醒目的「葉克膜專線」', '葉克膜模式改顯示「院前啟動的差別」：有葉克膜的醫院不用轉院，只是到院後才集結團隊'] },
+  { v: 'v3.27.2', d: '2026-10-21', items: ['葉克膜專線改由後台填寫（不寫在原始碼）；輔大醫院先不列入院前葉克膜醫院'] },
+  { v: 'v3.27.1', d: '2026-10-21', items: ['「主要臨床問題（單選）」提醒縮成一行小字'] },
+  { v: 'v3.27.0', d: '2026-10-21', items: ['新增院前啟動葉克膜（ECPR）：6 項條件勾選、葉克膜醫院與專線', '臺北市重度級醫院動脈取栓改為 24 小時（新北市 119 指揮中心）'] },
+  { v: 'v3.26.0', d: '2026-10-20', items: ['標明適用範圍新北市・臺北市；使用須知加入製作團隊；電腦版導航改開新分頁'] },
+  { v: 'v3.25.1', d: '2026-10-20', items: ['後台醫院編輯的「時段」改成下拉選單'] },
+  { v: 'v3.25.0', d: '2026-10-20', items: ['39 間醫院座標全面校正（依 OpenStreetMap 名稱與門牌地址）'] }
+];
 // 醫院即時量能（急救室、候床、ICU、滿載）：目前沒有醫院即時回報的資料來源，先關閉；之後有資料來源再改成 true
 const SHOW_CAPACITY = false;
 const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
@@ -1661,6 +1721,107 @@ function normTraffic(t) {
 // 意見回饋：收件 Email（示範模式下每支手機的設定分開存，所以預設值寫在這裡，大家才寄得到）與選填的表單連結
 const DEFAULT_FEEDBACK_EMAIL = '';
 const DEFAULT_FEEDBACK_URL = '';
+// 消防分隊位置（OpenStreetMap，2026-10）：大傷「後送單位」預設按鈕用；管理者可在後台「設定」增修
+const STATIONS_SEED = `三峽｜24.93062,121.37528
+三芝｜25.25856,121.5005
+三重｜25.06011,121.50067
+中和｜25.00553,121.50319
+中港｜25.05469,121.44671
+九份｜25.10624,121.84673
+二重｜25.05843,121.46925
+保長｜25.07196,121.67954
+光興｜25.06033,121.49918
+八里｜25.15589,121.4082
+南勢｜24.98975,121.50667
+台北港｜25.15157,121.39168
+員山｜25.00903,121.48177
+國光｜24.99964,121.47256
+土城｜24.97328,121.44519
+坪林｜24.939,121.71188
+大埔｜24.90692,121.36247
+大觀｜25.00428,121.4434
+安和｜24.97977,121.51707
+安康｜24.95405,121.49389
+平溪｜25.02333,121.73235
+成功｜25.07656,121.46934
+文化｜25.06992,121.36277
+新店｜24.96905,121.5423
+新板｜25.00927,121.46437
+新莊｜25.03604,121.45091
+更寮｜25.07519,121.45956
+板橋｜24.99923,121.46341
+林口｜25.07885,121.38835
+柑園｜24.96045,121.40296
+樹林｜24.97591,121.42329
+樹潭｜25.00725,121.42087
+橫科｜25.05052,121.62017
+民生｜25.01723,121.47237
+永利｜25.00427,121.52005
+永和｜25.00958,121.52013
+永平｜25.01329,121.50512
+汐止｜25.07135,121.67954
+泰山｜25.04985,121.42727
+海山｜25.02375,121.45999
+淡水｜25.17493,121.43971
+深坑｜25.00266,121.62816
+清水｜24.98854,121.46014
+溪崑｜24.98872,121.43039
+滬尾｜25.17186,121.43731
+烏來｜24.86389,121.54857
+瑞亭｜25.10234,121.76209
+瑞芳｜25.10729,121.80771
+石碇｜24.99104,121.66089
+石門｜25.29058,121.56752
+社后｜25.06508,121.63392
+福營｜25.02939,121.42754
+秀峰｜25.06411,121.65702
+竹圍｜25.1595,121.45563
+萬里｜25.1799,121.68941
+裕民｜25.02175,121.41768
+貢寮｜25.02194,121.90991
+重陽｜25.06089,121.4869
+金山｜25.22099,121.62815
+長青｜25.11278,121.60346
+隆恩｜24.94058,121.35734
+雙溪｜25.03192,121.86662
+雪山｜24.94291,121.71394
+頂埔｜24.96318,121.42121
+鳳鳴｜24.96724,121.33478
+鶯歌｜24.95191,121.34279
+中崙｜25.0484,121.5458
+光明｜25.13516,121.50245
+內湖｜25.06971,121.59026
+八德｜25.04848,121.56307
+劍潭｜25.08997,121.52785
+古亭｜25.01164,121.5377
+圓山｜25.0686,121.52979
+城中｜25.04689,121.51349
+大同｜25.06141,121.51386
+大湖｜25.08399,121.60148
+大直｜25.08023,121.55683
+天母｜25.12542,121.53295
+延平｜25.05034,121.51138
+建成｜25.05479,121.51847
+復興｜25.03003,121.54323
+成德｜25.04786,121.58683
+景美｜24.9924,121.54117
+東湖｜25.0674,121.61295
+松江｜25.04766,121.53413
+民權｜25.06699,121.5781
+永吉｜25.04547,121.56929
+石牌｜25.11805,121.5171
+社子｜25.07911,121.51141
+秀山｜25.14566,121.49311
+興隆｜25.00003,121.5486
+莊敬｜25.0296,121.56505
+華山｜25.04723,121.52085
+萬芳｜25.00214,121.5666
+金華｜25.03266,121.52786
+關渡｜25.12325,121.46678
+陽明山｜25.15147,121.54646
+雙園｜25.02843,121.49586
+雙溪｜25.09767,121.54467
+龍山｜25.03863,121.49936`;
 const SEED_SETTINGS = { rulesVer: 3, coordVer: 1, dataVer: 1, listCount: 20, presets: [{ name: '板橋車站（測試用）', lat: 25.0143, lng: 121.4635 }] };
 const DEFAULT_TABLE_SRC = '115年度第四季新北市各急救責任醫院急重症病人24小時專科處置能力一覽表';
 // 舊版預設的資料來源文字：存著舊預設的裝置自動換成新版（自己改過的不動）
@@ -1867,6 +2028,8 @@ function normSettings(s = {}) {
     notice: (t => !t || OLD_NOTICES.includes(t) ? DEFAULT_TEXTS.notice : t)(String(s.notice || '').trim().slice(0, 1500)),
     credit: s.credit === undefined ? DEFAULT_TEXTS.credit : String(s.credit).trim().slice(0, 120),
     team: s.team === undefined ? DEFAULT_TEXTS.team : String(s.team).trim().slice(0, 1500),
+    // 消防分隊位置（大傷「後送單位」預設按鈕用）：每行「名稱｜緯度,經度」；留白＝內建清單
+    stations: (t => t === STATIONS_SEED.trim() ? '' : t)(String(s.stations || '').trim().slice(0, 12000)),
     tableSrc: (t => !t || OLD_TABLE_SRC.includes(t) ? DEFAULT_TABLE_SRC : t)(String(s.tableSrc || '').trim().slice(0, 120)),
     tableSrcTpe: String(s.tableSrcTpe || '').trim().slice(0, 120) || TPE_TABLE_SRC,
     feedbackEmail: normEmails(s.feedbackEmail) || DEFAULT_FEEDBACK_EMAIL,
@@ -4047,13 +4210,13 @@ const REFS = [
     { c: 'OpenStreetMap 醫院點位（Nominatim 查詢）', url: 'https://www.openstreetmap.org/copyright', use: '醫院座標（2026-10-20 校正：名稱與門牌地址一致；從新莊分隊以道路計算的距離與 Google 地圖相符）。座標為醫院主建築，急診入口可能相差數十公尺' },
     { c: '林口長庚紀念醫院：不在上述兩份表內，處置能力依管理者設定', use: '林口長庚' }] },
   { k: 'STROKE', t: '急性腦中風', items: [
-    { c: 'Prabhakaran S, et al. 2026 Guideline for the Early Management of Patients With Acute Ischemic Stroke: A Guideline From the American Heart Association/American Stroke Association. Stroke. 2026.', doi: '10.1161/STR.0000000000000513',
+    { c: 'Prabhakaran S, et al. 2026 Guideline for the Early Management of Patients With Acute Ischemic Stroke: A Guideline From the American Heart Association/American Stroke Association. Stroke. 2026;57(8).', doi: '10.1161/STR.0000000000000513',
       use: 'alteplase 或 tenecteplase 4.5 小時內；影像篩選可延至 9 小時；取栓 6／24 小時；沒有快速轉院機制時直送可取栓醫院' },
     { c: 'Nogueira RG, et al. Thrombectomy 6 to 24 Hours after Stroke with a Mismatch between Deficit and Infarct (DAWN). N Engl J Med. 2018;378:11–21.', doi: '10.1056/NEJMoa1706442', use: '6–24 小時影像篩選後取栓' },
     { c: 'Albers GW, et al. Thrombectomy for Stroke at 6 to 16 Hours with Selection by Perfusion Imaging (DEFUSE 3). N Engl J Med. 2018;378:708–718.', doi: '10.1056/NEJMoa1713973', use: '6–16 小時影像篩選後取栓' }] },
   { k: 'STEMI', t: '急性心肌梗塞', items: [
     { c: 'Byrne RA, et al. 2023 ESC Guidelines for the management of acute coronary syndromes. Eur Heart J. 2023;44(38):3720–3826.', doi: '10.1093/eurheartj/ehad191', use: '首次接觸病人到打通血管 ≤90 分；需轉院 ≤120 分；12 小時內再灌流' },
-    { c: 'Rao SV, O’Donoghue ML, Ruel M, et al. 2025 ACC/AHA/ACEP/NAEMSP/SCAI Guideline for the Management of Patients With Acute Coronary Syndromes. Circulation. 2025.', doi: '10.1161/CIR.0000000000001309', use: '美國急性冠心症指引（含到院前與轉院時間目標）' }] },
+    { c: 'Rao SV, O’Donoghue ML, Ruel M, et al. 2025 ACC/AHA/ACEP/NAEMSP/SCAI Guideline for the Management of Patients With Acute Coronary Syndromes. Circulation. 2025;151(13).', doi: '10.1161/CIR.0000000000001309', use: '美國急性冠心症指引（含到院前與轉院時間目標）' }] },
   { k: 'TRIAGE', t: '重大創傷（現場檢傷與處置）', items: [
     { c: 'Newgard CD, Fischer PE, Gestring M, et al. National guideline for the field triage of injured patients: Recommendations of the National Expert Panel on Field Triage, 2021. J Trauma Acute Care Surg. 2022;93(2):e49–e60.', url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC9323557/',
       use: '紅色／黃色檢傷條件、依年齡的生命徵象門檻；紅色送最高等級創傷醫院、黃色送創傷醫院（App 對應為重度級／中度級以上＋外傷處置小組）' },
@@ -4087,13 +4250,13 @@ const REFS = [
     { c: 'Suverein MM, et al. Early Extracorporeal CPR for Refractory Out-of-Hospital Cardiac Arrest (INCEPTION). N Engl J Med. 2023;388:299–309.', doi: '10.1056/NEJMoa2204511',
       use: '多中心試驗：ECPR 未改善 30 天神經學預後，顯示病人篩選與系統時效是關鍵' },
     { c: '亞東紀念醫院 院前啟動葉克膜條件；院前葉克膜醫院名單（管理者提供，2026 年 10 月）', use: '院前葉克膜 6 項條件與可啟動的醫院；專線由管理者在後台設定' },
-    { c: 'Richardson ASC, et al. Extracorporeal Cardiopulmonary Resuscitation in Adults. Interim Guideline Consensus Statement From the Extracorporeal Life Support Organization. ASAIO J. 2021.', doi: '10.1097/MAT.0000000000001344', use: 'ECPR 收案條件參考（倒下到上機 60 分內；各院標準不同）' }] },
+    { c: 'Richardson ASC, et al. Extracorporeal Cardiopulmonary Resuscitation in Adults. Interim Guideline Consensus Statement From the Extracorporeal Life Support Organization. ASAIO J. 2021;67(3):221–228.', doi: '10.1097/MAT.0000000000001344', use: 'ECPR 收案條件參考（倒下到上機 60 分內；各院標準不同）' }] },
   { k: 'SE', t: '癲癇重積', items: [
     { c: 'Glauser T, et al. Evidence-Based Guideline: Treatment of Convulsive Status Epilepticus in Children and Adults: Report of the Guideline Committee of the American Epilepsy Society. Epilepsy Curr. 2016;16(1):48–61.', doi: '10.5698/1535-7597-16.1.48', use: '0–5、5–20、20–40、40 分以上的分期處置' },
     { c: 'National Institute for Health and Care Excellence. Epilepsies in children, young people and adults (NG217), Chapter 7: Treating status epilepticus. 2022.', url: 'https://www.nice.org.uk/guidance/NG217/chapter/7-Treating-status-epilepticus', use: '抽搐 5 分鐘即開始治療；5–10 分鐘未停給第二劑 benzodiazepine；再來是第二線藥物' },
     { c: 'Kapur J, et al. Randomized Trial of Three Anticonvulsant Medications for Status Epilepticus (ESETT). N Engl J Med. 2019;381:2103–2113.', doi: '10.1056/NEJMoa1905795', use: '第二線 levetiracetam、fosphenytoin、valproate 效果相近' }] },
   { k: 'CO', t: '一氧化碳中毒', items: [
-    { c: 'American College of Emergency Physicians. Clinical Policy: A Critical Issue in the Management of Adult Patients Presenting to the Emergency Department With Acute Carbon Monoxide Poisoning. Ann Emerg Med. 2025;85(4):e45–e59.', doi: '10.1016/j.annemergmed.2024.12.005',
+    { c: 'Shih RD, Tomaszewski CA, Kaji AH, et al.; American College of Emergency Physicians Clinical Policies Subcommittee. Clinical Policy: A Critical Issue in the Management of Adult Patients Presenting to the Emergency Department With Acute Carbon Monoxide Poisoning. Ann Emerg Med. 2025;85(4):e45–e59.', doi: '10.1016/j.annemergmed.2024.12.005',
       use: '最新急診指引（2025）：有症狀的 CO 中毒，經過選擇的病人可從高壓氧受益，依症狀嚴重度與多快能到高壓氧決定（Level C）' },
     { c: 'Weaver LK. Carbon Monoxide Poisoning. In: UHMS Hyperbaric Oxygen Therapy Indications. Undersea Hyperb Med. 2024;51(3):253–276.', url: 'https://www.uhms.org/uhm-search/uhm-journal-volume-51-2024/number-3/indications-chapter.html',
       use: '高壓氧醫學會（2024）：有症狀的急性 CO 中毒都應考慮高壓氧；合併氰化物中毒（火場濃煙）也適用' },
@@ -4110,6 +4273,15 @@ const REFS = [
     { c: 'Prescott HC, Antonelli M, Alhazzani W, et al. Surviving Sepsis Campaign: International Guidelines for Management of Sepsis and Septic Shock 2026. Crit Care Med. 2026;54(4):725–812.', doi: '10.1097/CCM.0000000000007075',
       use: '最新版（2026）：休克或很可能敗血症 1 小時內給抗生素；可能敗血症且無休克，3 小時內' },
     { c: 'Evans L, et al. Surviving Sepsis Campaign: International Guidelines for Management of Sepsis and Septic Shock 2021. Crit Care Med. 2021;49(11):e1063–e1143.', doi: '10.1097/CCM.0000000000005337', use: '前一版指引（2021）' }] },
+  { k: 'MCI', t: '大量傷病患', items: [
+    { c: 'Lerner EB, Schwartz RB, Coule PL, et al. Mass casualty triage: an evaluation of the data and development of a proposed national guideline (SALT). Disaster Med Public Health Prep. 2008;2(Suppl 1):S25–S34.', doi: '10.1097/DMP.0b013e318182194e', use: 'SALT 檢傷：先整體分類，再個別評估與救命處置' },
+    { c: 'Lerner EB, Cone DC, Weinstein ES, et al. Mass casualty triage: an evaluation of the science and refinement of a national guideline (Model Uniform Core Criteria). Disaster Med Public Health Prep. 2011;5(2):129–137.', doi: '10.1001/dmp.2011.39', use: '大量傷病患檢傷的共同核心準則' },
+    { c: 'Benson M, Koenig KL, Schultz CH. Disaster triage: START, then SAVE — a new method of dynamic triage for victims of a catastrophic earthquake. Prehosp Disaster Med. 1996;11(2):117–124.', doi: '10.1017/S1049023X0004276X', use: 'START 檢傷（紅黃綠黑）' },
+    { c: 'Joint Committee to Create a National Policy to Enhance Survivability from Mass Casualty Shooting Events. Improving survival from active shooter events: the Hartford Consensus. J Trauma Acute Care Surg. 2013;74(6):1399–1400.', url: 'https://asprtracie.hhs.gov/technical-resources/resource/229/improving-survival-from-active-shooter-events-the-hartford-consensus', use: '暴力攻擊：止血帶與傷口填塞、熱區／暖區／冷區' },
+    { c: 'Centers for Disease Control and Prevention. Explosions and Blast Injuries: A Primer for Clinicians.', url: 'https://stacks.cdc.gov/view/cdc/28987', use: '爆炸：爆震傷（耳膜、肺、腹部）與二次爆炸' },
+    { c: 'U.S. Department of Health and Human Services. Chemical Hazards Emergency Medical Management (CHEMM)／Radiation Emergency Medical Management (REMM).', url: 'https://chemm.hhs.gov/', use: '核化災：上風處集結、先除污再後送' },
+    { c: 'Sever MS, Vanholder R; RDRTF of ISN Work Group. Recommendations for the management of crush victims in mass disasters. Nephrol Dial Transplant. 2012;27(Suppl 1):i1–i67.', doi: '10.1093/ndt/gfs156', use: '天災：壓砸症候群與緊急洗腎' },
+    { c: 'Memish ZA, Steffen R, White P, et al. Mass gatherings medicine: public health issues arising from mass gathering religious and sporting events. Lancet. 2019;393(10185):2073–2084.', doi: '10.1016/S0140-6736(19)30501-X', use: '群聚事故：推擠踩踏、中暑與動線' }] },
   { k: 'MAP', t: '車程與地圖', items: [
     { c: 'OSRM（Open Source Routing Machine）公開路線服務', url: 'https://project-osrm.org/', use: '道路通暢時的車程與距離' },
     { c: '地圖資料與底圖 © OpenStreetMap 貢獻者', url: 'https://www.openstreetmap.org/copyright', use: '地圖與底圖圖磚' },
@@ -4418,22 +4590,47 @@ const Tracker = {
   }
 };
 
-/* ========== 大量傷病患分流 ========== */
 /* ========== 大量傷病患分流（後送官） ==========
- * 流程：開始大傷（定位、依車程排出鄰近醫院）→ 逐一登錄傷患（檢傷、性別、年齡）→ 設定各院可收人數 → 傷患點選後送醫院（可收人數自動減 1）
+ * 流程：選事故類型 → 開始大傷（定位、依車程排出鄰近醫院）→ 逐一登錄傷患（檢傷、性別、年齡）→ 依醫院回覆調整各色可收人數 → 傷患點選後送醫院（該色可收人數自動減 1）
  * 紀錄存在這支手機（localStorage），App 關掉再打開仍在；直到按「結束大傷」才清除。只記錄性別、年齡與傷情，不記姓名 */
-const MCI_TYPES = { general: '一般', trauma: '創傷', burn: '燒燙傷', co: '火災／一氧化碳' };
+// 事故類型：現場重點依 SALT 檢傷、Hartford Consensus、CHEMM／REMM、CDC 爆炸傷、ISN 壓砸傷、大型集會醫學等（完整出處見參考文獻「大量傷病患」）
+const MCI_TYPES = {
+  traffic: { n: '車禍', icon: 'car', prefer: 'TRAUMA', tips: ['先管制車流、確認現場安全，再進入檢傷', '用 SALT／START 檢傷，先處理大出血與呼吸道', '紅色優先送重度級（外傷小組），避免全部送最近一間'] },
+  fire: { n: '火災／爆炸', icon: 'flame', prefer: 'BURN', tips: ['注意吸入性傷害、一氧化碳與氰化物中毒', '大面積燒燙傷、吸入性傷害優先送有燒燙傷收治的醫院', '爆炸：留意二次爆炸，爆震傷（耳膜、肺、腹部）可能延遲出現'] },
+  cbrn: { n: '核化災', icon: 'rad', prefer: 'CHEM', tips: ['上風處、熱區外集結；個人防護後才進入', '先除污再後送（危及生命的處置不延誤），通知醫院準備除污', '輻射污染不影響急救，先處理外傷；回報物質名稱給醫院'] },
+  violence: { n: '暴力攻擊', icon: 'shield', prefer: 'TRAUMA', tips: ['等警方確認安全區（熱區／暖區／冷區）再進入', '大出血先用止血帶、傷口填塞（Hartford Consensus）', '穿刺傷、槍傷的紅色傷患送重度級外傷'] },
+  disaster: { n: '天災', icon: 'quake', prefer: 'HD', tips: ['醫院也可能受災，先確認可收治能力', '受困、壓砸傷注意壓砸症候群（高血鉀、急性腎衰竭），需要洗腎能力', '分散後送，預留遠距醫院量能'] },
+  gathering: { n: '群聚事故', icon: 'users', prefer: '', tips: ['推擠踩踏：窒息、胸腹壓傷優先', '同時注意中暑、酒精與藥物中毒', '設立傷患集結點與單一進出動線'] },
+  other: { n: '其他', icon: 'alert', prefer: '', tips: ['依 SALT／START 檢傷，先處理大出血與呼吸道', '紅色送中度級以上', '依醫院回覆調整可收人數'] }
+};
+const MCI_OLD_TYPE = { general: 'other', trauma: 'traffic', burn: 'fire', co: 'fire' };
 const MCI_COLORS = [['red', '紅', '危急'], ['yellow', '黃', '緊急'], ['green', '綠', '輕傷'], ['black', '黑', '死亡／瀕死']];
 const MCI_KEY = 'hf_mci_v1', MCI_MAX_ETA = 60;
 const MCI_BODY = [['head', '頭部'], ['neck', '頸部'], ['chest', '胸部'], ['abd', '腹部'], ['pelvis', '骨盆'], ['back', '背部'], ['rua', '右上肢'], ['lua', '左上肢'], ['rll', '右下肢'], ['lll', '左下肢']];
-const MCI_INJ = ['骨折', '出血', '燒燙傷', '撕裂傷', '意識不清', '呼吸困難', '疼痛'];
-function mciBlank() { return { active: false, startedAt: null, type: 'general', note: '', pos: null, posLabel: '', eta: {}, patients: [], cap: {}, seq: 0, add: { tri: 'red', sex: 'M' } }; }
+const MCI_INJ = ['擦挫傷', '切割傷', '撕裂傷', '穿刺傷', '骨折', '變形／脫臼', '出血', '大出血', '燒燙傷', '壓砸傷', '截肢', '疼痛'];
+const MCI_GEN = ['意識不清', '呼吸困難', '休克徵象', '吸入性傷害', '中毒'];
+// 各色預設可收人數（null＝不限）：後送官問完醫院再自己調
+const MCI_CAP_DEFAULT = {
+  '重度級': { red: 2, yellow: null, green: null, black: null },
+  '中度級': { red: 1, yellow: 2, green: null, black: null },
+  '一般級': { red: 0, yellow: 2, green: null, black: null }
+};
+const regionName = r => (MCI_BODY.find(b => b[0] === r) || [, r])[1];
+function mciBlank() { return { active: false, startedAt: null, type: 'traffic', note: '', pos: null, posLabel: '', eta: {}, patients: [], cap: {}, seq: 0, add: { tri: 'red', sex: 'M' } }; }
+function mciNormPt(p) {
+  const q = { unit: '', cond: '', inj: [], injT: [], injMap: null, dest: '', sex: '', age: '', ...p };
+  if (!q.injMap || typeof q.injMap !== 'object') { q.injMap = {}; (q.inj || []).forEach(r => { q.injMap[r] = (q.injT || []).filter(t => MCI_INJ.includes(t)); }); }
+  q.injT = (q.injT || []).filter(t => MCI_GEN.includes(t));
+  delete q.inj;
+  return q;
+}
 function loadMci() {
   const m = readLS(MCI_KEY);
   if (!m || !m.active) return mciBlank();
-  const b = mciBlank();
-  return { ...b, ...m, eta: m.eta || {}, cap: m.cap || {}, add: { ...b.add, ...(m.add || {}) },
-    patients: (Array.isArray(m.patients) ? m.patients : []).map(p => ({ unit: '', cond: '', inj: [], injT: [], dest: '', sex: '', age: '', ...p })) };
+  const b = mciBlank(), cap = {};
+  Object.entries(m.cap || {}).forEach(([k, v]) => { if (v && typeof v === 'object') cap[k] = v; });   // 舊版（單一總數）的可收人數不沿用
+  return { ...b, ...m, type: MCI_TYPES[m.type] ? m.type : (MCI_OLD_TYPE[m.type] || 'other'), eta: m.eta || {}, cap, add: { ...b.add, ...(m.add || {}) },
+    patients: (Array.isArray(m.patients) ? m.patients : []).map(mciNormPt) };
 }
 function saveMci() {
   const m = state.mci;
@@ -4455,36 +4652,46 @@ function mciHosps() {
   return state.hospitals.filter(h => h.lat != null && h.lng != null && h.level)
     .map(h => ({ h, eta: mciEta(h) })).filter(x => x.eta <= MCI_MAX_ETA).sort((a, b) => a.eta - b.eta);
 }
-const mciAssigned = hid => state.mci.patients.filter(p => p.dest === hid);
-function mciLeft(hid) { const c = state.mci.cap[hid]; return c == null ? null : c - mciAssigned(hid).length; }
-// 依醫院等級估計（給後送官參考，不會自動套用）
-function mciCapacity(h) {
-  const lr = levelRank(h.level);
-  return { red: [1, 2, 3][lr] ?? 0, yellow: [2, 4, 6][lr] ?? 1, green: [6, 8, 10][lr] ?? 4 };
+const mciAssigned = (hid, c) => state.mci.patients.filter(p => p.dest === hid && (!c || p.tri === c));
+const mciCapDefault = (h, c) => { const d = MCI_CAP_DEFAULT[h.level]; return d ? d[c] : null; };
+function mciCapOf(hid, c) {
+  const o = state.mci.cap[hid];
+  if (o && Object.prototype.hasOwnProperty.call(o, c)) return o[c];
+  const h = hospById(hid); return h ? mciCapDefault(h, c) : null;
 }
+// 這間醫院某顏色還能收幾位（null＝不限）
+function mciLeft(hid, c) { const cap = mciCapOf(hid, c); return cap == null ? null : cap - mciAssigned(hid, c).length; }
+const mciCustom = hid => !!(state.mci.cap[hid] && Object.keys(state.mci.cap[hid]).length);
 function mciEligible(h, color, type) {
-  const lr = levelRank(h.level);
-  if (color === 'red') return type === 'trauma' ? lr === 2 && availCaps(h).has('TRAUMA') : lr >= 1;
-  if (color === 'yellow') return type === 'trauma' ? lr >= 1 : lr >= 0;
+  const lr = levelRank(h.level), trauma = MCI_TYPES[type] && MCI_TYPES[type].prefer === 'TRAUMA';
+  if (color === 'red') return trauma ? lr === 2 && availCaps(h).has('TRAUMA') : lr >= 1;
+  if (color === 'yellow') return trauma ? lr >= 1 : lr >= 0;
   return true;
 }
 function mciPreferred(h, color, type) {
-  const av = availCaps(h);
-  if (type === 'burn' && color !== 'green') return av.has('BURN');
-  if (type === 'co' && color !== 'green') return av.has('HBO');
-  return true;
+  const pf = MCI_TYPES[type] && MCI_TYPES[type].prefer, av = availCaps(h);
+  if (!pf || pf === 'TRAUMA' || color === 'green' || color === 'black') return true;
+  if (pf === 'CHEM') return av.has('CHEM') || av.has('RAD');
+  if (pf === 'HD') return color !== 'red' || av.has('HD');
+  return av.has(pf);
 }
 function mciWarn(p, h) {
   if (!p || p.tri === 'black' || p.tri === 'green') return '';
-  const t = state.mci.type;
-  if (!mciEligible(h, p.tri, t)) return p.tri === 'red' ? (t === 'trauma' ? '紅色創傷建議重度級＋外傷小組' : '紅色建議中度級以上') : '黃色創傷建議中度級以上';
-  if (!mciPreferred(h, p.tri, t)) return t === 'burn' ? '沒有燒燙傷收治' : '沒有高壓氧';
+  const t = state.mci.type, pf = MCI_TYPES[t].prefer;
+  if (!mciEligible(h, p.tri, t)) return p.tri === 'red' ? (pf === 'TRAUMA' ? '紅色外傷建議重度級＋外傷小組' : '紅色建議中度級以上') : '黃色外傷建議中度級以上';
+  if (!mciPreferred(h, p.tri, t)) return { BURN: '沒有燒燙傷收治', CHEM: '沒有毒化災／輻災處置', HD: '沒有緊急洗腎' }[pf] || '';
   return '';
 }
 function mciStats() {
   const s = {}; MCI_COLORS.forEach(([c]) => { s[c] = { n: 0, M: 0, F: 0, sent: 0 }; });
   state.mci.patients.forEach(p => { const x = s[p.tri]; if (!x) return; x.n++; if (p.sex === 'M') x.M++; if (p.sex === 'F') x.F++; if (p.dest) x.sent++; });
   return s;
+}
+function mciTypeHtml(m, compact) {
+  const T = MCI_TYPES[m.type];
+  return `<div class="mci-types ${compact ? 'compact' : ''}">${Object.entries(MCI_TYPES).map(([k, v]) => `<button class="mty ${m.type === k ? 'on' : ''}" data-act="mciType" data-v="${k}">${ic(v.icon)}<span>${v.n}</span></button>`).join('')}</div>
+    <div class="mci-tips"><b>${ic(T.icon, 'sm')}${esc(T.n)}・現場重點</b><ul>${T.tips.map(t => `<li>${esc(t)}</li>`).join('')}</ul>
+      <button class="linkish" data-act="refsGo" data-k="MCI">依據與出處</button></div>`;
 }
 function renderMci() {
   const p = $('#mciPanel'); if (!p) return;
@@ -4495,12 +4702,12 @@ function renderMci() {
     p.innerHTML = `<section class="card">
       <div class="sec-h"><b>大量傷病患分流</b><span class="sub">後送官登錄傷患、分配後送醫院</span></div>
       <div class="label">事故類型</div>
-      <div class="seg">${Object.entries(MCI_TYPES).map(([k, v]) => `<button class="${m.type === k ? 'on' : ''}" data-act="mciType" data-v="${k}">${v}</button>`).join('')}</div>
+      ${mciTypeHtml(m)}
       <label class="label" for="mciNote">事故描述（選填）</label>
       <input id="mciNote" value="${esc(m.note)}" placeholder="例：遊覽車翻覆、國道 3 號南下 30K">
       <div class="loc-row">${ic('pin', 'sm')}<span>${state.pos ? esc(state.posLabel) : '尚未定位（會使用 GPS）'}</span></div>
       <button class="btn-cta" data-act="mciStart">${ic('ambu')}<span>開始大傷</span></button>
-      <ol class="mci-how"><li>依目前位置排出鄰近醫院（依車程）</li><li>逐一登錄傷患：檢傷顏色、性別、年齡（例：男 17）</li><li>設定各院可收治人數，點傷患選後送醫院，可收人數自動減 1</li><li>紀錄存在這支手機，App 關掉再開仍在，直到按「結束大傷」</li></ol>
+      <ol class="mci-how"><li>依目前位置排出鄰近醫院（依車程）</li><li>逐一登錄傷患：檢傷顏色、性別、年齡（例：男 17）</li><li>依醫院回覆調整各色可收人數，點傷患選後送醫院，該色名額自動減 1</li><li>紀錄存在這支手機，App 關掉再開仍在，直到按「結束大傷」</li></ol>
     </section>`;
     return;
   }
@@ -4523,25 +4730,32 @@ function renderMci() {
       return `<button class="mpt ${x.dest ? 'sent' : ''}" data-act="mciPt" data-id="${esc(x.id)}"><b>${esc(mciLabel(x))}</b><small>#${x.no}${x.unit ? '・' + esc(x.unit) : ''}</small><em>${h ? esc(h.short || h.name) : '未指定醫院'}</em></button>`; }).join('')}</div></div>`;
   }).join('') || '<div class="empty">還沒有傷患，用上面的列新增</div>';
   const hs = mciHosps(), more = state.mciMore, shown = more ? hs : hs.slice(0, 12);
+  const capCell = (hid, c, t) => {
+    const cap = mciCapOf(hid, c), left = mciLeft(hid, c), n = mciAssigned(hid, c).length;
+    return `<div class="mc ${c} ${left != null && left <= 0 ? 'full' : ''}"><i>${t}</i>
+      <div class="mc-s"><button data-act="mciCap" data-h="${esc(hid)}" data-c="${c}" data-d="-1" aria-label="${t}可收減一">−</button>
+        <button class="mc-v num" data-act="mciCapInf" data-h="${esc(hid)}" data-c="${c}" aria-label="${t}可收人數（點一下切換不限）">${cap == null ? '不限' : cap}</button>
+        <button data-act="mciCap" data-h="${esc(hid)}" data-c="${c}" data-d="1" aria-label="${t}可收加一">＋</button></div>
+      <small>${cap == null ? `已 ${n}` : `剩 ${left}`}</small></div>`;
+  };
   const hHtml = shown.map(x => {
-    const cap = m.cap[x.h.id], left = mciLeft(x.h.id), got = mciAssigned(x.h.id), est = mciCapacity(x.h);
-    const cnt = MCI_COLORS.map(([c, t]) => { const n = got.filter(p => p.tri === c).length; return n ? `<span class="mci-pill ${c}">${t} ${n}</span>` : ''; }).join('');
-    return `<div class="mh ${left != null && left <= 0 ? 'full' : ''}">
-      <div class="mh-main"><b>${esc(x.h.short || x.h.name)}</b><span class="h-lv l${levelRank(x.h.level)}">${esc(x.h.level)}</span>
-        <small>${x.eta} 分・參考：紅 ${est.red}／黃 ${est.yellow}／綠 ${est.green}</small>${cnt ? `<div class="mci-got">${cnt}</div>` : ''}</div>
-      <div class="mh-cap"><div class="step"><button data-act="mciCap" data-h="${esc(x.h.id)}" data-d="-1" aria-label="可收減一">−</button><span class="num">${cap == null ? '–' : cap}</span><button data-act="mciCap" data-h="${esc(x.h.id)}" data-d="1" aria-label="可收加一">＋</button></div>
-        <small class="${left != null && left <= 0 ? 'bad' : ''}">${cap == null ? '未設定可收' : `剩 ${left}`}</small></div></div>`;
+    const got = mciAssigned(x.h.id);
+    return `<div class="mh">
+      <div class="mh-top"><b>${esc(x.h.short || x.h.name)}</b><span class="h-lv l${levelRank(x.h.level)}">${esc(x.h.level)}</span><em class="num">${x.eta} 分</em>
+        ${got.length ? `<span class="mh-n">已分 ${got.length}</span>` : ''}${mciCustom(x.h.id) ? `<button class="linkish" data-act="mciCapReset" data-h="${esc(x.h.id)}">恢復預設</button>` : ''}</div>
+      <div class="mh-caps">${MCI_COLORS.map(([c, t]) => capCell(x.h.id, c, t)).join('')}</div></div>`;
   }).join('');
   p.innerHTML = `<section class="card">
-      <div class="sec-h"><b>大傷進行中</b><span class="sub">${MCI_TYPES[m.type]}・${fmtDayClock(m.startedAt)} 開始</span></div>
+      <div class="sec-h"><b>大傷進行中</b><span class="sub">${esc(MCI_TYPES[m.type].n)}・${fmtDayClock(m.startedAt)} 開始</span></div>
+      <details class="mci-typebox"><summary>${ic(MCI_TYPES[m.type].icon, 'sm')}事故類型：<b>${esc(MCI_TYPES[m.type].n)}</b><span>（點開可改、看現場重點）</span></summary>${mciTypeHtml(m, true)}</details>
       <label class="label" for="mciNote">事故描述（選填）</label>
       <input id="mciNote" value="${esc(m.note)}" placeholder="例：遊覽車翻覆、國道 3 號南下 30K">
       <div class="loc-row">${ic('pin', 'sm')}<span>${esc(m.posLabel || '事故現場')}</span><button class="btn sm" data-act="mciRelocate">重新定位</button></div>
       ${statHtml}
     </section>
     <section class="card"><div class="sec-title">新增傷患</div>${addHtml}${ptHtml}</section>
-    <section class="card"><div class="sec-title">鄰近醫院・可收治人數</div>
-      <div class="hint" style="margin:0 0 8px">依車程排序；請依醫院回覆設定可收人數，傷患選了醫院就自動減 1。</div>
+    <section class="card"><div class="sec-title">鄰近醫院・各色可收人數</div>
+      <div class="hint" style="margin:0 0 8px">依車程排序。預設：重度級 紅 2、黃綠不限；中度級 紅 1、黃 2、綠不限；一般級 黃 2、綠不限。問完醫院再用 −／＋ 調整，點數字可切換「不限」。傷患選了醫院，該色名額自動減 1。</div>
       <div class="mh-list">${hHtml || '<div class="empty">60 分鐘車程內沒有醫院</div>'}</div>
       ${hs.length > 12 ? `<button class="btn ghost" style="width:100%;margin-top:8px" data-act="mciMore">${more ? '收合' : `顯示全部 ${hs.length} 間`}</button>` : ''}
       <button class="btn" style="width:100%;margin-top:10px" data-act="mciAuto">${ic('spark', 'sm')}幫未指定的傷患建議醫院</button>
@@ -4550,11 +4764,11 @@ function renderMci() {
     <button class="btn-cta" data-act="mciNotify">${ic('paste')}<span>${navigator.share ? '分享' : '複製'}分流結果</span></button>
     <div class="hint">分流結果只在這支手機上整理，不會自動傳給醫院；請傳給勤務中心或指揮官。</div>
     <button class="btn danger mci-end" data-act="mciEnd">結束大傷（清除這支手機的紀錄）</button>
-    <div class="foot">建議醫院：由紅到綠，指派到「車程＋已分配人數×5 分」最小、且還有可收名額的醫院；紅色需中度級以上（創傷需重度級＋外傷小組）。僅供參考，以後送官判斷為準。</div>`;
-  const used = hs.filter(x => mciAssigned(x.h.id).length || m.cap[x.h.id] != null);
+    <div class="foot">建議醫院：由紅到綠，指派到「車程＋已分配人數×5 分」最小、且該色還有名額的醫院；紅色需中度級以上（車禍、暴力攻擊需重度級＋外傷小組），並優先有對應專科（燒燙傷、毒化災、洗腎）的醫院。僅供參考，以後送官判斷為準。</div>`;
+  const used = hs.filter(x => mciAssigned(x.h.id).length || mciCustom(x.h.id));
   const pins = [{ lat: m.pos.lat, lng: m.pos.lng, cls: 'me-pin', html: '<span></span>', size: [18, 18], z: 1000, popup: '事故現場' }]
-    .concat(used.map((x, i) => ({ lat: x.h.lat, lng: x.h.lng, cls: 'h-pin match', html: `<b>${mciAssigned(x.h.id).length}</b><em class="pin-lab">${esc((x.h.short || x.h.name).replace(/醫院$/, '').slice(0, 6))}</em>`,
-      popup: `<div class="pop"><b>${esc(x.h.short || x.h.name)}</b><div class="m">${x.eta} 分・已分 ${mciAssigned(x.h.id).length} 人${m.cap[x.h.id] != null ? `・剩 ${mciLeft(x.h.id)}` : ''}</div></div>` })));
+    .concat(used.map(x => ({ lat: x.h.lat, lng: x.h.lng, cls: 'h-pin match', html: `<b>${mciAssigned(x.h.id).length}</b><em class="pin-lab">${esc((x.h.short || x.h.name).replace(/醫院$/, '').slice(0, 6))}</em>`,
+      popup: `<div class="pop"><b>${esc(x.h.short || x.h.name)}</b><div class="m">${x.eta} 分・已分 ${mciAssigned(x.h.id).length} 人</div></div>` })));
   renderPinsMap('mciMap', pins);
 }
 function renderMciNotices() { /* 舊版「到院前通知」批次：已改為分享分流結果 */ }
@@ -4589,17 +4803,32 @@ function mciAdd() {
   const m = state.mci, inp = $('#mciAge');
   const age = inp ? inp.value.trim() : '';
   if (age !== '' && (!/^\d{1,3}$/.test(age) || Number(age) > 120)) throw new Error('年齡請填 0–120 的數字');
-  const p = { id: 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), no: ++m.seq, tri: m.add.tri, sex: m.add.sex, age, unit: '', cond: '', inj: [], injT: [], dest: '', at: Date.now() };
+  const p = mciNormPt({ id: 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), no: ++m.seq, tri: m.add.tri, sex: m.add.sex, age, injMap: {}, at: Date.now() });
   m.patients.push(p); saveMci(); renderMci();
   toast(`已新增 ${MCI_COLORS.find(c => c[0] === p.tri)[1]}・${mciLabel(p)}（#${p.no}）`, 1800);
   const ni = $('#mciAge'); if (ni) ni.focus();
 }
-// 傷患詳細：檢傷、性別年齡、後送單位、傷情（人圖）、後送醫院
-let mciPtId = '';
-function mciUnits() { return [...new Set([localCfg.unit, ...state.mci.patients.map(p => p.unit)].map(s => (s || '').trim()).filter(Boolean))].slice(0, 8); }
+/* 鄰近消防分隊：預設按鈕列出事故現場附近 6 個分隊的救護車（分隊名＋91）。
+ * 分隊位置來自 OpenStreetMap，管理者可在後台「設定／資料 › 消防分隊位置」增修 */
+function parseStations(t) {
+  return String(t || '').split(/\n+/).map(l => {
+    const m = l.trim().match(/^([^｜|,，]+)[｜|]\s*(-?\d+(?:\.\d+)?)\s*[,，]\s*(-?\d+(?:\.\d+)?)$/);
+    return m ? { name: m[1].trim(), lat: Number(m[2]), lng: Number(m[3]) } : null;
+  }).filter(s => s && Math.abs(s.lat) <= 90 && Math.abs(s.lng) <= 180);
+}
+function mciNearUnits(n = 6) {
+  const m = state.mci; if (!m.pos) return [];
+  return parseStations(state.settings.stations || STATIONS_SEED).map(s => ({ ...s, d: distKm(m.pos, s) })).sort((a, b) => a.d - b.d).slice(0, n).map(s => s.name + '91');
+}
+// 傷患詳細：檢傷、性別年齡、後送單位、傷情（人圖：先點部位、再點傷情）、後送醫院
+let mciPtId = '', mciRegion = '';
+function mciUnits() {
+  const used = state.mci.patients.map(p => p.unit);
+  return [...new Set([...used.slice().reverse(), localCfg.unit, ...mciNearUnits()].map(s => (s || '').trim()).filter(Boolean))].slice(0, 10);
+}
 function mciBodySvg(p) {
-  const on = r => p.inj.includes(r) ? 'on' : '';
-  const R = (r, el) => el.replace('<', `<g class="br ${on(r)}" data-act="mciInj" data-r="${r}"><title>${MCI_BODY.find(b => b[0] === r)[1]}</title><`).replace(/\/>$/, '/></g>');
+  const cls = r => [(p.injMap[r] ? 'on' : ''), (mciRegion === r ? 'sel' : '')].join(' ');
+  const R = (r, el) => el.replace('<', `<g class="br ${cls(r)}" data-act="mciRegion" data-r="${r}"><title>${regionName(r)}</title><`).replace(/\/>$/, '/></g>');
   return `<svg class="mci-body" viewBox="0 0 120 240" role="img" aria-label="人體傷情圖（面向救護員）">
     ${R('head', '<circle cx="60" cy="20" r="15"/>')}${R('neck', '<rect x="53" y="35" width="14" height="9" rx="3"/>')}
     ${R('chest', '<rect x="37" y="45" width="46" height="40" rx="9"/>')}${R('abd', '<rect x="39" y="86" width="42" height="30" rx="6"/>')}
@@ -4608,36 +4837,41 @@ function mciBodySvg(p) {
     ${R('rll', '<rect x="40" y="141" width="18" height="94" rx="8"/>')}${R('lll', '<rect x="62" y="141" width="18" height="94" rx="8"/>')}
     <text x="25" y="146" text-anchor="middle">右</text><text x="95" y="146" text-anchor="middle">左</text></svg>`;
 }
+function mciInjText(p) { return Object.entries(p.injMap).map(([r, ts]) => regionName(r) + (ts.length ? ts.join('、') : '')).concat(p.injT).join('；'); }
 function mciPtBody(p) {
-  const units = mciUnits(), hs = mciHosps();
+  const units = mciUnits(), hs = mciHosps(), sel = mciRegion, selT = sel ? (p.injMap[sel] || []) : [];
+  const leftTxt = (hid, c) => { const l = mciLeft(hid, c); return l == null ? `${MCI_COLORS.find(x => x[0] === c)[1]} 不限` : `${MCI_COLORS.find(x => x[0] === c)[1]} 剩 ${l}`; };
   return `<div class="label" style="margin-top:0">檢傷</div>
     <div class="tri-seg">${MCI_COLORS.map(([c, t]) => `<button class="tri ${c} ${p.tri === c ? 'on' : ''}" data-act="mciPtSet" data-k="tri" data-v="${c}">${t}</button>`).join('')}</div>
     <div class="mci-add-row" style="margin-top:10px">
       <div class="seg sex">${[['M', '男'], ['F', '女']].map(([k, t]) => `<button class="${p.sex === k ? 'on' : ''}" data-act="mciPtSet" data-k="sex" data-v="${k}">${t}</button>`).join('')}</div>
       <input id="mp_age" class="num" type="number" inputmode="numeric" min="0" max="120" placeholder="年齡" value="${esc(p.age)}" aria-label="年齡"></div>
-    <label class="label" for="mp_unit">後送單位</label>
+    <label class="label" for="mp_unit">後送單位<small>附近分隊的救護車，不在裡面請自己輸入</small></label>
     <input id="mp_unit" value="${esc(p.unit)}" placeholder="例：新板91">
     ${units.length ? `<div class="chips mci-units">${units.map(u => `<button class="chip ${p.unit === u ? 'on' : ''}" data-act="mciPtSet" data-k="unit" data-v="${esc(u)}">${esc(u)}</button>`).join('')}</div>` : ''}
-    <div class="label">傷情（點人圖標示受傷部位・人圖面向你）</div>
+    <div class="label">傷情<small>先點人圖部位，再點傷情（人圖面向你）</small></div>
     <div class="mci-inj">${mciBodySvg(p)}<div class="mci-injr">
-      <div class="chips">${MCI_BODY.filter(([r]) => r === 'back').map(([r, t]) => `<button class="chip ${p.inj.includes(r) ? 'on bad' : ''}" data-act="mciInj" data-r="${r}">${t}</button>`).join('')}</div>
-      <div class="chips">${MCI_INJ.map(t => `<button class="chip ${p.injT.includes(t) ? 'on' : ''}" data-act="mciInjT" data-v="${esc(t)}">${esc(t)}</button>`).join('')}</div>
-      <div class="mci-injtxt">${p.inj.length ? '部位：' + p.inj.map(r => MCI_BODY.find(b => b[0] === r)[1]).join('、') : '尚未標示部位'}</div></div></div>
-    <label class="label" for="mp_cond">傷病狀況</label>
-    <textarea id="mp_cond" rows="2" placeholder="例：右大腿開放性骨折、意識清楚（請勿輸入姓名）">${esc(p.cond)}</textarea>
+      <div class="chips"><button class="chip ${p.injMap.back ? 'on bad' : ''} ${sel === 'back' ? 'sel' : ''}" data-act="mciRegion" data-r="back">背部</button></div>
+      <div class="mci-selh">${sel ? `<b>${esc(regionName(sel))}</b>的傷情` : '<span>還沒選部位</span>'}</div>
+      <div class="chips mci-injc ${sel ? '' : 'off'}">${MCI_INJ.map(t => `<button class="chip ${selT.includes(t) ? 'on' : ''}" data-act="mciInjT" data-v="${esc(t)}" ${sel ? '' : 'disabled'}>${esc(t)}</button>`).join('')}</div>
+    </div></div>
+    ${Object.keys(p.injMap).length ? `<div class="mci-injlist">${Object.entries(p.injMap).map(([r, ts]) => `<div><b>${esc(regionName(r))}</b><span>${ts.length ? esc(ts.join('、')) : '（未選傷情）'}</span><button class="linkish" data-act="mciInjDel" data-r="${r}" aria-label="移除${esc(regionName(r))}">移除</button></div>`).join('')}</div>` : ''}
+    <div class="label">全身狀況</div>
+    <div class="chips">${MCI_GEN.map(t => `<button class="chip ${p.injT.includes(t) ? 'on' : ''}" data-act="mciGen" data-v="${esc(t)}">${esc(t)}</button>`).join('')}</div>
+    <label class="label" for="mp_cond">傷病狀況（補充）</label>
+    <textarea id="mp_cond" rows="2" placeholder="例：意識清楚、已上止血帶 10:42（請勿輸入姓名）">${esc(p.cond)}</textarea>
     <div class="label">後送醫院${p.tri === 'black' ? '<small>黑色：原則上不後送</small>' : ''}</div>
     <div class="mpd">
       <button class="mpd-r ${!p.dest ? 'on' : ''}" data-act="mciPtDest" data-h=""><b>未指定</b></button>
-      ${hs.map(x => { const left = mciLeft(x.h.id), w = mciWarn(p, x.h), on = p.dest === x.h.id;
-        const leftShown = left == null ? '未設定可收' : `剩 ${left}`;
-        return `<button class="mpd-r ${on ? 'on' : ''} ${left != null && left <= 0 && !on ? 'full' : ''}" data-act="mciPtDest" data-h="${esc(x.h.id)}">
+      ${hs.map(x => { const left = mciLeft(x.h.id, p.tri), w = mciWarn(p, x.h), on = p.dest === x.h.id, full = left != null && left <= 0 && !on;
+        return `<button class="mpd-r ${on ? 'on' : ''} ${full ? 'full' : ''}" data-act="mciPtDest" data-h="${esc(x.h.id)}">
           <b>${esc(x.h.short || x.h.name)}</b><span class="h-lv l${levelRank(x.h.level)}">${esc(x.h.level)}</span><em class="num">${x.eta} 分</em>
-          <small class="${left != null && left <= 0 && !on ? 'bad' : ''}">${leftShown}${w ? `・<span class="warn">${esc(w)}</span>` : ''}</small></button>`; }).join('')}
+          <small class="${full ? 'bad' : ''}">${leftTxt(x.h.id, p.tri)}${w ? `・<span class="warn">${esc(w)}</span>` : ''}</small></button>`; }).join('')}
     </div>`;
 }
 function openMciPt(id) {
   const p = state.mci.patients.find(x => x.id === id); if (!p) return;
-  mciPtId = id;
+  mciPtId = id; mciRegion = '';
   openModal({ title: `傷患 #${p.no}・${mciLabel(p)}`, body: mciPtBody(p), buttons: [
     { text: '刪除', cls: 'danger', onClick: () => { if (!confirm(`刪除傷患 #${p.no}？`)) return; state.mci.patients = state.mci.patients.filter(x => x.id !== id); saveMci(); closeModal(); renderMci(); } },
     { text: '完成', cls: 'primary', onClick: () => { closeModal(); renderMci(); } }] });
@@ -4648,48 +4882,44 @@ function mciPtRefresh() {
   const t = $('#modalTitle'); if (t) t.textContent = `傷患 #${p.no}・${mciLabel(p)}`;
   saveMci();
 }
-// 幫未指定的傷患建議醫院（由紅到綠；只用還有名額的醫院；都沒設定可收人數時，用等級估計）
+// 幫未指定的傷患建議醫院（由紅到綠；只用該色還有名額的醫院）
 function mciAuto() {
   const m = state.mci, hs = mciHosps();
-  const anyCap = hs.some(x => m.cap[x.h.id] != null);
   const left = {}, n = {};
-  hs.forEach(x => { n[x.h.id] = mciAssigned(x.h.id).length; left[x.h.id] = anyCap ? (m.cap[x.h.id] == null ? 0 : m.cap[x.h.id] - n[x.h.id]) : Infinity; });
-  const estLeft = {}; if (!anyCap) hs.forEach(x => { const e = mciCapacity(x.h); estLeft[x.h.id] = { ...e }; mciAssigned(x.h.id).forEach(p => { if (estLeft[x.h.id][p.tri] != null) estLeft[x.h.id][p.tri]--; }); });
+  hs.forEach(x => { n[x.h.id] = mciAssigned(x.h.id).length; left[x.h.id] = {}; MCI_COLORS.forEach(([c]) => { const l = mciLeft(x.h.id, c); left[x.h.id][c] = l == null ? Infinity : l; }); });
   let done = 0, miss = 0;
   ['red', 'yellow', 'green'].forEach(c => m.patients.filter(p => p.tri === c && !p.dest).forEach(p => {
     let best = null, bestCost = Infinity;
     hs.forEach(x => {
       const id = x.h.id;
-      if (!mciEligible(x.h, c, m.type)) return;
-      if (anyCap ? left[id] <= 0 : estLeft[id][c] <= 0) return;
+      if (!mciEligible(x.h, c, m.type) || left[id][c] <= 0) return;
       const cost = x.eta + n[id] * 5 + (mciPreferred(x.h, c, m.type) ? 0 : 20);
       if (cost < bestCost) { bestCost = cost; best = x; }
     });
-    if (best) { p.dest = best.h.id; n[best.h.id]++; if (anyCap) left[best.h.id]--; else estLeft[best.h.id][c]--; done++; } else miss++;
+    if (best) { p.dest = best.h.id; n[best.h.id]++; left[best.h.id][c]--; done++; } else miss++;
   }));
   saveMci(); renderMci();
   if (!done && !miss) toast('沒有未指定醫院的傷患');
-  else toast(`已建議 ${done} 位${miss ? `，${miss} 位找不到有名額的醫院（請增加可收人數或請求支援）` : ''}；可點傷患修改${anyCap ? '' : '（尚未設定可收人數，先用醫院等級估計）'}`, 5000);
+  else toast(`已建議 ${done} 位${miss ? `，${miss} 位找不到有名額的醫院（請調整可收人數或請求支援）` : ''}；可點傷患修改`, 5000);
 }
 function mciEnd() {
   const m = state.mci;
   if (!confirm(`結束大傷會清除這支手機上的 ${m.patients.length} 位傷患紀錄。\n建議先按「分享／複製分流結果」。確定結束？`)) return;
   logEvent({ type: 'mci_end', total: m.patients.length, sent: m.patients.filter(p => p.dest).length });
-  const keep = { type: m.type };
-  state.mci = { ...mciBlank(), ...keep }; state.mciMore = false;
+  state.mci = { ...mciBlank(), type: m.type }; state.mciMore = false;
   saveMci(); renderMci(); toast('已結束大傷，紀錄已清除');
 }
 // 分流結果整理成文字（給勤務中心、指揮官或 LINE 群組）；不會自動傳給醫院
 function mciText() {
   const m = state.mci; if (!m.active || !m.patients.length) throw new Error('還沒有傷患紀錄');
   const st = mciStats(), note = m.note.trim();
-  const pt = p => `${MCI_COLORS.find(c => c[0] === p.tri)[1]} ${mciLabel(p)}${p.unit ? `（${p.unit}）` : ''}`;
+  const pt = p => { const inj = mciInjText(p); return `${MCI_COLORS.find(c => c[0] === p.tri)[1]} ${mciLabel(p)}${p.unit ? `（${p.unit}）` : ''}${inj ? `［${inj}］` : ''}`; };
   const hs = mciHosps().filter(x => mciAssigned(x.h.id).length);
   const un = m.patients.filter(p => !p.dest);
-  return [`【大量傷病患分流】${MCI_TYPES[m.type]}・共 ${m.patients.length} 人・${fmtClock(Date.now())}${localCfg.unit ? '・' + localCfg.unit : ''}`,
+  return [`【大量傷病患分流】${MCI_TYPES[m.type].n}・共 ${m.patients.length} 人・${fmtClock(Date.now())}${localCfg.unit ? '・' + localCfg.unit : ''}`,
     note ? `現場：${note}` : '',
     MCI_COLORS.map(([c, t]) => `${t} ${st[c].n}（男 ${st[c].M}・女 ${st[c].F}）`).join('、'),
-    ...hs.map((x, i) => `${i + 1}. ${x.h.short || x.h.name}（${x.eta} 分${m.cap[x.h.id] != null ? `・可收 ${m.cap[x.h.id]}・剩 ${mciLeft(x.h.id)}` : ''}）：${mciAssigned(x.h.id).map(pt).join('、')}`),
+    ...hs.map((x, i) => `${i + 1}. ${x.h.short || x.h.name}（${x.eta} 分）：${mciAssigned(x.h.id).map(pt).join('、')}`),
     un.length ? `尚未指定醫院：${un.map(pt).join('、')}` : ''
   ].filter(Boolean).join('\n');
 }
@@ -4793,6 +5023,7 @@ const HP_FIELDS = [
 function hpHospital() { return hospById(state.hp.hid); }
 async function onAuthChanged() {
   saveMigration().then(ensureBundle);
+  setTimeout(maybeShowChangelog, 800);
   startEmsNoticeWatch();
   renderSide();
   state.hp.allowed = null;
@@ -5507,12 +5738,37 @@ function adminUnlock() {
   }
   adminPin.ok = true; adminPin.fails = 0;
   try { sessionStorage.setItem(ADMIN_OK_KEY, ADMIN_PIN_HASH); } catch (e) { /* 私密瀏覽：只在這次開啟有效 */ }
-  el.value = ''; toast('已解鎖管理後台'); renderAdmin();
+  el.value = ''; toast('已解鎖管理後台'); renderAdmin(); setTimeout(maybeShowChangelog, 600);
 }
 function adminLock() {
   adminPin.ok = false;
   try { sessionStorage.removeItem(ADMIN_OK_KEY); } catch (e) { /* ignore */ }
   toast('已鎖定管理後台'); location.hash = '';
+}
+/* ----- 更新紀錄：只對登入後台的人（Firebase 管理者帳號，或示範模式輸入後台密碼）顯示；未登入的人不跳 ----- */
+const SEEN_VER_KEY = 'hf_seen_ver';
+function verNum(v) { return String(v || '').replace(/^v/, '').split('.').map(n => parseInt(n, 10) || 0).reduce((a, n) => a * 1000 + n, 0); }
+async function isBackendUser() {
+  if (Store.mode === 'demo') return adminPin.ok || adminUnlockedStored();
+  if (!Store.email()) return false;
+  try { return !(await Store.getHospitalUser(Store.email())); } catch (e) { return true; }   // 醫院端帳號不算後台
+}
+let changelogShown = false;
+async function maybeShowChangelog() {
+  if (changelogShown || (window.__noChangelog && !window.__wantChangelog) || !(await isBackendUser())) return;   // __skipAck：自動測試用
+  let seen = ''; try { seen = localStorage.getItem(SEEN_VER_KEY) || ''; } catch (e) { /* ignore */ }
+  if (seen === APP_VERSION) return;
+  const cur = verNum(APP_VERSION);
+  // 看過的版本之後到現在的每一版；從沒看過時列最近 5 版
+  const list = CHANGELOG.filter(e => verNum(e.v) <= cur && (seen ? verNum(e.v) > verNum(seen) : true)).slice(0, seen ? 50 : 5);
+  if (!list.length) { try { localStorage.setItem(SEEN_VER_KEY, APP_VERSION); } catch (e) { /* ignore */ } return; }
+  if (!$('#modal').hidden) { setTimeout(maybeShowChangelog, 1500); return; }   // 有其他視窗開著，晚一點再跳
+  changelogShown = true;
+  openModal({ title: `救途已更新到 ${APP_VERSION}`,
+    body: `<div class="cl-sub">${seen ? `上次看到 ${esc(seen)}，之後有 ${list.length} 個版本` : '最近的更新'}（只有登入後台的人會看到）</div>
+      ${list.map(e => `<section class="cl"><div class="cl-h"><b>${esc(e.v)}</b><span>${esc(e.d)}</span></div><ul>${e.items.map(i => `<li>${esc(i)}</li>`).join('')}</ul></section>`).join('')}
+      <div class="hint">完整紀錄在 GitHub 的 README「更新紀錄」。</div>`,
+    buttons: [{ text: '知道了', cls: 'primary', onClick: () => { try { localStorage.setItem(SEEN_VER_KEY, APP_VERSION); } catch (e) { /* ignore */ } closeModal(); } }] });
 }
 function renderAdmin() {
   renderSide();
@@ -5581,6 +5837,9 @@ function renderAdminPanel() {
       <input id="s_credit" value="${esc(state.settings.credit)}">
       <label for="s_team">製作團隊（顯示在「使用須知」；一行一人，格式：姓名｜單位｜介紹，介紹可以留白）</label>
       <textarea id="s_team" rows="4" placeholder="尤偉檁｜新北市政府消防局 新板分隊｜負責系統設計與開發">${esc(state.settings.team)}</textarea>
+      <label for="s_stations">消防分隊位置（大傷「後送單位」會列出事故現場附近 6 個分隊的 91 車；一行一隊：名稱｜緯度,經度；留白＝內建清單）</label>
+      <textarea id="s_stations" rows="5" spellcheck="false">${esc(state.settings.stations || STATIONS_SEED)}</textarea>
+      <div class="hint" style="margin:-4px 0 10px">內建 ${parseStations(STATIONS_SEED).length} 個分隊，位置取自 OpenStreetMap，可能缺少部分分隊，請自行補上。</div>
       <label for="s_tsrc">醫院能力資料來源（顯示在能力表、使用須知與「參考文獻」頁）</label>
       <input id="s_tsrc" value="${esc(state.settings.tableSrc)}">
       <div class="sec-title" style="margin-top:22px">意見回饋</div>
@@ -6263,7 +6522,7 @@ async function saveSettingsForm() {
   const bad = state.presetDraft.findIndex(p => p.lat === '' || !p.name);
   if (bad >= 0) throw new Error(`第 ${bad + 1} 個出發點的名稱或座標有誤`);
   const s = normSettings({ rulesVer: state.settings.rulesVer, coordVer: state.settings.coordVer, dataVer: state.settings.dataVer, listCount: $('#s_count').value, presets: state.presetDraft,
-    disclaimer: $('#s_disc').value, notice: $('#s_notice').value, credit: $('#s_credit').value, team: $('#s_team').value,
+    disclaimer: $('#s_disc').value, notice: $('#s_notice').value, credit: $('#s_credit').value, team: $('#s_team').value, stations: $('#s_stations').value,
     tableSrc: $('#s_tsrc').value, tableSrcTpe: $('#s_tsrc2').value,
     feedbackEmail: $('#s_fbmail').value, feedbackUrl: $('#s_fburl').value,
     traffic: Object.fromEntries(TRAFFIC_SLOTS.map(([k]) => [k, $('#s_tf_' + k).value])) });
@@ -6499,25 +6758,35 @@ const ACTIONS = {
   onsetAgo: el => setOnset(Date.now() - Number(el.dataset.m) * 60e3, 'manual'),
   onsetUnknown: () => { state.clock.unknown = !state.clock.unknown; if (state.clock.unknown) { state.clock.onsetAt = null; state.clock.src = 'manual'; } renderClockBox(); renderResults(); },
   fmcNow: () => { state.clock.fmcAt = Date.now(); renderClockBox(); renderResults(); },
-  mciType: el => { state.mci.type = el.dataset.v; renderMci(); },
+  mciType: el => { state.mci.type = el.dataset.v; if (state.mci.active) saveMci(); renderMci(); if (state.mci.active) { const d = $('.mci-typebox'); if (d) d.open = true; } },
   mciStart: () => mciStart(),
   mciRelocate: () => mciRelocate(),
   mciAddSet: el => { state.mci.add[el.dataset.k] = el.dataset.v; saveMci(); const age = $('#mciAge') ? $('#mciAge').value : ''; renderMci(); if ($('#mciAge')) $('#mciAge').value = age; },
   mciAdd: () => mciAdd(),
   mciPt: el => openMciPt(el.dataset.id),
   mciPtSet: el => { const p = state.mci.patients.find(x => x.id === mciPtId); if (!p) return; p[el.dataset.k] = p[el.dataset.k] === el.dataset.v && el.dataset.k === 'unit' ? '' : el.dataset.v; mciPtRefresh(); },
-  mciInj: el => { const p = state.mci.patients.find(x => x.id === mciPtId); if (!p) return; const r = el.dataset.r; p.inj = p.inj.includes(r) ? p.inj.filter(x => x !== r) : p.inj.concat(r); mciPtRefresh(); },
-  mciInjT: el => { const p = state.mci.patients.find(x => x.id === mciPtId); if (!p) return; const v = el.dataset.v; p.injT = p.injT.includes(v) ? p.injT.filter(x => x !== v) : p.injT.concat(v); mciPtRefresh(); },
+  // 人形圖：先點部位（再點一次取消選取），再點傷情
+  mciRegion: el => { const p = state.mci.patients.find(x => x.id === mciPtId); if (!p) return; const r = el.dataset.r;
+    mciRegion = mciRegion === r ? '' : r; if (mciRegion && !p.injMap[r]) p.injMap[r] = []; else if (!mciRegion && p.injMap[r] && !p.injMap[r].length) delete p.injMap[r]; mciPtRefresh(); },
+  mciInjT: el => { const p = state.mci.patients.find(x => x.id === mciPtId); if (!p || !mciRegion) return; const v = el.dataset.v, a = p.injMap[mciRegion] || [];
+    p.injMap[mciRegion] = a.includes(v) ? a.filter(x => x !== v) : a.concat(v); mciPtRefresh(); },
+  mciInjDel: el => { const p = state.mci.patients.find(x => x.id === mciPtId); if (!p) return; delete p.injMap[el.dataset.r]; if (mciRegion === el.dataset.r) mciRegion = ''; mciPtRefresh(); },
+  mciGen: el => { const p = state.mci.patients.find(x => x.id === mciPtId); if (!p) return; const v = el.dataset.v; p.injT = p.injT.includes(v) ? p.injT.filter(x => x !== v) : p.injT.concat(v); mciPtRefresh(); },
   mciPtDest: el => {
     const p = state.mci.patients.find(x => x.id === mciPtId); if (!p) return;
-    const hid = el.dataset.h, left = hid ? mciLeft(hid) : null;
+    const hid = el.dataset.h, left = hid && hid !== p.dest ? mciLeft(hid, p.tri) : null;
     p.dest = hid;
     mciPtRefresh();
-    if (hid && left != null && left <= 0) toast(`注意：${(hospById(hid) || {}).short || ''} 已超過設定的可收人數`, 3500);
+    if (hid && left != null && left <= 0) toast(`注意：${(hospById(hid) || {}).short || ''} 的${MCI_COLORS.find(c => c[0] === p.tri)[1]}色名額已滿，超過設定的可收人數`, 3500);
   },
-  mciCap: el => { const m = state.mci, id = el.dataset.h, d = Number(el.dataset.d), c = m.cap[id];
-    if (c == null) { if (d > 0) m.cap[id] = 1; } else { const v = c + d; if (v < 0) delete m.cap[id]; else m.cap[id] = Math.min(200, v); }
+  mciCap: el => { const m = state.mci, id = el.dataset.h, c = el.dataset.c, d = Number(el.dataset.d), cur = mciCapOf(id, c);
+    const o = m.cap[id] = { ...(m.cap[id] || {}) };
+    if (cur == null) { if (d < 0) o[c] = mciAssigned(id, c).length; else return; }
+    else o[c] = Math.max(0, Math.min(99, cur + d));
     saveMci(); renderMci(); },
+  mciCapInf: el => { const m = state.mci, id = el.dataset.h, c = el.dataset.c, cur = mciCapOf(id, c);
+    const o = m.cap[id] = { ...(m.cap[id] || {}) }; o[c] = cur == null ? mciAssigned(id, c).length : null; saveMci(); renderMci(); },
+  mciCapReset: el => { delete state.mci.cap[el.dataset.h]; saveMci(); renderMci(); },
   mciMore: () => { state.mciMore = !state.mciMore; renderMci(); },
   mciAuto: () => mciAuto(),
   mciEnd: () => mciEnd(),
@@ -6817,7 +7086,7 @@ async function boot() {
   if (Store.mode === 'demo') startStatusWatch();
   if (SHOW_CAPACITY && localCfg.sim) Sim.start();
   Tracker.start();
-  if (Store.mode === 'demo') { await Store.authReady; startEmsNoticeWatch(); route(); }
+  if (Store.mode === 'demo') { await Store.authReady; startEmsNoticeWatch(); route(); setTimeout(maybeShowChangelog, 900); }
   else { route(); cloudSync().then(() => Store.authReady); }
 }
 boot();
