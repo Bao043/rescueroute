@@ -1259,10 +1259,13 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "653252329719",
   appId: "1:653252329719:web:c3c9ca0891de64c69b13f2"
 };
-const APP_VERSION = 'v3.32.0';
+const APP_VERSION = 'v3.32.1';
 /* 更新紀錄：登入後台的人第一次打開新版本，會跳出「上次看過的版本之後」每一版改了什麼（可能一次上傳好幾版）
  * 每次改版請在最上面加一筆（版本號要和 APP_VERSION 一致） */
 const CHANGELOG = [
+  { v: 'v3.32.1', d: '2026-10-27', items: [
+    '拿掉求救原因「吸入性傷害：呼吸道危險（就近）」，危及生命只留 OHCA',
+    '濃煙嗆傷／吸入性傷害：勾到任一項呼吸道危險徵象，建議送往直接改為最近、能緊急插管的急診（不用再按按鈕）；取消勾選就回到高壓氧醫院'] },
   { v: 'v3.32.0', d: '2026-10-27', items: [
     '濃煙嗆傷／吸入性傷害：新增「呼吸道危險徵象」勾選（聲音沙啞、喘鳴、臉頸明顯燒燙傷或口內燒傷、呼吸費力、血氧下降、意識不清），派遣內容提到會自動勾；任一項符合就建議「改送最近急診」，先確保呼吸道再轉高壓氧或燒燙傷中心',
     '新增求救原因「吸入性傷害：呼吸道危險（就近）」（危及生命）；只有口鼻碳粒、鼻毛燒焦屬「可能吸入」，提示密切觀察',
@@ -1306,7 +1309,7 @@ const LEAFLET_CSS = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leafle
 const LEAFLET_JS = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
 const DECLINE_REASONS = ['急救室滿床', 'CT 忙碌中', '加護病房滿床', '無相關專科醫師', '設備故障'];
 const DEMO_CASES = [
-  { t: '火場吸入濃煙', text: '火災 一名男性 約50歲 火場救出 口鼻有碳粒 吸入濃煙 聲音沙啞 意識清楚', story: true },
+  { t: '火場吸入濃煙', text: '火災 一名男性 約50歲 火場救出 口鼻有碳粒 吸入濃煙 意識清楚', story: true },
   { t: '內科 OHCA', text: '急病 一名男性年約35歲 主訴內科OHCA 民眾CPR中' },
   { t: '一氧化碳', text: '火災 一名女性約60多歲 浴室燒炭 意識不清 疑似一氧化碳中毒' },
   { t: '疑似中風', text: '急病 一名男性 68歲 主訴右側無力 口齒不清 發作約40分鐘' },
@@ -1444,8 +1447,8 @@ const ECPR_NOTE = '6 項條件全部符合才啟動；有專線的醫院直接�
 const STROKE_NOTE = '疑似大血管阻塞（明顯單側無力、凝視偏移、失語）且沒有快速轉院機制時，直送最近可取栓醫院（AHA/ASA 2026）';
 // 吸入性傷害：有呼吸道危險徵象就近送醫（Sheridan NEJM 2016；ABLS 2018）
 const R22_NOTE_OLD = '吸入性傷害可能在數小時內呼吸道水腫，且常合併一氧化碳中毒：優先送有高壓氧、能插管、有加護病房的醫院；已插管者注意部分高壓氧艙不收呼吸器病人';
-const R22_NOTE = '吸入性傷害可能在數小時內呼吸道水腫，且常合併一氧化碳中毒。有聲音沙啞、喘鳴、臉頸明顯燒燙傷、呼吸費力、血氧下降、意識不清任一項：改「呼吸道危險（就近）」；沒有就優先送有高壓氧、能插管、有加護病房的醫院（已插管者注意部分高壓氧艙不收呼吸器病人）';
-const R31_NOTE = '上呼吸道可能在數小時內水腫阻塞，越晚插管越困難：就近送能緊急插管的急診，到院前先通知醫院準備呼吸道處置（可能需早期插管）；呼吸道穩定後再轉高壓氧或燒燙傷中心';
+const R22_NOTE_V4 = '吸入性傷害可能在數小時內呼吸道水腫，且常合併一氧化碳中毒。有聲音沙啞、喘鳴、臉頸明顯燒燙傷、呼吸費力、血氧下降、意識不清任一項：改「呼吸道危險（就近）」；沒有就優先送有高壓氧、能插管、有加護病房的醫院（已插管者注意部分高壓氧艙不收呼吸器病人）';
+const R22_NOTE = '吸入性傷害可能在數小時內呼吸道水腫，且常合併一氧化碳中毒。勾到任一項呼吸道危險徵象（聲音沙啞、喘鳴、臉頸明顯燒燙傷、呼吸費力、血氧下降、意識不清）就改為就近送能緊急插管的急診，先確保呼吸道；沒有就優先送有高壓氧、能插管、有加護病房的醫院（已插管者注意部分高壓氧艙不收呼吸器病人）';
 const SEED_RULES = [
   { id: 'r01', name: '胸痛／疑似 STEMI', proto: 'STEMI', kw: '胸痛 胸悶 胸悶痛 STEMI 心肌梗塞 心梗', g: [{ label: '可做心導管', caps: ['PCI'] }] },
   { id: 'r02', name: '疑似腦中風', proto: 'STROKE', kw: '中風 CVA 單側無力 半側無力 肢體無力 右側無力 左側無力 口齒不清 言語不清 講話不清楚 嘴歪 臉歪', g: [{ label: '可動脈取栓', caps: ['EVT'] }],
@@ -1488,10 +1491,6 @@ const SEED_RULES = [
     note: R22_NOTE },
   { id: 'r30', name: 'OHCA（符合葉克膜啟動）', proto: 'OHCA', prio: 11, kw: 'ECPR 葉克膜 院前葉克膜 啟動葉克膜 葉克膜專線', g: [{ label: '院前葉克膜（ECPR）醫院', caps: ['ECPR'] }],
     note: ECPR_NOTE },
-  { id: 'r31', name: '吸入性傷害：呼吸道危險（就近）', prio: 9,
-    kw: '呼吸道危險 呼吸道灼傷 呼吸道燒燙傷 上呼吸道水腫',
-    g: [{ label: '最近的急救責任醫院（能緊急插管）', minLevel: '一般級' }],
-    note: R31_NOTE },
   { id: 'r29', name: '意識改變／血糖異常', kw: '意識改變 意識不清 意識模糊 叫不醒 昏迷 低血糖 高血糖 血糖過低 血糖過高 血糖異常 酮酸中毒 DKA', g: [{ label: '急救責任醫院', minLevel: '一般級' }],
     note: '先測血糖：低血糖矯正後意識恢復可送最近醫院；合併單側無力或口齒不清改選「疑似腦中風」、疑似藥物或酒精改選「中毒」、發燒合併低血壓改選「疑似敗血症」' },
   { id: 'r21', name: '疑似敗血症', proto: 'SEPSIS', kw: '敗血症 感染性休克 發燒 低血壓 意識改變 寒顫', g: [{ label: '中度級以上', minLevel: '中度級' }] }
@@ -1612,7 +1611,9 @@ function trgGroups(groups, ev) {
 }
 function effGroups(rule) {
   const res = applicableGroups(rule, state.patient.sex, ageVal());
-  return isTraumaRule(rule) ? { ...res, groups: trgGroups(res.groups, trgEval()) } : res;
+  if (isTraumaRule(rule)) return { ...res, groups: trgGroups(res.groups, trgEval()) };
+  if (isInhalRule(rule) && airwayEval().any) return { ...res, groups: [normGroup({ label: AIRWAY_GROUP_LABEL, minLevel: '一般級' })] };
+  return res;
 }
 function redFlags(text) {
   const t = normText(text);
@@ -2004,11 +2005,11 @@ function normHosp(h = {}) {
 }
 // 求救原因分類（救護端依這個順序分組顯示：最危急的在最上面）
 const RULE_TIERS = [['life', '危及生命'], ['time', '黃金時間'], ['special', '特殊處置'], ['obped', '婦幼'], ['other', '其他急症']];
-const SEED_TIER = { r07: 'life', r08: 'life', r30: 'life', r31: 'life', r01: 'time', r02: 'time', r12: 'time', r05: 'time', r20: 'time', r21: 'time',
+const SEED_TIER = { r07: 'life', r08: 'life', r30: 'life', r01: 'time', r02: 'time', r12: 'time', r05: 'time', r20: 'time', r21: 'time',
   r03: 'special', r22: 'special', r06: 'special', r14: 'special', r13: 'special', r15: 'special', r28: 'special', r04: 'special', r23: 'special', r24: 'special',
   r10: 'obped', r25: 'obped', r11: 'obped', r29: 'other', r09: 'other', r16: 'other', r27: 'other', r26: 'other', r17: 'other', r18: 'other', r19: 'other' };
 // 分類內的預設順序（跟著嚴重程度）；管理者改過「排序」就照管理者的
-const SEED_TIER_ORDER = ['r07', 'r08', 'r30', 'r31', 'r01', 'r02', 'r12', 'r05', 'r20', 'r21', 'r03', 'r22', 'r06', 'r14', 'r13', 'r15', 'r28', 'r04', 'r23', 'r24', 'r10', 'r25', 'r11', 'r29', 'r09', 'r16', 'r27', 'r26', 'r17', 'r18', 'r19'];
+const SEED_TIER_ORDER = ['r07', 'r08', 'r30', 'r01', 'r02', 'r12', 'r05', 'r20', 'r21', 'r03', 'r22', 'r06', 'r14', 'r13', 'r15', 'r28', 'r04', 'r23', 'r24', 'r10', 'r25', 'r11', 'r29', 'r09', 'r16', 'r27', 'r26', 'r17', 'r18', 'r19'];
 const tierIdx = t => Math.max(0, RULE_TIERS.findIndex(([k]) => k === t));
 function normRule(r = {}) {
   return {
@@ -2139,8 +2140,10 @@ function groupedCaps(list) {
 // 預設求救原因的調整（只改「還是舊預設」的內容；管理者自己改過的不動）。改完記版本號，之後不再改
 // v2（3.15）：孕婦急症只要點就找產科、兒童急症只要點就找小兒加護
 // v3（3.17）：外傷 OHCA 加復甦性開胸計時、腦中風提示依 2026 指引、新增「意識改變／血糖異常」
-// v4（3.32）：吸入性傷害加呼吸道危險徵象，新增「吸入性傷害：呼吸道危險（就近）」
-const RULES_VER = 4;
+// v4（3.32.0）：吸入性傷害加呼吸道危險徵象（3.32.0 曾新增 r31「吸入性傷害：呼吸道危險（就近）」）
+// v5（3.32.1）：拿掉 r31，改成在濃煙嗆傷裡勾到任一徵象就自動就近
+const RULES_VER = 5;
+let migrRemove = null;
 let migrPending = null;
 /* 醫院座標校正（2026-10-20）：原本的座標是概略值，最多偏 4 公里（淡水馬偕）。
  * 依 OpenStreetMap 醫院點位（名稱＋門牌地址一致）更新；從新莊分隊用道路計算的距離與 Google 地圖相符。
@@ -2242,11 +2245,12 @@ function migrateRules(from) {
       const nr = normRule({ ...seedRule(sd), order: state.rules.reduce((m, r) => Math.max(m, r.order), 0) + 1 }); state.rules.push(nr); changed.add(nr);
     }
   }
-  if (from < 4) {
-    const r22 = state.rules.find(r => r.id === 'r22'); if (r22 && r22.note === R22_NOTE_OLD) { r22.note = R22_NOTE; changed.add(r22); }
-    if (!state.rules.some(r => r.id === 'r31')) {
-      const sd = SEED_RULES.find(x => x.id === 'r31');
-      const nr = normRule({ ...seedRule(sd), order: state.rules.reduce((m, r) => Math.max(m, r.order), 0) + 1 }); state.rules.push(nr); changed.add(nr);
+  if (from < 5) {
+    const r22 = state.rules.find(r => r.id === 'r22'); if (r22 && (r22.note === R22_NOTE_OLD || r22.note === R22_NOTE_V4)) { r22.note = R22_NOTE; changed.add(r22); }
+    if (state.rules.some(r => r.id === 'r31')) {
+      state.rules = state.rules.filter(r => r.id !== 'r31'); changed.forEach(r => { if (r.id === 'r31') changed.delete(r); });
+      migrRemove = [...new Set([...(migrRemove || []), 'r31'])];
+      if (state.patient && state.patient.ruleId === 'r31') state.patient.ruleId = 'r22';
     }
   }
   state.settings.rulesVer = RULES_VER;
@@ -2264,11 +2268,12 @@ async function ensureBundle() {
   finally { bundling = false; }
 }
 async function saveMigration() {
-  if (!migrPending && !coordPending && !dataPending) return;
-  if (Store.mode === 'demo') { migrPending = null; coordPending = null; dataPending = null; Store._persistLocal(); return; }
+  if (!migrPending && !coordPending && !dataPending && !(migrRemove && migrRemove.length)) return;
+  if (Store.mode === 'demo') { migrPending = null; coordPending = null; dataPending = null; migrRemove = null; Store._persistLocal(); return; }
   if (!Store.email() || Store.cloudEmpty || !Store.db) return;
-  const ch = migrPending, hc = coordPending, dp = dataPending; migrPending = null; coordPending = null; dataPending = null;
+  const ch = migrPending, hc = coordPending, dp = dataPending, rm = migrRemove; migrPending = null; coordPending = null; dataPending = null; migrRemove = null;
   try {
+    for (const id of rm || []) await Store.remove('rules', id);
     const rs = [...(ch || []), ...(dp ? dp.rules : [])], hs = [...new Set([...(hc || []), ...(dp ? dp.hospitals : [])])];
     if (dp && dp.caps.length) await Store.saveMany('caps', dp.caps);
     if (rs.length) await Store.saveMany('rules', rs);
@@ -2276,7 +2281,7 @@ async function saveMigration() {
     await Store.saveSettings(state.settings);
     if (hc && hc.length) toast(`已把 ${hc.length} 間醫院的校正座標寫回雲端`, 4000);
     if (dp && (dp.caps.length || dp.hospitals.length || dp.rules.length)) toast('已把院前葉克膜醫院與臺北市動脈取栓資料寫回雲端', 4000);
-  } catch (e) { console.warn('調整寫回雲端失敗', e); migrPending = ch; coordPending = hc; dataPending = dp; }
+  } catch (e) { console.warn('調整寫回雲端失敗', e); migrPending = ch; coordPending = hc; dataPending = dp; migrRemove = rm; }
 }
 function applyData(d) {
   state.caps = (d.caps || []).map(normCap); sortCaps();
@@ -3265,8 +3270,8 @@ const AIRWAY_ITEMS = [
   { id: 'loc', t: '意識不清，無法保護呼吸道', kw: ['意識不清', '昏迷', '叫不醒', '無法保護呼吸道', '沒有咳嗽反射'],
     fn: () => { const v = trgVs(); return v.gcs != null && v.gcs <= 8; } }
 ];
-const isAirwayRule = r => !!r && r.id === 'r31';
 const isInhalRule = r => !!r && r.id === 'r22';
+const AIRWAY_GROUP_LABEL = '最近的急救責任醫院（能緊急插管）';
 // 生命徵象：手動填的優先，其次派遣內容
 function trgVs() { const p = parseVitals(state.caseText), m = (state.trg && state.trg.vs) || {}; const o = { ...p }; Object.keys(m).forEach(k => { if (m[k] !== '' && m[k] != null && !isNaN(Number(m[k]))) o[k] = Number(m[k]); }); return o; }
 // 關鍵字命中：「無聲音沙啞」不能因為較短的「沙啞」而算有
@@ -3282,11 +3287,6 @@ function airwayEval() {
   const soot = ['碳粒', '鼻毛燒焦', '黑痰', '咳出黑色', '吸入濃煙'].some(k => hasKw(t, k));
   return { auto, on, n: on.size, any: on.size > 0, soot };
 }
-function airwayNearest(n = 3) {
-  if (!state.searched || !state.pos) return [];
-  const r = state.rules.find(isAirwayRule), min = Math.max(0, levelRank((r && r.groups[0] && r.groups[0].minLevel) || '一般級'));
-  return computeList(getHighlight()).filter(x => levelRank(x.h.level) >= min).sort((a, b) => etaOf(a) - etaOf(b)).slice(0, n);
-}
 function airwaySummary() {
   const ev = airwayEval(); if (!ev.any) return '';
   return `呼吸道危險徵象：${AIRWAY_ITEMS.filter(i => ev.on.has(i.id)).map(i => i.t.replace(/（.*）/, '')).join('、')}`;
@@ -3294,24 +3294,16 @@ function airwaySummary() {
 function renderAirwayBox() {
   const box = $('#airwayBox'); if (!box) return;
   const r = activeRule();
-  if (!isInhalRule(r) && !isAirwayRule(r)) { if (box.innerHTML) box.innerHTML = ''; return; }
-  const ev = airwayEval(), onA = isAirwayRule(r), ar = state.rules.find(isAirwayRule), ir = state.rules.find(isInhalRule);
+  if (!isInhalRule(r)) { if (box.innerHTML) box.innerHTML = ''; return; }
+  const ev = airwayEval();
   const lv = ev.any ? 'red' : 'none';
   const head = ev.any
-    ? `<b>符合 ${ev.n} 項：就近送醫，先確保呼吸道</b><span>上呼吸道可能很快水腫，越晚插管越困難；到院前先通知醫院準備呼吸道處置</span>`
-    : `<b>目前沒有呼吸道危險徵象</b><span>${ev.soot ? '只有口鼻碳粒、鼻毛燒焦屬「可能吸入」：密切觀察，出現下列任一項就改送最近急診' : '任一項符合就改送最近、能緊急插管的急診'}</span>`;
-  let act = '';
-  if (ev.any && !onA && ar) act = `<button class="btn primary ecpr-go aw-go" data-act="airwayGo" data-id="${esc(ar.id)}">${ic('alert', 'sm')}改送最近急診（先確保呼吸道）</button>`;
-  else if (onA && !ev.any && ir) act = `<button class="btn ecpr-go" data-act="airwayGo" data-id="${esc(ir.id)}">改回${esc(ir.name)}</button>`;
-  const near = ev.any ? airwayNearest() : [];
-  const nearHtml = near.length ? `<div class="ecpr-near"><div class="ecpr-nh">最近的急救責任醫院</div>${near.map(x =>
-    `<div class="ecpr-row"><span class="nm"><b>${esc(x.h.short || x.h.name)}</b><em class="num">約 ${etaOf(x)} 分</em><small>${esc(x.h.level || '')}</small></span><a class="btn sm" href="tel:119">${ic('phone', 'sm')}<span>119 轉報</span></a></div>`).join('')}</div>` : '';
+    ? `<b>符合 ${ev.n} 項：已改為就近送醫，先確保呼吸道</b><span>建議送往改為最近、能緊急插管的急診；上呼吸道可能很快水腫，越晚插管越困難，到院前先通知醫院準備呼吸道處置</span>`
+    : `<b>目前沒有呼吸道危險徵象</b><span>${ev.soot ? '只有口鼻碳粒、鼻毛燒焦屬「可能吸入」：密切觀察，出現下列任一項就勾選，會自動改為就近送醫' : '任一項符合就勾選，會自動改為就近送能緊急插管的急診'}</span>`;
   box.innerHTML = `<section class="trg ecpr airway">
     <div class="trg-h"><b>${ic('alert', 'sm')} 呼吸道危險徵象（任一項就近送醫）</b><button class="linkish" data-act="airwayClear">清除</button></div>
     <div class="trg-lv ${lv}">${head}</div>
     <div class="chips ecpr-c">${AIRWAY_ITEMS.map(i => `<button class="chip trg-c ${ev.on.has(i.id) ? 'on' : ''}" data-act="airway" data-id="${i.id}" aria-pressed="${ev.on.has(i.id)}">${esc(i.t)}${ev.auto.has(i.id) && ev.on.has(i.id) ? '<i>自動</i>' : ''}</button>`).join('')}</div>
-    ${act}
-    ${nearHtml}
     <details class="trg-more tips"><summary>現場與轉送重點</summary><ul class="tw-tips">
       <li>坐姿或半坐臥、高濃度氧氣；持續觀察聲音、喘鳴、呼吸費力，症狀可能在數小時內加重</li>
       <li>一般血氧機會把一氧化碳當成氧氣：SpO₂ 正常不能排除缺氧</li>
@@ -4554,7 +4546,7 @@ function handoverFacts(h) {
     summary: $('#n_summary').value.trim(), vitals: $('#n_vitals').value.trim(), tx: [$('#n_tx').value.trim(), state.run.events.length ? '途中 ' + runSummary() : ''].filter(Boolean).join('；'),
     complaint: r ? r.name : '', onset, severity: ai ? SEV_TXT[ai.severity] : '',
     findings: ai ? ai.keyFindings.join('、') : '', need: ai && ai.suggestedCaps.length ? ai.suggestedCaps.map(capName).join('、') : (r ? effGroups(r).groups.map(groupLabel).join('、') : ''),
-    hospital: h.short || h.name, flags: [redFlags(state.caseText).map(x => x.split('：')[0]).join('、'), isInhalRule(r) || isAirwayRule(r) ? airwaySummary() : ''].filter(Boolean).join('；'), trauma: isTraumaRule(r) ? trgHandover() : null,
+    hospital: h.short || h.name, flags: [redFlags(state.caseText).map(x => x.split('：')[0]).join('、'), isInhalRule(r) ? airwaySummary() : ''].filter(Boolean).join('；'), trauma: isTraumaRule(r) ? trgHandover() : null,
     ecpr: isOhcaRule(r) || isEcprRule(r) ? ecprHandover() : ''
   };
 }
@@ -6954,11 +6946,6 @@ const ACTIONS = {
     renderResults();
   },
   airwayClear: () => { state.airway = { on: [], off: [] }; renderResults(); toast('已清除呼吸道徵象勾選（派遣內容帶入的仍會保留）'); },
-  airwayGo: el => {
-    const r = state.rules.find(x => x.id === el.dataset.id); if (!r) return;
-    state.patient.ruleId = r.id; renderPatient(); renderParse(); renderResults(); maybeAutoSearch();
-    toast(isAirwayRule(r) ? '已改送最近急診：到院前先通知醫院準備呼吸道處置' : `已改回${r.name}`, 4000);
-  },
   ecprClear: () => { state.ecpr = { on: [], off: [] }; renderResults(); toast('已清除葉克膜條件勾選（派遣內容帶入的仍會保留）'); },
   ecprGo: el => {
     const r = state.rules.find(x => x.id === el.dataset.id); if (!r) return;
