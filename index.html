@@ -312,6 +312,21 @@ input:disabled{opacity:.6}
 .scope-box{display:flex;gap:8px;align-items:flex-start;padding:10px 12px;margin-bottom:12px;border-radius:12px;background:var(--blue-soft);color:var(--ink);font-size:13.5px;line-height:1.55}
 .scope-box b{display:block;color:var(--blue)}.scope-box .ic{flex:none;margin-top:3px;color:var(--blue)}
 .app-foot .scope-foot{display:inline-flex;align-items:center;gap:5px;margin-bottom:6px;padding:3px 10px;border-radius:999px;background:var(--blue-soft);color:var(--blue);font-size:11.5px;font-weight:600}
+.soon{display:inline-flex;align-items:center;gap:6px;font-weight:700;color:var(--amber)}
+.soon em{font-style:normal;font-size:10.5px;letter-spacing:.3px;padding:2px 8px;border-radius:999px;background:var(--amber);color:var(--surface)}
+.scope-box .soon.in-box{display:flex;margin:3px 0 4px;font-size:13px}
+.app-foot .soon.in-foot{margin:0 3px 6px;padding:3px 10px 3px 4px;border-radius:999px;background:var(--amber-soft);font-size:11.5px}
+.lk-empty .soon.lk{margin-top:10px;font-size:12.5px}
+.addr-form{display:flex;gap:8px;margin-bottom:8px}
+.addr-form input{flex:1;min-width:0;font-size:16px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--field);color:var(--ink)}
+.addr-form .btn{flex:none}
+.addr-msg{margin:10px 2px 6px;font-size:13.5px;color:var(--muted);display:flex;gap:6px;align-items:flex-start}
+.addr-msg.warn{color:var(--amber);font-weight:600}.addr-msg .ic{flex:none;margin-top:2px}
+.addr-list{display:flex;flex-direction:column;gap:6px}
+.addr-item{display:flex;gap:8px;align-items:flex-start;text-align:left;width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:inherit;cursor:pointer}
+.addr-item:hover,.addr-item:focus-visible{border-color:var(--blue);background:var(--blue-soft)}
+.addr-item .ic{flex:none;margin-top:3px;color:var(--blue)}.addr-item b{font-weight:600;font-size:14.5px}
+.addr-item small{display:block;color:var(--red);font-weight:600;font-size:12px}
 .extra-note.out-area{display:flex;gap:8px;align-items:flex-start;background:var(--red-soft);color:var(--red);font-weight:600}
 .team{display:flex;flex-direction:column;gap:10px}
 .team-m{display:flex;gap:12px;align-items:flex-start;padding:12px;border:1px solid var(--line2);border-radius:14px;background:var(--card)}
@@ -1259,10 +1274,13 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "653252329719",
   appId: "1:653252329719:web:c3c9ca0891de64c69b13f2"
 };
-const APP_VERSION = 'v3.32.1';
+const APP_VERSION = 'v3.33.0';
 /* 更新紀錄：登入後台的人第一次打開新版本，會跳出「上次看過的版本之後」每一版改了什麼（可能一次上傳好幾版）
  * 每次改版請在最上面加一筆（版本號要和 APP_VERSION 一致） */
 const CHANGELOG = [
+  { v: 'v3.33.0', d: '2026-10-29', items: [
+    '出發位置可以「手動輸入地址」：輸入地址、路口或地標，從查到的候選中點選（資料來源 OpenStreetMap；輸入的地址不會儲存）',
+    '基隆市、桃園市的醫院資料整理中：使用須知、頁尾與醫院查詢加上「Coming soon」預告'] },
   { v: 'v3.32.1', d: '2026-10-27', items: [
     '拿掉求救原因「吸入性傷害：呼吸道危險（就近）」，危及生命只留 OHCA',
     '濃煙嗆傷／吸入性傷害：勾到任一項呼吸道危險徵象，建議送往直接改為最近、能緊急插管的急診（不用再按按鈕）；取消勾選就回到高壓氧醫院'] },
@@ -3813,7 +3831,8 @@ function renderLoc() {
   const sel = $('#locSource');
   sel.innerHTML = [`<option value="gps">GPS 定位</option>`]
     .concat(state.settings.presets.map((p, i) => `<option value="p${i}">${esc(p.name)}</option>`))
-    .concat([`<option value="manual">手動輸入座標…</option>`]).join('');
+    .concat(state.locSource === 'addr' ? [`<option value="addr">${esc(state.posLabel.slice(0, 26))}</option>`] : [])
+    .concat([`<option value="addrNew">手動輸入地址…</option>`, `<option value="manual">手動輸入座標…</option>`]).join('');
   if (![...sel.options].some(o => o.value === state.locSource)) state.locSource = 'gps';
   sel.value = state.locSource;
   const lt = $('#locText'), gps = state.locSource === 'gps' && state.posAcc != null;
@@ -3987,7 +4006,7 @@ function renderResults() {
     html = renderRecommend(rec ? ordered : ordered.slice().sort((a, b) => tierOf(a, hl) - tierOf(b, hl) || distKey(a) - distKey(b)), hl)
       + renderInsights(pool, hl) + `<div class="hlist">${chunks.flat().join('')}</div>`;
     if (hl.active && matchCount === 0) html = '<div class="extra-note">' + ic('alert', 'sm') + '目前沒有適合且可用的醫院，以下依距離列出</div>' + html;
-    if (!inServiceArea(state.pos)) html = `<div class="extra-note out-area">${ic('alert', 'sm')}<span>你目前的位置不在雙北。救途只有新北市、臺北市與林口長庚的醫院資料，附近其他縣市的醫院不會列出，請依當地規定送醫。</span></div>` + html;
+    if (!inServiceArea(state.pos)) html = `<div class="extra-note out-area">${ic('alert', 'sm')}<span>你目前的位置不在雙北。救途只有新北市、臺北市與林口長庚的醫院資料，附近其他縣市的醫院不會列出，請依當地規定送醫。基隆市、桃園市的醫院資料即將推出（Coming soon）。</span></div>` + html;
   }
   box.innerHTML = html;
   renderRunBar();
@@ -4515,6 +4534,8 @@ function jumpToResults() {
 function onLocSourceChange(v) {
   if (state.scn) { state.scn = null; renderScnBar(); renderHeroPills(); if (state.searched) renderResults(); }
   if (v === 'gps') { state.locSource = 'gps'; renderLoc(); return; }
+  if (v === 'addr') { renderLoc(); return; }
+  if (v === 'addrNew') { renderLoc(); openAddrInput(); return; }
   if (v === 'manual') {
     const s = prompt('輸入座標（緯度, 經度）\n可在 Google 地圖長按位置後複製，例：25.0143, 121.4635');
     const c = parseCoord(s);
@@ -4525,11 +4546,84 @@ function onLocSourceChange(v) {
     if (!p) return;
     state.pos = { lat: p.lat, lng: p.lng }; state.posLabel = `出發點：${p.name}`; state.locSource = v; state.posAcc = null;
   }
+  afterPosChange();
+}
+function afterPosChange() {
   renderLoc();
   if (state.searched) {
     state.eta = {}; state.etaState = ''; state.etaKey = '';
     renderResults(); fetchEta(state.pos, computeList({ active: false }));
   }
+}
+// 手動輸入地址：用 OpenStreetMap（Nominatim）查地址 → 列出候選讓救護員點選
+// 個資：輸入的地址只放在這次畫面的記憶體裡，不寫進 localStorage、不上傳雲端、不記錄
+const ADDR_VIEWBOX = '121.28,25.32,122.01,24.67';   // 雙北範圍優先（不限定，外縣市也查得到）
+let addrCands = [];
+function addrVariants(q) {
+  const base = String(q || '').replace(/[\s　]+/g, '').replace(/^(台灣|臺灣)/, '').replace(/台(北|中|南|東)/g, '臺$1').slice(0, 80);
+  if (!base) return [];
+  const noFloor = base.replace(/(\d+|[一二三四五六七八九十]+)樓.*$/, '').replace(/之\d+$/, '');
+  const noNum = noFloor.replace(/\d+(之\d+)?號.*$/, '');
+  const noLane = noNum.replace(/\d+(巷|弄).*$/, '');
+  return [...new Set([base, noFloor, noNum, noLane].filter(x => x && x.length >= 2))];
+}
+function fmtAddrHit(x) {
+  const a = x.address || {};
+  const parts = [a.city || a.county || a.state || '', a.city_district || a.suburb || a.town || a.district || a.village || '', a.road || a.pedestrian || a.neighbourhood || '', a.house_number ? a.house_number + (/號$/.test(a.house_number) ? '' : '號') : ''];
+  const s = parts.join('').trim();
+  const nm = x.name && !s.includes(x.name) && !/^\d/.test(x.name) ? `（${x.name}）` : '';
+  return (s || String(x.display_name || '').split(',').map(t => t.trim()).filter(t => t && !/^\d{3,6}$/.test(t) && !/^(臺灣|台灣|Taiwan)$/.test(t)).slice(0, 4).reverse().join('')) + nm;
+}
+async function addrSearch(q) {
+  const vs = addrVariants(q);
+  for (let i = 0; i < vs.length; i++) {
+    if (i) await new Promise(res => setTimeout(res, GEO_GAP()));   // Nominatim 規定每秒最多 1 次
+    const r = await fetchTimeout(`https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&countrycodes=tw&limit=5&accept-language=zh-TW&viewbox=${ADDR_VIEWBOX}&q=${encodeURIComponent(vs[i])}`, {}, 8000);
+    if (!r.ok) throw new Error('地址查詢服務暫時無法使用，請改用座標或出發點');
+    const seen = new Set();
+    const list = (await r.json()).map(x => ({ lat: Number(x.lat), lng: Number(x.lon), label: fmtAddrHit(x) }))
+      .filter(x => isFinite(x.lat) && isFinite(x.lng) && x.label && !seen.has(x.label) && seen.add(x.label));
+    if (list.length) return { list, approx: i > 0, used: vs[i] };
+  }
+  return { list: [], approx: false, used: '' };
+}
+function addrListHtml(res) {
+  if (!res) return '';
+  if (!res.list.length) return `<div class="addr-msg warn">${ic('alert', 'sm')}<span>找不到這個地址。可以只輸入「區＋路名」或附近地標再試一次，或改用「手動輸入座標」。</span></div>`;
+  return `${res.approx ? `<div class="addr-msg warn">${ic('alert', 'sm')}<span>找不到完整門牌，以下是「${esc(res.used)}」的位置（路段或巷口），請按「確認目前位置」看地圖核對。</span></div>` : '<div class="addr-msg">請點選正確的地址：</div>'}
+    <div class="addr-list">${res.list.map((x, i) => `<button class="addr-item" data-act="addrPick" data-i="${i}">${ic('pin', 'sm')}<span><b>${esc(x.label)}</b>${inServiceArea(x) ? '' : '<small>不在雙北</small>'}</span></button>`).join('')}</div>`;
+}
+function openAddrInput() {
+  addrCands = [];
+  openModal({ title: '手動輸入地址',
+    body: `<div class="addr-form"><input id="addrInput" type="search" enterkeyhint="search" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="80" placeholder="例：新北市板橋區文化路一段188巷" aria-label="地址">
+      <button class="btn primary" data-act="addrSearch">${ic('search', 'sm')}<span>查詢</span></button></div>
+      <div class="hint">可輸入地址、路口或地標。資料來源 OpenStreetMap，門牌可能只對到路段，選好後請用「確認目前位置」看地圖核對。輸入的地址不會被儲存。</div>
+      <div id="addrRes"></div>`,
+    buttons: [{ text: '取消', onClick: () => { addrCands = []; closeModal(); } }] });
+  setTimeout(() => { const i = $('#addrInput'); if (i) i.focus(); }, 60);
+}
+async function runAddrSearch() {
+  const inp = $('#addrInput'), box = $('#addrRes'), btn = $('[data-act="addrSearch"]'); if (!inp || !box) return;
+  const q = inp.value.trim();
+  if (!q) { toast('請先輸入地址'); inp.focus(); return; }
+  box.innerHTML = '<div class="addr-msg">查詢中…</div>'; if (btn) btn.disabled = true;
+  try {
+    const res = await addrSearch(q);
+    if (!$('#addrRes')) return;
+    addrCands = res.list; box.innerHTML = addrListHtml(res);
+  } catch (e) {
+    addrCands = []; box.innerHTML = '';
+    toast(e && e.name !== 'AbortError' && /地址查詢/.test(e.message) ? e.message : '查詢失敗：請確認網路，或改用座標／出發點', 4500);
+  } finally { if (btn) btn.disabled = false; }
+}
+function pickAddr(i) {
+  const c = addrCands[i]; if (!c) return;
+  if (state.scn) { state.scn = null; renderScnBar(); renderHeroPills(); }
+  state.pos = { lat: c.lat, lng: c.lng }; state.posLabel = `地址：${c.label}`; state.locSource = 'addr'; state.posAcc = null; state.posAddr = null; state.posAddrKey = '';
+  addrCands = []; closeModal();
+  afterPosChange();
+  toast(inServiceArea(state.pos) ? '已設定出發位置' : '已設定出發位置（不在雙北，醫院資料可能不完整）', 3500);
 }
 
 
@@ -4707,6 +4801,7 @@ const MCI_CAP_DEFAULT = {
   '一般級': { red: 0, yellow: 2, green: null, black: null }
 };
 const regionName = r => (MCI_BODY.find(b => b[0] === r) || [, r])[1];
+const mciPosLabel = () => state.locSource === 'addr' ? '手動輸入的地址' : state.posLabel;   // 大傷會存在手機：不存地址
 function mciBlank() { return { active: false, startedAt: null, type: 'traffic', note: '', pos: null, posLabel: '', eta: {}, patients: [], cap: {}, seq: 0, add: { tri: 'red', sex: 'M' } }; }
 function mciNormPt(p) {
   const q = { unit: '', cond: '', inj: [], injT: [], injMap: null, dest: '', sex: '', age: '', ...p };
@@ -4870,7 +4965,7 @@ async function mciStart() {
   try {
     if (!state.pos || state.locSource === 'gps') { if (btn) btn.querySelector('span').textContent = '定位中…'; await locate(true); }
     await mciEtaFor(state.pos);
-    Object.assign(m, { active: true, startedAt: Date.now(), pos: { ...state.pos }, posLabel: state.posLabel, patients: [], cap: {}, seq: 0 });
+    Object.assign(m, { active: true, startedAt: Date.now(), pos: { ...state.pos }, posLabel: mciPosLabel(), patients: [], cap: {}, seq: 0 });
     saveMci();
     logEvent({ type: 'mci', mciType: m.type, hospitals: mciHosps().length });
     renderMci(); toast('已開始大傷：紀錄會保留在這支手機，直到按「結束大傷」');
@@ -4887,7 +4982,7 @@ async function mciRelocate() {
     if (state.locSource === 'gps') await locate(true);
     if (!state.pos) throw new Error('尚未取得位置');
     await mciEtaFor(state.pos);
-    state.mci.pos = { ...state.pos }; state.mci.posLabel = state.posLabel; saveMci(); renderMci(); toast('已重新定位，醫院依新的車程排序');
+    state.mci.pos = { ...state.pos }; state.mci.posLabel = mciPosLabel(); saveMci(); renderMci(); toast('已重新定位，醫院依新的車程排序');
   } finally { setRunning(false); }
 }
 function mciAdd() {
@@ -5480,7 +5575,8 @@ function lookupOptions() {
   hs.forEach(h => { const k = `${cityOf(h)}・${h.level || '未分級'}`; if (!by.has(k)) by.set(k, []); by.get(k).push(h); });
   const km = h => state.pos && h.lat != null && h.lng != null ? `（直線 ${distKm(state.pos, h).toFixed(1)} km）` : '';
   return `<option value="">請選擇醫院（共 ${hs.length} 間）</option>` + [...by].map(([lv, list]) =>
-    `<optgroup label="${esc(lv)}">${list.map(h => `<option value="${esc(h.id)}">${esc(h.short || h.name)}${km(h)}</option>`).join('')}</optgroup>`).join('');
+    `<optgroup label="${esc(lv)}">${list.map(h => `<option value="${esc(h.id)}">${esc(h.short || h.name)}${km(h)}</option>`).join('')}</optgroup>`).join('')
+    + `<optgroup label="即將推出 Coming soon">${SOON_CITIES.map(c => `<option disabled>${c} 醫院資料整理中</option>`).join('')}</optgroup>`;
 }
 function renderLookup() {
   const sel = $('#lkSel'); if (!sel) return;
@@ -5495,7 +5591,7 @@ function renderLookupBody() {
   const h = hospById(localCfg.lkId);
   if (!h) {
     box.innerHTML = `<section class="card lk-empty">${ic('hosp')}<b>從上方選單選一間醫院</b>
-      <span>會列出這間醫院的 24 小時專科處置能力、服務時段與能力表原文說明</span></section>`;
+      <span>會列出這間醫院的 24 小時專科處置能力、服務時段與能力表原文說明</span>${soonBadge('lk')}</section>`;
     return;
   }
   const d = capNow(), st = liveStatus(h.id);
@@ -5574,7 +5670,9 @@ function creditLines() { return [state.settings.credit, '更新資料：' + stat
 function creditHtml(cls, tag = 'div') { return `<${tag} class="${cls}">${creditLines().map(esc).join('<br>')}</${tag}>`; }
 function textHash(t) { let h = 0; for (const ch of String(t)) h = (h * 31 + ch.charCodeAt(0)) | 0; return String(h); }
 // 適用範圍：只有雙北（與林口長庚）的醫院資料
-const SCOPE_TXT = '本系統為新北市、臺北市的消防救護人員設計，醫院資料只有雙北急救責任醫院與林口長庚；其他縣市（包括桃園市）目前沒有資料，請勿用來決定送醫。';
+const SCOPE_TXT = '本系統為新北市、臺北市的消防救護人員設計，醫院資料只有雙北急救責任醫院與林口長庚；基隆市、桃園市的醫院資料整理中，即將推出。目前其他縣市都還沒有資料，請勿用來決定送醫。';
+const SOON_CITIES = ['基隆市', '桃園市'];   // 資料整理中，之後加入
+const soonBadge = (cls = '') => `<span class="soon ${cls}"><em>Coming soon</em>${SOON_CITIES.join('・')}</span>`;
 const inServiceArea = p => !!p && p.lat >= 24.67 && p.lat <= 25.31 && p.lng >= 121.28 && p.lng <= 122.01;
 function teamList() {
   return String(state.settings.team || '').split(/\n+/).map(l => l.split(/[｜|]/).map(x => x.trim())).filter(a => a[0])
@@ -5589,7 +5687,7 @@ function teamHtml() {
 }
 function noticeHtml() {
   const lines = state.settings.notice.split(/\n+/).map(x => x.trim()).filter(Boolean);
-  return `<div class="scope-box">${ic('pin', 'sm')}<span><b>適用範圍：新北市・臺北市</b>${esc(SCOPE_TXT.replace(/^本系統為新北市、臺北市的消防救護人員設計，/, ''))}</span></div>
+  return `<div class="scope-box">${ic('pin', 'sm')}<span><b>適用範圍：新北市・臺北市</b>${soonBadge('in-box')}${esc(SCOPE_TXT.replace(/^本系統為新北市、臺北市的消防救護人員設計，/, ''))}</span></div>
     <ul class="ack-list">${lines.map(l => `<li>${esc(l)}</li>`).join('')}</ul>
     <div class="ds-h">資料說明：哪些是真的、哪些是估算</div>${dataStatusHtml()}
     ${teamHtml()}
@@ -5611,7 +5709,7 @@ function showNotice() {
 }
 // 頁尾：免責提醒＋署名（每個頁面都有）
 function footHtml() {
-  return `<div class="scope-foot">${ic('pin', 'sm')}適用範圍：新北市・臺北市（含林口長庚）・其他縣市尚無資料</div><div class="disc">${ic('shield', 'sm')}<span>${esc(state.settings.disclaimer)}</span></div>
+  return `<div class="scope-foot">${ic('pin', 'sm')}適用範圍：新北市・臺北市（含林口長庚）</div>${soonBadge('in-foot')}<div class="disc">${ic('shield', 'sm')}<span>${esc(state.settings.disclaimer)}</span></div>
     ${state.settings.credit ? `<div class="credit">${esc(state.settings.credit)}</div>` : ''}`;
 }
 /* ========== 瀏覽次數（雲端模式才有；開啟 App 時讀一次） ========== */
@@ -7051,6 +7149,8 @@ const ACTIONS = {
   seed: async () => { if (!confirm('把內建的醫院、能力、主訴與設定寫入雲端？\n寫入後全隊都會讀到雲端這份資料。')) return; await Store.replaceAll(seedData()); state.presetDraft = null; renderNet(); toast('已寫入雲端'); renderAdminPanel(); },
   resetDemo: async () => { if (!confirm('清除此裝置上的修改，恢復預設測試資料？')) return; await Store.replaceAll(seedData()); state.presetDraft = null; if (localCfg.sim) { Sim.stop(); Sim.start(); } toast('已重設'); renderAdminPanel(); },
   modalClose: () => closeModal(),
+  addrSearch: () => runAddrSearch(),
+  addrPick: el => pickAddr(Number(el.dataset.i)),
   modalBtn: el => { const b = state.modalBtns[Number(el.dataset.i)]; if (b) return b.onClick(); }
 };
 
@@ -7076,6 +7176,7 @@ document.addEventListener('click', e => {
 });
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && e.target.id === 'mciAge') { e.preventDefault(); runAction($('[data-act="mciAdd"]'), e); return; }
+  if (e.key === 'Enter' && e.target.id === 'addrInput') { e.preventDefault(); runAction($('[data-act="addrSearch"]'), e); return; }
   if (e.key === 'Enter' && e.target.id === 'adminPinInput') { e.preventDefault(); runAction($('[data-act="adminUnlock"]'), e); return; }
   if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('.h-card[data-act]')) { e.preventDefault(); runAction(e.target, e); }
 });
