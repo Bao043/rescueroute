@@ -1274,10 +1274,13 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "653252329719",
   appId: "1:653252329719:web:c3c9ca0891de64c69b13f2"
 };
-const APP_VERSION = 'v3.33.0';
+const APP_VERSION = 'v3.34.0';
 /* 更新紀錄：登入後台的人第一次打開新版本，會跳出「上次看過的版本之後」每一版改了什麼（可能一次上傳好幾版）
  * 每次改版請在最上面加一筆（版本號要和 APP_VERSION 一致） */
 const CHANGELOG = [
+  { v: 'v3.34.0', d: '2026-10-31', items: [
+    '管理後台「設定」新增「示範功能」開關：關閉後所有手機的前台都不顯示示範內容（正式／示範切換、示範案例、隨機情境、模擬救護車、名稱含「測試用／示範」的出發點）',
+    '接上雲端且還沒設定過時，示範功能預設關閉；上課或報告時再到後台打開'] },
   { v: 'v3.33.0', d: '2026-10-29', items: [
     '出發位置可以「手動輸入地址」：輸入地址、路口或地標，從查到的候選中點選（資料來源 OpenStreetMap；輸入的地址不會儲存）',
     '基隆市、桃園市的醫院資料整理中：使用須知、頁尾與醫院查詢加上「Coming soon」預告'] },
@@ -2069,7 +2072,8 @@ function normSettings(s = {}) {
     traffic: normTraffic(s.traffic),
     rulesVer: clampInt(s.rulesVer, 0, 99, s.rulesV2 === true ? 2 : 1),   // 預設求救原因調整做到第幾版
     coordVer: clampInt(s.coordVer, 0, 99, 0),   // 醫院座標校正做到第幾版
-    dataVer: clampInt(s.dataVer, 0, 99, 0)   // 醫院資料補充做到第幾版（1：院前葉克膜、臺北市動脈取栓）
+    dataVer: clampInt(s.dataVer, 0, 99, 0),   // 醫院資料補充做到第幾版（1：院前葉克膜、臺北市動脈取栓）
+    demoOn: typeof s.demoOn === 'boolean' ? s.demoOn : null   // 前台示範功能：true 開、false 關、null 未設定（依模式）
   };
 }
 function normStatus(s = {}) {
@@ -2115,7 +2119,11 @@ if (!['formal', 'demo'].includes(localCfg.uiMode)) localCfg.uiMode = 'formal';
 delete localCfg.showDemo;
 // 網址加 ?demo=1 直接進示範模式（上課、簡報用）；?demo=0 回正式
 try { const q = new URLSearchParams(location.search).get('demo'); if (q === '1' || q === '0') { localCfg.uiMode = q === '1' ? 'demo' : 'formal'; writeLS(LOCAL_CFG_KEY, localCfg); } } catch (e) {}
-const isDemoUI = () => localCfg.uiMode === 'demo';
+// 示範功能總開關（管理後台「設定」）：關閉時前台完全不顯示示範內容；沒設定過時，接上雲端＝關、本機示範版＝開
+const demoAllowed = () => (state.settings && typeof state.settings.demoOn === 'boolean') ? state.settings.demoOn : Store.mode === 'demo';
+const isDemoUI = () => demoAllowed() && localCfg.uiMode === 'demo';
+const simOn = () => demoAllowed() && !!localCfg.sim;
+const isDemoPreset = p => /測試|示範|demo|test/i.test(String(p && p.name || ''));
 function saveLocalCfg() { writeLS(LOCAL_CFG_KEY, localCfg); }
 function applyTheme() {
   const r = document.documentElement;
@@ -2313,6 +2321,7 @@ function applyData(d) {
     return normRule(r);
   });
   state.settings = normSettings(d.settings || SEED_SETTINGS);
+  if (!demoAllowed() && state.scn) { state.scn = null; if (state.locSource === 'manual' && String(state.posLabel).startsWith('情境現場')) { state.locSource = 'gps'; state.pos = null; state.searched = false; } }   // 管理者關掉示範功能：結束進行中的隨機情境
   if (state.settings.rulesVer < RULES_VER) migrateRules(state.settings.rulesVer);
   if (state.settings.coordVer < COORD_VER) migrateCoords();
   if (state.settings.dataVer < DATA_VER) migrateData(state.settings.dataVer);
@@ -2697,7 +2706,7 @@ function logEvent(e) {
 function liveStatus(hid) {
   const r = state.status[hid];
   if (r && r.updatedAt && Date.now() - r.updatedAt < STALE_MS) return { ...r, source: 'real' };
-  if (SHOW_CAPACITY && localCfg.sim && state.simStatus[hid]) return { ...state.simStatus[hid], source: 'sim' };
+  if (SHOW_CAPACITY && simOn() && state.simStatus[hid]) return { ...state.simStatus[hid], source: 'sim' };
   return null;
 }
 function capLive(st, capId) {
@@ -3830,7 +3839,7 @@ function renderHint() {
 function renderLoc() {
   const sel = $('#locSource');
   sel.innerHTML = [`<option value="gps">GPS 定位</option>`]
-    .concat(state.settings.presets.map((p, i) => `<option value="p${i}">${esc(p.name)}</option>`))
+    .concat(state.settings.presets.map((p, i) => demoAllowed() || !isDemoPreset(p) ? `<option value="p${i}">${esc(p.name)}</option>` : ''))
     .concat(state.locSource === 'addr' ? [`<option value="addr">${esc(state.posLabel.slice(0, 26))}</option>`] : [])
     .concat([`<option value="addrNew">手動輸入地址…</option>`, `<option value="manual">手動輸入座標…</option>`]).join('');
   if (![...sel.options].some(o => o.value === state.locSource)) state.locSource = 'gps';
@@ -4049,9 +4058,9 @@ function renderClock() {
 function renderHeroPills() {
   const box = $('#heroPills'); if (!box) return;
   box.innerHTML = [
-    `<div class="seg mode-seg" role="group" aria-label="正式或示範"><button class="${isDemoUI() ? '' : 'on'}" data-act="setUiMode" data-v="formal">正式</button><button class="${isDemoUI() ? 'on demo' : ''}" data-act="setUiMode" data-v="demo">示範</button></div>`,
+    !demoAllowed() ? '' : `<div class="seg mode-seg" role="group" aria-label="正式或示範"><button class="${isDemoUI() ? '' : 'on'}" data-act="setUiMode" data-v="formal">正式</button><button class="${isDemoUI() ? 'on demo' : ''}" data-act="setUiMode" data-v="demo">示範</button></div>`,
     aiReady() ? `<span class="pill ai"><span class="dot"></span>AI 辨識開啟</span>` : AI_ENABLED && isDemoUI() ? `<button class="pill" data-act="localSettings">AI 辨識未設定</button>` : '',
-    SHOW_CAPACITY && localCfg.sim ? `<span class="pill info"><span class="dot"></span>模擬量能</span>` : '',
+    SHOW_CAPACITY && simOn() ? `<span class="pill info"><span class="dot"></span>模擬量能</span>` : '',
     state.scn ? `<span class="pill warn"><span class="dot"></span>情境時間 ${fmtScnTime(state.scn.time)}</span>` : ''
   ].join('');
 }
@@ -4761,7 +4770,7 @@ const Tracker = {
       if (useGps && this.last && now - this.last.at < 60000) {
         pos = { lat: this.last.lat, lng: this.last.lng };
         etaAt = now + estMin(distKm(pos, h)) * 60e3;
-      } else if (localCfg.sim && n.origin && n.eta) {
+      } else if (simOn() && n.origin && n.eta) {
         // 示範：沿直線從出發點開往醫院
         const f = Math.min(1, (now - n.createdAt) / (n.eta * 60e3));
         pos = { lat: n.origin.lat + (h.lat - n.origin.lat) * f, lng: n.origin.lng + (h.lng - n.origin.lng) * f };
@@ -5770,8 +5779,8 @@ function dataStatusHtml() {
     ['real', '真實資料', `醫院能力（新北市：${state.settings.tableSrc}；臺北市：${state.settings.tableSrcTpe}；林口長庚不在表內，依管理者設定）、醫院地址與電話（衛福部醫院名冊）、治療時間窗（國際指引）`],
     ['est', '估算', '車程（道路通暢時間依星期與時段乘上車流係數，未含即時路況；沒有網路時用直線距離）、服務時段（由能力表文字判讀）'],
     ['est', '未提供', '醫院即時滿床、急救室與 ICU 空床：目前沒有醫院即時回報的資料來源，App 不顯示，送醫前請電話確認'],
-    ['sim', '模擬', `救護車位置在沒有 GPS 時為模擬路線；隨機情境的地點與時間；數據分析的示範數據`]
   ];
+  if (demoAllowed()) rows.push(['sim', '模擬', `救護車位置在沒有 GPS 時為模擬路線；隨機情境的地點與時間；數據分析的示範數據`]);
   if (demo) rows.push(['sim', '本機資料', '尚未接上雲端，資料只存在這台裝置；醫院端頁面只在這台裝置示範']);
   rows.push(['est', '不自動傳送', '「交班」摘要與大量傷病患的分流結果只在手機上整理，不會自動傳給醫院或勤務中心']);
   return `<div class="ds-list">${rows.map(([k, t, d]) => `<div class="${k}"><b>${esc(t)}</b><span>${esc(d)}</span></div>`).join('')}</div>`;
@@ -6012,6 +6021,9 @@ function renderAdminPanel() {
     if (!state.presetDraft) state.presetDraft = plain(state.settings.presets);
     const empty = Store.cloudEmpty || (!state.hospitals.length && !state.caps.length && !state.rules.length);
     p.innerHTML = demoNote + `<section class="card form">
+      <div class="sec-title">示範功能</div>
+      <label class="chk"><input type="checkbox" id="s_demo" ${demoAllowed() ? 'checked' : ''}>前台顯示示範功能</label>
+      <div class="hint" style="margin:2px 0 14px">包括：「正式／示範」切換、示範案例與隨機情境、模擬救護車行進，以及名稱含「測試用」或「示範」的出發點。關閉後所有手機的前台都不會出現；上課或報告時再打開。</div>
       <div class="sec-title">查詢設定</div>
       <label>列表顯示幾間醫院</label><input id="s_count" class="num" type="number" min="1" max="100" value="${state.settings.listCount}">
       <label>出發點（GPS 失效時使用，座標可從 Google 地圖長按複製）</label>
@@ -6714,7 +6726,7 @@ async function saveSettingsForm() {
     disclaimer: $('#s_disc').value, notice: $('#s_notice').value, credit: $('#s_credit').value, team: $('#s_team').value, stations: $('#s_stations').value,
     tableSrc: $('#s_tsrc').value, tableSrcTpe: $('#s_tsrc2').value,
     feedbackEmail: $('#s_fbmail').value, feedbackUrl: $('#s_fburl').value,
-    traffic: Object.fromEntries(TRAFFIC_SLOTS.map(([k]) => [k, $('#s_tf_' + k).value])) });
+    traffic: Object.fromEntries(TRAFFIC_SLOTS.map(([k]) => [k, $('#s_tf_' + k).value])), demoOn: $('#s_demo') ? $('#s_demo').checked : state.settings.demoOn });
   const fm = $('#s_fbmail').value.trim(), fu = $('#s_fburl').value.trim();
   { const bad = fm.split(/[\s,;，；、]+/).filter(x => x && !EMAIL_RE.test(x)); if (bad.length) throw new Error('Email 格式不對：' + bad.join('、')); }
   if (fu && !/^https:\/\/\S+$/i.test(fu)) throw new Error('意見表單連結要用 https:// 開頭');
@@ -6723,6 +6735,7 @@ async function saveSettingsForm() {
   await Store.saveSettings(s);
   state.presetDraft = null;
   if (state.locSource[0] === 'p') { state.locSource = 'gps'; state.pos = null; state.searched = false; }
+  if (!demoAllowed()) endScenario();
   toast('設定已儲存'); renderAdminPanel(); renderFoots();
 }
 
@@ -6742,10 +6755,10 @@ function openLocalSettings() {
       <label>外觀</label>
       <div class="seg" id="ls_theme">${[['auto', '跟隨系統'], ['light', '日間'], ['dark', '夜間']].map(([v, t]) =>
         `<button type="button" class="${localCfg.theme === v ? 'on' : ''}" data-act="pickTheme" data-v="${v}">${t}</button>`).join('')}</div>
-      <div class="label" style="margin-top:18px">示範與顯示</div>
+      <div class="label" style="margin-top:18px">${demoAllowed() ? '示範與顯示' : '顯示'}</div>
       <div class="chk-list">
-        <label class="chk"><input type="checkbox" id="ls_sim" ${localCfg.sim ? 'checked' : ''}>示範：模擬救護車行進（沒有 GPS 時，醫院端看板顯示救護車沿路線前進）</label>
-        <label class="chk"><input type="checkbox" id="ls_demo" ${isDemoUI() ? 'checked' : ''}>示範模式（展開派遣內容、顯示示範案例與隨機情境；出勤時關掉比較快）</label>
+        ${demoAllowed() ? `<label class="chk"><input type="checkbox" id="ls_sim" ${localCfg.sim ? 'checked' : ''}>示範：模擬救護車行進（沒有 GPS 時，醫院端看板顯示救護車沿路線前進）</label>
+        <label class="chk"><input type="checkbox" id="ls_demo" ${isDemoUI() ? 'checked' : ''}>示範模式（展開派遣內容、顯示示範案例與隨機情境；出勤時關掉比較快）</label>` : ''}
         <label class="chk"><input type="checkbox" id="ls_auto" ${localCfg.autoSearch ? 'checked' : ''}>辨識出求救原因後自動查詢</label>
         
       </div>`,
@@ -6756,7 +6769,7 @@ function readLocalForm() {
   return {
     unit: $('#ls_unit').value.trim(), geminiKey: $('#ls_key') ? $('#ls_key').value.trim() : localCfg.geminiKey,
     geminiModel: $('#ls_model') ? ($('#ls_model').value.trim() || DEFAULT_GEMINI_MODEL) : localCfg.geminiModel, aiAuto: $('#ls_aiAuto') ? $('#ls_aiAuto').checked : localCfg.aiAuto,
-    sim: $('#ls_sim').checked, uiMode: $('#ls_demo').checked ? 'demo' : 'formal', autoSearch: $('#ls_auto').checked,
+    sim: $('#ls_sim') ? $('#ls_sim').checked : localCfg.sim, uiMode: $('#ls_demo') ? ($('#ls_demo').checked ? 'demo' : 'formal') : localCfg.uiMode, autoSearch: $('#ls_auto').checked,
     theme: ($('#ls_theme button.on') || {}).dataset ? $('#ls_theme button.on').dataset.v : localCfg.theme
   };
 }
@@ -6764,7 +6777,7 @@ function saveLocalSettings() {
   const f = readLocalForm();
   const simChanged = f.sim !== localCfg.sim, keyChanged = f.geminiKey !== localCfg.geminiKey || f.geminiModel !== localCfg.geminiModel;
   Object.assign(localCfg, f); saveLocalCfg(); applyTheme();
-  if (simChanged && SHOW_CAPACITY) { if (localCfg.sim) Sim.start(); else Sim.stop(); }
+  if (simChanged && SHOW_CAPACITY) { if (simOn()) Sim.start(); else Sim.stop(); }
   if (keyChanged) state.ai = { state: 'idle' };
   closeModal(); toast('已儲存');
   if (isRoute('')) { renderMain(); if (aiAuto() && state.caseText.trim() && keyChanged) AI.run(state.caseText.trim()); }
@@ -6881,9 +6894,10 @@ function pickFile(inputSel) {
 /* ========== 事件 ========== */
 function setCaseText(t) { $('#caseText').value = t; state.caseText = t; state.caseOpen = true; renderCaseCard(); onCaseInput(); }
 const ACTIONS = {
-  menu: () => { $('#mUiMode').lastChild.textContent = isDemoUI() ? '切換到正式模式（出勤）' : '切換到示範模式'; $('#menu').hidden = !$('#menu').hidden; },
+  menu: () => { $('#mUiMode').hidden = !demoAllowed(); $('#mUiMode').lastChild.textContent = isDemoUI() ? '切換到正式模式（出勤）' : '切換到示範模式'; $('#menu').hidden = !$('#menu').hidden; },
   toggleUiMode: () => {
-    $('#menu').hidden = true; localCfg.uiMode = isDemoUI() ? 'formal' : 'demo'; saveLocalCfg();
+    $('#menu').hidden = true; if (!demoAllowed()) { localCfg.uiMode = 'formal'; saveLocalCfg(); return; }
+    localCfg.uiMode = isDemoUI() ? 'formal' : 'demo'; saveLocalCfg();
     if (!isDemoUI() && state.scn) state.scn = null;
     state.caseOpen = false; if (isRoute('')) renderMain(); else renderCaseCard();
     toast(isDemoUI() ? '示範模式：顯示派遣內容與示範案例' : '正式模式：直接選主訴查詢');
