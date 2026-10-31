@@ -26,6 +26,8 @@ service cloud.firestore {
     match /hospitals/{id} { allow read: if true; allow write: if isAdmin(); }
     match /rules/{id}     { allow read: if true; allow write: if isAdmin(); }
     match /settings/{id}  { allow read: if true; allow write: if isAdmin(); }
+    // 合併資料（醫院、能力、主訴、設定整份一個文件）：每次開啟只讀 1 筆
+    match /pub/{id}       { allow read: if true; allow write: if isAdmin(); }
 
     // ===== 即時量能：大家都能讀，醫院只能改自己的 =====
     match /status/{hid} {
@@ -61,6 +63,35 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['type', 'at', 'uid', 'tab', 'ruleId', 'ruleName', 'caps', 'onset', 'hid', 'handover', 'total', 'hospitals']);
       allow read: if isAdmin();
       allow update, delete: if isAdmin();
+    }
+
+    // ===== 辨識回饋（語音聽錯被改字、辨識不到求救原因）：救護端只能新增（手機上已去除數字、地址與稱謂），只有管理者能讀、改、刪 =====
+    match /speechq/{id} {
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['type', 'at', 'uid', 'src', 'text', 'wrong', 'right', 'ruleId', 'ruleName', 'kwRuleId', 'kwRuleName', 'status'])
+        && request.resource.data.type in ['miss', 'wrong', 'fix']
+        && request.resource.data.status == 'new'
+        && (!('text' in request.resource.data) || request.resource.data.text.size() <= 80)
+        && (!('wrong' in request.resource.data) || request.resource.data.wrong.size() <= 20)
+        && (!('right' in request.resource.data) || request.resource.data.right.size() <= 20)
+        && (!('ruleName' in request.resource.data) || request.resource.data.ruleName.size() <= 40)
+        && (!('kwRuleName' in request.resource.data) || request.resource.data.kwRuleName.size() <= 40);
+      allow read, update, delete: if isAdmin();
+    }
+
+    // ===== 瀏覽次數：大家都能讀；每次只能 +1（開啟次數）與 +0／+1（使用裝置），其他欄位不能動 =====
+    match /meta/stats {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasOnly(['views', 'devices', 'updatedAt'])
+        && request.resource.data.views == 1
+        && request.resource.data.devices in [0, 1]
+        && request.resource.data.updatedAt == request.time;
+      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['views', 'devices', 'updatedAt'])
+        && request.resource.data.views == resource.data.views + 1
+        && request.resource.data.devices in [resource.data.devices, resource.data.devices + 1]
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isAdmin();
     }
 
     // ===== 醫院帳號綁定：只有管理者能改 =====
