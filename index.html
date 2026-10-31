@@ -536,6 +536,18 @@ input:disabled{opacity:.6}
 .row-item .chev{color:var(--dim)}
 .lv{font-size:11px;font-weight:800;padding:2px 7px;border-radius:6px}
 .lv.l2{background:var(--red-soft);color:var(--red2)}.lv.l1{background:var(--amber-soft);color:var(--amber)}.lv.l0{background:var(--blue-soft);color:var(--blue)}
+.vfix{margin-top:6px;font-size:12.5px;line-height:1.6;color:var(--muted)}.vfix b{color:var(--ink)}.vfix .ic{vertical-align:-3px;margin-right:4px}
+.sfix-out{margin-top:8px;line-height:1.7}.sfix-out .warn{color:var(--amber);font-weight:700}
+.sq-cnt{display:inline-block;margin-left:8px;min-width:22px;padding:1px 7px;border-radius:999px;background:var(--sunken);color:var(--muted);font-size:12px;text-align:center}
+.sq-row{display:flex;align-items:center;gap:8px;padding:10px 0;border-top:1px solid var(--line)}.sq-row .main{flex:1;min-width:0}.sq-row small{display:block;color:var(--muted)}
+.sq-item{padding:12px 0;border-top:1px solid var(--line)}
+.sq-meta{display:flex;gap:6px;align-items:center;margin-bottom:6px}.sq-meta small{color:var(--muted);margin-left:auto}
+.tagx.warn{background:var(--amber-soft);color:var(--amber)}
+.sq-text{font-size:15px;line-height:1.6;padding:8px 10px;border-radius:10px;background:var(--field);user-select:text;-webkit-user-select:text;word-break:break-all}
+.sq-who{font-size:12.5px;color:var(--muted);margin:6px 0 8px}
+.sq-act{display:grid;grid-template-columns:1fr 1fr;gap:8px}.sq-act input,.sq-act select{min-width:0}
+.sq-btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+@media (max-width:520px){.sq-act{grid-template-columns:1fr}}
 .tagx{font-size:11px;font-weight:700;padding:2px 7px;border-radius:6px;background:var(--sunken);color:var(--muted)}
 .tagx.unv{border:1px dashed var(--line2);background:transparent;color:var(--dim)}
 .form label{display:block;font-size:13px;color:var(--muted);margin:13px 0 5px;font-weight:600}
@@ -1235,6 +1247,7 @@ td.mx.off .dt{opacity:.35}
       <button data-act="atab" data-tab="hosp">醫院</button>
       <button data-act="atab" data-tab="rules">主訴規則（進階）</button>
       <button data-act="atab" data-tab="caps">處置能力</button>
+      <button data-act="atab" data-tab="speech">語音辨識</button>
       <button data-act="atab" data-tab="stats">數據分析</button>
       <button data-act="atab" data-tab="users">醫院帳號</button>
       <button data-act="atab" data-tab="settings">設定／資料</button>
@@ -1274,10 +1287,16 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "653252329719",
   appId: "1:653252329719:web:c3c9ca0891de64c69b13f2"
 };
-const APP_VERSION = 'v3.34.0';
+const APP_VERSION = 'v3.35.0';
 /* 更新紀錄：登入後台的人第一次打開新版本，會跳出「上次看過的版本之後」每一版改了什麼（可能一次上傳好幾版）
  * 每次改版請在最上面加一筆（版本號要和 APP_VERSION 一致） */
 const CHANGELOG = [
+  { v: 'v3.35.0', d: '2026-10-31', items: [
+    '語音校正：後台新增「語音辨識」分頁，可編輯易錯詞對照表（全隊共用），並可輸入句子試看校正結果',
+    '語音結果自動比對同音字與台灣口音（ㄓㄗ、ㄔㄘ、ㄕㄙ、ㄖㄌ、ㄋㄌ、ㄈㄏ、ㄣㄥ、ㄧㄣㄧㄥ），3 個字以上的醫療關鍵字聽錯會自動改正；畫面會顯示改了哪些字',
+    '從救護員的修正學習：語音結果被改字後查詢，記下「聽成什麼→改成什麼」，後台按「採用」加進對照表',
+    '辨識不到或判斷錯的派遣內容（已去除數字、地址與稱謂）回傳後台，管理者可直接加成求救原因的關鍵字；本機設定可關閉回傳',
+    'Firestore 規則新增 speechq（辨識回饋）：請把 firestore.rules 重新貼上並發布'] },
   { v: 'v3.34.0', d: '2026-10-31', items: [
     '管理後台「設定」新增「示範功能」開關：關閉後所有手機的前台都不顯示示範內容（正式／示範切換、示範案例、隨機情境、模擬救護車、名稱含「測試用／示範」的出發點）',
     '接上雲端且還沒設定過時，示範功能預設關閉；上課或報告時再到後台打開'] },
@@ -1318,6 +1337,7 @@ const DEMO_KEY = 'hf_demo_data_v2';
 const DEMO_STATUS_KEY = 'hf_demo_status_v2';
 const DEMO_NOTICE_KEY = 'hf_demo_notices_v2';
 const DEMO_LOG_KEY = 'hf_demo_logs_v1';
+const SPEECHQ_KEY = 'hf_speechq_v1';   // 示範模式：辨識回饋存在這台裝置
 const DEMO_HIST_KEY = 'hf_demo_history_v1'; // 儀表板「示範數據」只存在這台裝置
 const CACHE_KEY = 'hf_cache_v2';
 const LOCAL_CFG_KEY = 'hf_local_cfg_v1';
@@ -1698,6 +1718,16 @@ const PROTOCOLS = {
     { min: 180, label: '可能敗血症（無休克）：3 小時內決定是否給抗生素', short: '3 小時' }],
     ref: 'Surviving Sepsis Campaign 2026：休克或很可能敗血症 1 小時內抗生素；可能敗血症且無休克，3 小時內' }
 };
+// 預設易錯詞對照表（管理者可在後台修改；一行一組：聽錯的寫法（可多個，用「、」分開）→ 正確寫法）
+const DEFAULT_SPEECH_FIX = [
+  '中瘋、中鋒、終風 → 中風',
+  '抽蓄、抽觸 → 抽搐',
+  '顛癇、癲閒、顛閒 → 癲癇',
+  '休剋 → 休克',
+  '頁克膜、葉可膜、夜克膜 → 葉克膜',
+  '喘明 → 喘鳴',
+  '沙亞 → 沙啞'
+].join('\n');
 // 顯示文字：管理後台「設定／資料」可以修改
 const DEFAULT_TEXTS = {
   disclaimer: '本 App 僅供送醫判斷輔助，實際送醫仍以現場評估、勤務中心指示與醫院回覆為準。',
@@ -2073,7 +2103,8 @@ function normSettings(s = {}) {
     rulesVer: clampInt(s.rulesVer, 0, 99, s.rulesV2 === true ? 2 : 1),   // 預設求救原因調整做到第幾版
     coordVer: clampInt(s.coordVer, 0, 99, 0),   // 醫院座標校正做到第幾版
     dataVer: clampInt(s.dataVer, 0, 99, 0),   // 醫院資料補充做到第幾版（1：院前葉克膜、臺北市動脈取栓）
-    demoOn: typeof s.demoOn === 'boolean' ? s.demoOn : null   // 前台示範功能：true 開、false 關、null 未設定（依模式）
+    demoOn: typeof s.demoOn === 'boolean' ? s.demoOn : null,   // 前台示範功能：true 開、false 關、null 未設定（依模式）
+    speechFix: s.speechFix === undefined ? DEFAULT_SPEECH_FIX : String(s.speechFix).slice(0, 8000)   // 語音易錯詞對照表
   };
 }
 function normStatus(s = {}) {
@@ -2108,7 +2139,7 @@ function normNotice(n = {}) {
 /* ========== 本機設定（不上傳） ========== */
 const localCfg = Object.assign({
   unit: '', geminiKey: '', geminiModel: DEFAULT_GEMINI_MODEL, aiAuto: true,
-  sim: !FIREBASE_CONFIG.apiKey, uiMode: 'formal', sortBy: 'rec', showMap: false, dismissed: [], theme: 'auto', transferPrep: 45, autoSearch: true, usage: {},
+  sim: !FIREBASE_CONFIG.apiKey, uiMode: 'formal', sortBy: 'rec', showMap: false, dismissed: [], theme: 'auto', transferPrep: 45, autoSearch: true, helpImprove: true, usage: {},
   lkId: '', lkAll: false
 }, readLS(LOCAL_CFG_KEY) || {});
 if (!['rec', 'dist'].includes(localCfg.sortBy)) localCfg.sortBy = 'rec'; // v2.0 的「車程」排序併入建議／距離
@@ -2144,7 +2175,7 @@ const state = {
   caseText: '', lastParsed: null, parsed: null, kwParsed: null,
   clock: { onsetAt: null, src: '', unknown: false, fmcAt: null }, // 時間窗：發作時間、首次接觸病人時間
   ai: { state: 'idle' },
-  pos: null, posLabel: '', posAcc: null, posAt: 0, posAddr: null, posAddrKey: '', locSource: 'gps', searched: false,
+  voice: null, sq: null, sqFix: [], pos: null, posLabel: '', posAcc: null, posAt: 0, posAddr: null, posAddrKey: '', locSource: 'gps', searched: false,
   eta: {}, etaState: '', etaKey: '',
   status: {}, simStatus: {}, myNotices: [], expanded: new Set(), rec: null,
   mci: null, mciMore: false,
@@ -2635,6 +2666,29 @@ const Store = {
     const snap = await this.db.collection('logs').where('at', '>=', since).get();
     return snap.docs.map(d => d.data());
   },
+  /* ----- 語音／關鍵字辨識回饋（手機上已去識別；只有管理者能讀） ----- */
+  async addSpeechQ(doc) {
+    if (this.mode === 'demo') { const a = readLS(SPEECHQ_KEY) || []; a.push({ ...doc, id: uid('sq') }); writeLS(SPEECHQ_KEY, a.slice(-1000)); return; }
+    if (!this.db || !this.uid()) return;
+    await this.db.collection('speechq').add({ ...doc, uid: this.uid() });
+  },
+  async loadSpeechQ() {
+    if (this.mode === 'demo') return readLS(SPEECHQ_KEY) || [];
+    this._requireWrite(true);
+    const since = Date.now() - 90 * 864e5;
+    const snap = await this.db.collection('speechq').where('at', '>=', since).get();
+    return snap.docs.map(d => ({ ...d.data(), id: d.id }));
+  },
+  async updateSpeechQ(ids, patch) {
+    if (this.mode === 'demo') { writeLS(SPEECHQ_KEY, (readLS(SPEECHQ_KEY) || []).map(x => ids.includes(x.id) ? { ...x, ...patch } : x)); return; }
+    this._requireWrite(true);
+    for (let i = 0; i < ids.length; i += 400) { const b = this.db.batch(); ids.slice(i, i + 400).forEach(id => b.update(this.db.collection('speechq').doc(id), patch)); await b.commit(); }
+  },
+  async removeSpeechQ(ids) {
+    if (this.mode === 'demo') { writeLS(SPEECHQ_KEY, (readLS(SPEECHQ_KEY) || []).filter(x => !ids.includes(x.id))); return; }
+    this._requireWrite(true);
+    for (let i = 0; i < ids.length; i += 400) { const b = this.db.batch(); ids.slice(i, i + 400).forEach(id => b.delete(this.db.collection('speechq').doc(id))); await b.commit(); }
+  },
   async loadAllNotices() {
     if (this.mode === 'demo') return (readLS(DEMO_NOTICE_KEY) || []).map(normNotice);
     this._requireWrite(true);
@@ -2909,6 +2963,187 @@ const SPEECH_FIX = [
 ];
 const fixSpeech = s => SPEECH_FIX.reduce((t, [re, to]) => t.replace(re, to), String(s || '').normalize('NFKC'));
 const normText = s => fixSpeech(s).toLowerCase().replace(/\s+/g, '').replace(/炭(?=粒|渣|灰|痰)/g, '碳');
+/* ========== 語音校正（v3.35）：後台對照表 → 內建英文縮寫 → 注音模糊比對（口音） ==========
+ * 瀏覽器內建的語音辨識沒辦法加詞或訓練，所以在「辨識之後」校正：
+ * 1. 後台「語音辨識」的易錯詞對照表（全隊共用，管理者可以改）
+ * 2. 注音模糊比對：把聽到的字轉成拼音，和 App 的醫療關鍵字比對；台灣常見的口音（ㄓㄗ、ㄔㄘ、ㄕㄙ、ㄖㄌ、ㄋㄌ、ㄈㄏ、ㄣㄥ、ㄧㄣㄧㄥ）視為相同
+ *    只比對 3 個字以上的詞（2 個字太容易誤改，例如「中度」≠「中毒」，2 字詞請用對照表）
+ * 3. 救護員手動改字、或辨識不到主訴時，去除數字／地址／稱謂後回傳給管理者分類（本機設定可以關閉）
+ */
+// 常用字（Big5 常用字）的拼音，不含聲調；格式「拼音:字字字|…」
+const PY_TABLE = 'a:啊阿|ai:哀哎唉噯埃愛挨捱曖璦癌皚矮礙艾藹閡隘靄|an:俺安岸庵按暗案氨菴諳銨鞍鵪黯|ang:昂盎骯|ao:傲凹嗷奧媼懊拗敖澳熬翱聱襖遨鏖鼇|ba:八叭吧壩巴扒把拔捌灞爸疤笆罷耙芭跋霸靶|bai:佰拜擘擺敗柏白百襬|ban:伴半姅扮扳拌搬斑板版班瓣瘢絆舨般辦鈑闆阪頒|bang:傍幫梆棒榜磅綁膀蚌謗邦鎊|bao:保包堡報寶抱暴爆胞苞葆薄褒褓豹鉋鑤雹飽鮑|bei:倍備北卑孛悖悲憊揹杯焙狽盃碑背蓓被貝輩邶鋇陂|ben:奔本畚笨苯|beng:崩泵甭繃蹦迸|bi:俾匕嗶壁妣婢幣庇弊弼彼必愎敝斃比沘璧畢痺碧筆箄篦臂荸蔽薜裨襞詖賁蹕逼避鄙鉍閉陛鼻|bian:便匾卞弁扁汴砭編蝙褊變貶辨辮辯遍邊釆鞭|biao:婊彪杓標膘表錶鏢鑣驃鰾|bie:別彆癟鱉|bin:儐彬檳殯濱瀕繽臏豳賓鬢|bing:丙並併兵冰并摒柄炳病秉稟鉼餅|bo:亳伯剝勃博卜帛搏撥播檗波渤玻箔簸缽脖膊舶菠蔔蘗跛鈸鉑駁|bu:不佈哺埠布怖捕步簿補誧部鈽|ca:擦|cai:彩才採材猜睬綵纔菜蔡裁財踩采|can:參孱慘慚摻殘燦璨蠶餐|cang:倉傖滄艙蒼藏|cao:嘈操曹槽漕糙草|ce:側冊廁惻測策|cen:岑涔|ceng:層曾|cha:叉察岔差插搽查茶詫|chai:儕拆柴豺釵齜|chan:儳剷嬋巉懺攙毚潺澶產禪纏羼蟬蟾諂讒鏟闡顫饞|chang:倀倡償唱嘗嚐場娼嫦常廠徜悵敞昌暢氅猖腸萇鯧|chao:勦吵嘲巢抄晁朝潮炒超鈔|che:坼徹扯掣撤澈車|chen:塵宸忱晨櫬沉琛疢瞋縝臣襯諶讖趁辰陳|cheng:丞乘呈城懲成承撐橙澄瞠秤程稱誠逞騁|chi:侈叱吃呎啻喫嗤墀尺弛恥持敕斥池熾痴癡笞翅蚩褫赤踟遲飭馳魑齒|chong:充寵崇憧沖舂虫蟲衝|chou:丑仇儔惆愁抽疇稠籌綢臭裯躊酬醜|chu:儲出初廚怵杵楚楮櫥歜畜矗礎絀芻處褚觸躇鋤除雛黜齣搐|chuai:啜揣踹|chuan:串傳喘川穿舛船釧|chuang:創幢床愴瘡窗闖|chui:吹垂捶椎槌炊箠錘鎚陲|chun:唇春淳純脣蠢醇鶉|chuo:戳綽輟齪|ci:伺刺慈次此瓷疵磁祠茨詞賜辭雌|cong:匆叢囪從樅淙聰蔥|cou:湊輳|cu:促簇粗蹙蹴醋|cuan:爨竄篡|cui:催崔悴摧淬璀瘁粹翠脆萃|cun:吋存寸忖村皴|cuo:厝嵯挫措搓撮磋蹉銼錯|da:大怛打搭瘩答褡躂達靼韃|dai:代呆岱帶待怠戴歹殆玳袋貸迨逮黛|dan:丹但啖啗單彈憚撢擔旦氮淡澹疸簞耽膽蛋誕|dang:儅噹擋檔當盪蕩襠讜鐺黨|dao:倒刀到叨導島悼搗燾盜禱稻蹈道|de:得德的|deng:凳嶝燈登瞪磴等蹬鄧|di:低嘀地堤娣嫡帝底弟抵敵柢棣氐滌滴牴狄砥笛第締翟荻蒂詆諦迪遞邸鏑隄|dian:佃典墊奠巔店惦殿滇澱玷甸癲碘電靛顛點|diao:凋刁叼吊弔彫掉碉調貂釣雕鯛|die:喋爹牒疊碟絰耋蝶諜跌迭|ding:丁仃叮定盯訂酊釘錠頂鼎|diu:丟|dong:冬凍動咚峒恫懂東棟洞湩胴董鼕|dou:兜抖斗枓痘竇脰蚪豆逗都陡鬥|du:嘟堵妒度杜櫝毒渡瀆牘犢獨督睹篤肚蠹讀賭鍍髑黷|duan:斷段短端緞耑鍛|dui:兌堆對碓隊|dun:噸囤墩惇敦沌燉盹盾蹲躉遁鈍頓|duo:剁咄墮多奪惰朵綞舵跺踱躲鐸|e:俄厄呃噩堊娥婀峨惡愕扼萼蛾訛詻軛遏鄂鍔額顎餓鱷鵝|en:恩|er:二儿兒洱爾而耳貳邇餌|fa:乏伐法琺發砝筏罰醱閥髮|fan:凡反墦帆幡梵樊氾汎泛煩犯番礬範繁繙翻范蕃藩販返釩飯|fang:仿倣坊妨房放方枋紡肪舫芳訪防|fei:匪吠啡妃屝廢扉斐沸痱翡肥肺腓芾菲誹費霏非飛|fen:份分吩墳奮忿憤棻氛汾焚粉糞紛芬|feng:丰俸奉封峰楓烽瘋縫蜂諷豐逢鋒風馮鳳|fou:否缶|fu:付伏伕佛俘俯傅副匐咐夫婦孚孵富幅府弗彿復怫扶拂撫敷斧服氟浮涪父甫福符紱紼縛腐腑腹膚芙芣菔蝠袱複覆訃負賦賻赴趺輔輻釜鈇阜附頫馥駙麩|ga:伽呷嘎噶尬|gai:丐垓改概溉蓋該賅鈣|gan:坩尷干幹感敢杆柑桿榦橄淦甘疳稈竿肝贛趕紺|gang:剛岡崗杠槓港綱缸肛釭鋼|gao:告搞杲槁皋稿篙糕縞羔膏誥高|ge:個割各咯哥戈擱格歌疙箇胳膈葛鉻閣閤隔革骼鬲鴿|gei:給|gen:亙根艮跟|geng:哽埂庚更梗羹耕耿賡|gong:供公共功宮工廾弓恭拱攻汞肱蚣貢躬鞏龔|gou:佝勾垢夠媾搆枸構溝狗苟詬購遘鉤雊|gu:估僱古呱咕固姑孤故沽牯瞽穀罟股菰蛄蠱詁谷轂辜鈷錮雇顧骨鴣鼓|gua:刮卦寡挂掛瓜聒褂颳|guai:乖怪拐摑枴|guan:倌冠官慣棺灌琯盥管罐莞觀貫關館鰥鸛|guang:光廣洸獷胱逛|gui:傀劊匱圭晷桂檜櫃歸珪瑰癸皈規詭貴跪軌閨鬼鮭鱖龜|gun:棍滾袞輥鯀|guo:國堝幗果槨猓蟈裹過郭鍋|ha:哈蛤|hai:亥嗨孩害氦海還駭骸|han:函含喊寒悍憾捍撼旱汗涵漢瀚焊罕翰蚶酣銲韓頷鼾|hang:杭沆航|hao:嗥嚎壕好昊毫浩濠皓耗蒿號蠔豪貉郝鄗鎬顥|he:何劾合呵和喝壑曷核河涸盍盒禾紇翮荷蚵褐訶賀赫郃闔頜鶴|hei:嘿黑|hen:很恨狠痕|heng:亨哼恆桁橫衡|hong:哄宏弘泓洪烘紅薨虹訌轟閎鬨鴻黌|hou:侯候厚后吼喉堠後猴篌逅鱟|hu:乎互呼唬囫壺弧忽惚戶扈斛楛沍湖滬狐琥瑚瓠糊胡葫虎蝴護鬍鵠|hua:划劃化嘩樺滑猾畫花華話譁|huai:坏壞徊懷槐淮踝|huan:喚奐宦寰幻患換桓歡洹渙澴煥環瘓緩豢鍰|huang:凰幌徨恍惶慌晃湟煌璜皇磺篁簧肓荒蝗謊遑隍韹黃|hui:匯卉喙回彗彙徽恢悔惠慧揮晦暉會毀灰燬燴穢繪茴蕙虺蛔詼誨諱賄輝迴麾|hun:婚昏梡混渾琿葷餛魂|huo:伙夥惑或活濩火獲禍穫豁貨霍|ji:乩亟伋冀几劑勣即及吉唧嘰圾基妓姬嫉季寂寄屐岌嵇己幾忌急悸戟戢技擊擠既暨棘楫極機汲洎激濟犄璣畸畿疾瘠磯祭稷稽積箕籍紀級緝績繼羈肌脊芰薊薺藉覬計記譏跡蹟躋輯際集雞霽飢饑驥髻麂|jia:佳假傢價加嘉夾嫁家戛架浹甲痂稼胛茄莢葭袈豭賈迦鉀頰駕|jian:件健僭儉兼剪劍囝堅奸姦尖建揀撿柬檢殲毽減湔漸澗濺煎監瞼筧箋箭簡緘縑繭肩腱艦艱荐菅薦見諫賤踐鍵鑑鑒間韉餞鹼|jiang:僵匠姜將彊槳江漿獎疆絳蔣薑講醬降韁|jiao:交僥剿叫姣嬌攪教椒澆焦狡皎矯礁窖絞繳腳膠蕉蛟角跤較轎郊酵醮鉸餃驕鮫|jie:介借傑劫嗟姐孑屆戒截拮捷接揭杰桀潔界疥皆睫碣竭節結羯芥街解訐詰誡階|jin:今僅儘勁噤巾斤晉津浸燼瑾盡矜禁筋緊縉襟覲觔謹近進金錦饉|jing:井京兢境徑憬敬旌景晶涇淨璟痙睛竟競粳精經荊莖菁警逕鏡阱靖靜頸驚鯨|jiong:炯窘迥|jiu:久九咎啾就廄揪救柩灸玖疚究糾臼舅舊赳酒韭鳩|ju:侷俱倨具劇句咀局居屨巨懼拒拘掬據桔橘沮炬狙疽矩砠聚舉苣莒菊距跼踞遽鉅鋸鞠颶駒齟|juan:倦卷娟捐捲涓狷眷絹鐫雋鵑|jue:倔劂厥噱嚼孓崛抉掘攫決爵獗玨絕蕨覺觼訣譎蹶鴃|jun:俊君均峻浚濬竣菌軍郡鈞駿|ka:卡咖喀|kai:凱剴愒愷愾慨揩楷開|kan:侃刊勘坎堪崁戡檻看瞰砍|kang:亢伉康慷扛抗炕糠|kao:拷烤犒考銬靠|ke:克刻剋可咳嗑坷客恪柯棵殼渴溘瞌磕科稞窠緙苛蝌課軻顆髁|ken:啃墾懇肯齦|keng:吭坑鏗阬|kong:倥孔崆恐控硿空|kou:口叩寇扣釦|ku:哭庫枯窟苦褲酷骷|kua:垮夸胯誇跨|kuai:儈塊快筷膾|kuan:寬款髖|kuang:劻匡壙曠框況狂眶礦筐誑|kui:喟夔奎愧揆潰盔睽窺簣葵虧逵餽魁|kun:困坤崑捆昆梱焜琨睏綑錕髡|kuo:廓括擴蛞闊|la:剌啦喇垃拉臘蠟辣邋|lai:來徠瀨癩睞籟萊賴|lan:婪嵐懶攔攬斕欄欖濫瀾爛籃籣纜藍蘭襤覽闌|lang:廊朗榔浪狼琅瑯螂郎|lao:佬勞嘮姥撈潦烙牢癆老酪|le:了叻樂肋|lei:儡勒壘嫘擂淚磊累縲羸耒蕾鐳雷類|leng:冷愣楞稜|li:例俐俚儷利力勵厲吏哩唳喱壢娌慄戾曆李栗梨欐歷浬溧漓澧瀝犁狸理琍璃痢癘礪礫禮立笠籬粒罹荔莉蒞蜊蠡蠣裡貍邐酈醴里釐鋰鎘隸離靂驪鯉麗黎|lia:倆|lian:奩帘廉憐戀斂楝殮漣濂瀲煉簾練聯臉蓮連鍊鏈鐮鰱|liang:亮兩晾梁樑涼粱糧良諒輛量魎|liao:僚嘹寥寮廖撩料暸燎療瞭繚聊遼|lie:冽列劣咧捩洌烈獵裂鬣|lin:凜吝懍拎林淋燐琳璘痳磷臨藺賃躪轔遴鄰霖鱗麟|ling:令伶凌另嶺昤櫺泠玲綾羚翎聆苓菱蔆蛉鈴陵零靈領鴒齡|liu:六劉柳榴流溜瀏琉留瘤硫遛霤餾|long:嚨壟攏朧瓏矓窿籠聾隆隴龍|lou:嘍婁摟樓漏瘺簍螻鏤陋髏|lu:僇嚕廬戮擄櫓滷瀘爐盧碌祿穋臚蘆虜賂路錄鑪陸露顱魯鱸鷺鹵鹿麓|luan:亂卵孿巒攣灤鑾鸞|lun:侖倫崙掄淪綸論輪|luo:儸囉洛漯犖玀珞籮絡羅落蘿螺裸邏鏍鑼雒駱騾|lv:侶呂屢履律慮旅櫚氯濾率綠縷膂褸鋁閭驢|lve:掠略|ma:嗎嘛媽嬤瑪痲碼罵螞蟆馬麻|mai:埋脈買賣邁霾麥|man:屘幔慢曼滿漫瞞縵蔓蠻鏝饅鰻|mang:忙杗氓盲芒茫莽蟒|mao:冒卯帽懋毛泖犛瑁矛耄茂茅茆貌貓貿鉚錨髦|me:么麼|mei:妹媒媚寐昧枚梅楣每沒沬湄煤玫眉美莓袂鎂霉魅黴|men:們悶懣捫燜門|meng:夢孟懵朦檬濛猛甍盟矇艋萌蒙虻蜢錳|mi:冪咪密弭彌敉汨泌瀰瞇祕秘米糜糸羋蜜覓謎謐迷靡麋|mian:偭免冕勉娩棉沔湎澠眠綿緬面麵|miao:妙廟描杪渺眇瞄秒緲苗藐邈|mie:咩滅篾蔑|min:岷愍憫抿敏民泯湣皿閔閩|ming:冥名命明暝瞑茗螟酩銘鳴|miu:謬|mo:墨寞抹摩摸摹末模歿沫漠磨秣糢膜茉莫蘑謨貊陌驀魔默|mou:某牟眸繆謀|mu:募墓姆幕慕拇暮木母沐牡牧畝目睦穆苜|n:嗯|na:吶哪娜拿捺納那鈉|nai:乃奈奶氖耐迺|nan:南喃楠男赧難|nang:囊曩|nao:呶惱撓瑙腦蟯鐃鬧|ne:呢訥|nei:內餒|nen:嫩|neng:能|ni:你倪匿妮妳尼怩擬旎暱泥溺睨膩逆霓|nian:唸年廿念拈捻撚攆涊碾輦黏|niang:娘孃釀|niao:嬝尿裊鳥|nie:囁孽捏涅聶臬躡鎳鑷齧|nin:您|ning:佞凝嚀寧擰檸濘獰苧|niu:妞忸扭牛紐鈕|nong:儂噥弄濃穠膿農|nou:耨|nu:努奴弩怒駑|nuan:暖煖|nuo:懦挪糯諾|nv:女|nve:瘧虐|o:哦喔噢|ou:偶嘔歐毆甌耦藕鷗|pa:啪帕怕杷爬琶葩趴|pai:俳徘拍排派湃牌|pan:判叛拚攀槃潘畔盤盼磐蟠蹣|pang:乓彷徬旁滂胖螃龐|pao:刨匏咆庖拋泡炮皰砲袍跑|pei:佩呸培沛珮胚裴賠轡配陪|pen:噴盆|peng:彭抨捧朋棚澎烹砰硼碰篷膨蓬踫鵬|pi:丕仳僻劈匹啤埤媲屁批披枇毗琵疋疲痞癖皮睥紕脾譬辟鈹闢陴霹鼙|pian:偏片篇翩胼駢騙|piao:剽嫖漂瓢瞟票縹飄|pie:撇瞥|pin:品姘嬪拼牝聘貧頻顰|ping:乒坪娉屏平憑枰瓶萍蘋評|po:叵坡婆泊潑珀破粕迫鄱釙頗魄|pou:剖裒|pu:仆僕匍噗圃埔扑撲普曝朴樸浦溥濮瀑璞脯莆菩葡蒲譜蹼鋪|qi:七乞企俟其啟器圻奇契妻岐崎悽慼憩戚旗期杞柒棄棋棲槭欺歧氣汽泣淇淒漆琦琪畦砌磧祁祇祈祺綺耆臍萋訖豈起蹊迄錡騎鰭麒齊|qia:恰洽|qian:乾仟倩前千塹嵌愆搴欠歉淺潛牽箝簽籤縴虔謙譴遣遷鈐鉗鉛錢阡韆騫黔|qiang:嗆強戕搶槍檣牆繈羌腔薔鎗鏘|qiao:俏僑喬峭巧悄愀憔撬敲樵橇橋瞧竅翹誚譙蹺鍬鞘|qie:且切妾怯愜挈竊鍥|qin:侵勤噙寢嶔撳擒欽沁琴禽秦芹親|qing:傾卿情慶擎晴檠氫清磬罄蜻請輕青頃|qiong:瓊穹窮|qiu:丘囚梂毬求泅球秋蚯裘邱酋鞦鰍|qu:劬區去取娶屈嶇曲渠璩瞿蛆蛐衢趣趨軀驅麴齲|quan:佺全券勸圈拳權泉犬畎痊荃蜷詮踡銓|que:卻榷瘸確缺闋闕雀鵲|qun:群裙|ran:冉染然燃苒髯|rang:嚷壤攘瓤禳讓|rao:嬈擾橈繞饒|re:惹熱|ren:人仁仞任刃壬妊忍稔紉荏衽認軔韌飪|reng:仍扔|ri:日|rong:冗容嶸戎榕榮溶熔絨茸蓉融鎔|rou:揉柔肉蹂鞣|ru:乳儒入嚅如孺汝濡燸茹蠕褥辱|ruan:軟阮|rui:瑞睿蕊銳|run:潤閏|ruo:偌弱篛若鶸|sa:卅撒灑薩颯|sai:塞腮賽鰓|san:三傘散糝|sang:喪嗓桑|sao:嫂掃搔繅騷|se:嗇澀瑟穡色|sen:森|seng:僧|sha:傻剎廈殺沙煞砂紗莎裟霎鯊|shai:晒曬篩|shan:刪善姍山扇擅杉柵汕潸煽珊疝縿繕羶膳舢芟衫訕贍跚閃陝鱔|shang:上傷商尚晌殤裳觴賞|shao:勺哨少捎梢燒稍紹芍邵韶|she:奢射懾捨攝歙涉社舌舍蛇設賒赦麝|shen:什伸呻哂娠嬸審慎沈深滲瀋甚申砷神紳脤腎莘蜃身|sheng:剩勝升昇牲生甥盛省笙繩聖聲賸陞|shi:世事仕似使侍勢匙十史嗜噬塒士失奭始室實尸屍屎市師式弒恃拭拾施是時柿氏溼濕獅矢石示筮舐虱蝕蝨螫視試詩誓識豉豕軾逝適釋食飾駛|shou:受售壽守手授收狩獸瘦綬首|shu:倏叔塾墅孰屬庶恕戍抒數暑曙書朮束梳樞樹橾殊淑漱熟疏署舒菽蔬薯藷蜀術豎贖輸述黍鼠|shua:刷耍|shuai:帥摔甩蟀衰|shuan:拴栓涮閂|shuang:塽孀爽雙霜|shui:水睡稅誰|shun:吮瞬舜順|shuo:妁朔爍碩說鑠|si:兕司嗣嘶四姒寺巳廝思撕斯死泗祀私絲耜肆飼駟鷥|song:宋崧嵩忪悚慫松淞聳訟誦送頌鬆|sou:叟嗽嗾搜擻艘蒐藪颼餿|su:俗嗉囌塑夙宿溯甦穌簌粟素肅蘇訴速酥|suan:痠算蒜酸|sui:歲燧睢碎祟穗綏誶遂邃隋隧隨雖髓|sun:孫損榫筍蓀飧|suo:唆嗦娑所梭瑣簑索縮蓑鎖|ta:他塌塔她它撻榻牠獺踏蹋遝遢|tai:台太態抬檯汰泰胎臺苔薹跆颱|tan:嘆坍坦壇探攤曇檀歎毯潭灘炭痰癱碳罈袒覃談譚貪|tang:倘儻唐堂塘帑搪棠淌湯燙瑭糖膛螳趟躺醣鏜|tao:啕套掏桃檮洮淘滔濤絛萄討逃陶韜饕|te:慝特|teng:滕疼籐藤謄騰|ti:剃剔啼嚏屜悌惕提替梯涕緹踢蹄逖銻題體|tian:填天忝恬添甜田畋腆舔鈿闐靦|tiao:佻挑條眺窕蜩覜跳迢鯈|tie:帖貼鐵餮|ting:亭停听婷庭廳廷挺梃汀聽艇蜓霆|tong:僮同彤慟桐桶潼痛瞳童筒統通銅酮|tou:偷投透頭骰|tu:兔凸吐圖土塗屠徒禿突荼菟途酴|tuan:團湍糰|tui:推腿蛻褪退頹|tun:吞屯臀豚飩|tuo:佗唾妥托拓拖柝橢沱脫託跎陀馱駝鴕|wa:哇娃媧挖瓦窪蛙襪|wai:外崴歪|wan:丸剜婉完宛彎惋挽晚汍灣玩皖碗綰腕萬蜿豌輓頑|wang:亡妄往忘惘旺望枉汪王網罔輞魍|wei:位偉偎偽危味唯喂圍圩委威娓尉尾巍帷幃微惟慰未桅洧渭濰為煨猥畏痿維緯胃萎葦蔚薇衛褽諉謂逶違闈韋餵魏鮪|wen:刎吻問塭抆文汶溫玟瘟穩紊紋聞蚊雯|weng:嗡甕翁蓊|wo:倭我握撾擭斡沃渥渦窩臥萵蝸齷|wu:五伍侮兀務勿午吳吾唔嗚圬塢嫵寤屋巫悟憮戊捂晤梧武毋汙污烏無物舞蕪蜈誣誤鎢霧騖鵡鼯|xi:係僖兮吸唏喜嘻夕奚媳嬉希席徙息悉惜戲昔晞晰曦析檄汐洗淅溪潟烯熄熙熹犀犧璽矽禧稀系細繫羲習翕膝蓆蜥蟋襲西譆谿錫隙|xia:下俠匣嚇夏峽暇柙煆狎狹瑕瞎蝦轄遐霞黠|xian:仙僩先咸啣嫌嫻峴弦憲掀暹涎獻現祆秈絃線縣纖羨腺舷莧蘚蜆賢銑銜閑閒限陷險霰顯餡鮮鹹癇|xiang:享像向嚮巷庠廂想橡湘瓖相祥箱翔襄詳象鄉鑲響項餉饗香|xiao:傚哮嘐嘯囂孝宵小崤效曉校梟消淆瀟硝笑篠簫肖蕭詨逍銷霄驍|xie:些偕勰協卸寫屑懈挾擷攜斜械楔榭歇泄洩瀉燮紲脅蟹蠍褻諧謝邂邪鞋頡|xin:信心新昕欣芯薪訢辛釁鋅馨|xing:倖刑型姓幸形性悻惺星杏猩硎腥興行邢醒陘|xiong:兄兇凶匈洶熊胸雄|xiu:休修咻嗅岫朽溴秀繡羞脩袖鏽|xu:勗卹吁噓墟婿序徐恤戌敘旭栩洫煦絮緒續胥蓄蓿虛訏許酗需須頊鬚|xuan:喧宣懸旋晅暄渲漩炫玄璿癬眩絢萱諼軒選鉉|xue:削學穴薛血雪靴|xun:勛勳壎尋巡巽徇循旬殉汛洵潠潯燻荀蕈薰訊訓詢迅遜醺馴|ya:丫亞呀啞壓崖押氬涯牙琊芽蚜衙訝軋雅鴉鴨|yan:偃儼兗厭咽唁嚥嚴堰奄妍嫣宴岩巖延彥掩晏檐沿淹湮演炎焉焰煙燄燕眼研硯筵簷縯胭腌艷菸衍言諺豔贗郾醃釅閻雁顏饜驗魘鹽鼴|yang:仰佯央徉怏恙揚暘楊樣殃氧泱洋漾烊煬瘍癢秧羊鍚陽鞅颺養鴦|yao:吆咬堯夭妖姚搖曜杳榣爻瑤窈窯耀肴腰舀藥要謠遙邀鑰餚鷂|ye:也冶噎夜掖暍曄曳椰業液爺耶腋葉謁鄴野靨頁|yi:一乙亦以伊佚佾依倚偯儀億刈劓咦咿噫囈圯壹夷奕姨宜屹已帟弈弋彝役怡意憶懿抑揖旖易栘椅毅沂浥溢漪異疑疫痍益睪矣移縊繹義羿翌翳翼肄胰臆藝蜴蟻衣裔訑詣誼譯議貽軼迆迤逸遺邑醫鎰頤飴驛|yin:印吟因垠夤姻寅尹引慇殷氤淫癮胤茵蔭蚓鄞銀陰隱霪音飲|ying:嚶塋嬰嬴影應映楹櫻瀛熒營瑛瑩瓔盈硬穎縈纓罌膺英螢蠅贏迎郢鶯鷹鸚|yo:唷喲|yong:佣俑傭勇壅庸恿慵擁永泳涌湧用甬臃蛹詠踴邕鄘雍|you:佑侑優又友右囿宥尢尤幼幽悠憂攸有柚油游牖猶猷由疣祐莠誘遊郵酉釉鈾魷黝鼬|yu:予于余俞喻圄圉域堉妤娛嫗宇寓峪嶼庾御愈愉愚慾敔於昱榆欲歟毓浴淤渝漁澦煜燠獄玉瑜瘀瘉癒盂禦禹禺竽籲紆羽聿育腴臾與芋萸虞蝓裕褕覦語諛諭譽豫輿迂逾遇郁隅雨雩預餘馭鬱魚齬|yuan:元冤原員園圓垣媛怨愿援沅淵湲源爰猿緣苑袁轅遠院願騵鳶鴛|yue:刖岳嶽悅曰月玥籥粵約越躍軏閱|yun:云允勻孕慍昀暈氳熨筠紜耘芸蘊運醞隕雲韻|za:偺匝咋砸紮臢雜|zai:仔再哉在宰栽災載|zan:咱暫瓚簪讚贊鏨|zang:奘臟臧葬贓髒|zao:噪早棗澡灶燥皂糟藻蚤譟躁造遭鑿|ze:仄則嘖擇澤笮責|zei:賊鯽|zen:怎|zeng:增憎繒贈|zha:乍吒喳扎搾札柞榨渣炸眨砟蚱詐閘|zhai:債宅寨摘窄齋|zhan:佔占展嶄戰斬棧氈沾湛盞瞻站綻蘸詹譫輾霑|zhang:丈仗帳幛張彰掌杖樟漲漳獐璋瘴章脹蟑賬長障|zhao:兆召啁找招昭棹櫂沼炤照爪罩肇詔趙釗|zhe:哲折摺浙者蔗蜇褶謫赭輒轍這遮鷓|zhen:偵圳振斟朕枕楨榛珍甄甽疹真砧禎箴臻診貞賑針鎮陣震鴆|zheng:崢幀征徵怔拯掙政整正爭猙症癥睜箏蒸証諍證鄭錚鯖|zhi:之值制卮只吱咫址執姪峙幟志指摭摯擲支旨智枝梔植櫛止殖汁治泜滯炙痔痣直知祉祗秩稚窒紙緻織置職肢胝脂至致芝芷蛭蜘衹製誌質趾躑躓輊隻雉|zhong:中仲冢塚忠盅眾種終腫衷踵重鍾鐘|zhou:冑周咒妯宙州帚晝洲皺籀粥紂縐肘胄舟軸週驟|zhu:主佇住侏助囑拄朱杼柱株注渚煮燭珠矚硃祝竹竺筑箸築茱著蛀蛛註誅諸豬貯跦躅逐銖鑄駐|zhua:抓|zhuai:拽|zhuan:僎囀專撰磚篆賺轉顓|zhuang:壯妝撞樁狀莊裝|zhui:墜惴綴贅追錐隹|zhun:准準肫諄|zhuo:卓啄拙捉擢斫桌涿濁濯灼茁酌鐲|zi:咨姊姿子字孜孳恣梓淄滋滓漬玆籽紫緇自茲訾諮貲資輜錙髭|zong:傯宗棕粽綜縱總蹤鬃|zou:奏揍走鄒鄹陬|zu:俎卒族祖租組詛足鏃阻|zuan:纂鑽|zui:嘴最罪蕞醉|zun:尊撙樽遵|zuo:佐作做坐左座昨琢祚';
+let PY_MAP = null;
+function pyOf(ch) {
+  if (!PY_MAP) { PY_MAP = new Map(); PY_TABLE.split('|').forEach(g => { const i = g.indexOf(':'); const k = g.slice(0, i); for (const c of g.slice(i + 1)) PY_MAP.set(c, k); }); }
+  return PY_MAP.get(ch) || '';
+}
+// 口音折疊：zh→z、ch→c、sh→s、r→l、n→l、f→h（發→花）、eng→en、ing→in、ui→ei、uo→o
+function pyFold(s) {
+  if (!s) return '';
+  let x = s.replace(/^zh/, 'z').replace(/^ch/, 'c').replace(/^sh/, 's').replace(/^r/, 'l').replace(/^n(?!g)/, 'l').replace(/^f/, 'h').replace(/^hu(?=a)/, 'h');
+  return x.replace(/eng$/, 'en').replace(/ing$/, 'in').replace(/ui$/, 'ei').replace(/uo$/, 'o');
+}
+const foldCh = ch => { const p = pyOf(ch); return p ? pyFold(p) : ''; };
+const isHan = ch => /[\u4e00-\u9fff]/.test(ch);
+// 對照表文字 → [{ from, to }]（長的先換）
+function parseSpeechFix(text) {
+  const out = [];
+  String(text || '').split(/\n+/).forEach(line => {
+    const m = line.split(/\s*(?:→|->|=>|＝|=)\s*/);
+    if (m.length !== 2) return;
+    const to = m[1].trim(); if (!to || to.length > 20) return;
+    m[0].split(/[、,，\/／]/).map(s => s.trim()).filter(s => s && s !== to && s.length <= 20).forEach(from => out.push({ from, to }));
+  });
+  return out.sort((a, b) => b.from.length - a.from.length);
+}
+// 其他常見醫療詞（關鍵字以外，模糊比對時也認得）
+const MED_VOCAB = '抽搐 癲癇 中風 休克 昏迷 心肌梗塞 呼吸困難 胸痛 腹痛 頭痛 頭暈 嘔吐 發燒 低血糖 高血糖 過敏 骨折 燒燙傷 溺水 一氧化碳 嗆傷 喘鳴 沙啞 插管 葉克膜 主動脈剝離 腦出血 截肢 孕婦 陣痛 破水 出血 吐血 黑便 意識不清 無呼吸 無脈搏 心跳停止 電擊 壓胸 抽筋 麻木 無力 口齒不清 嘴歪 胸悶 心悸 氣喘 氣胸 中毒 農藥 割腕 吞藥 墜落 車禍 撕裂傷 擦傷 挫傷 脫臼 扭傷 痙攣 失禁 發紺 冒冷汗 呼吸喘 腦震盪 蜂螫 蛇咬 熱衰竭 中暑 失溫'.split(' ');
+let vocabCache = { key: '', list: [], set: new Set() };
+// 校正用的詞庫：求救原因關鍵字＋名稱、處置能力名稱、危險徵象／檢傷條件／呼吸道關鍵字、對照表的正確寫法、常見醫療詞（只取 2～8 個中文字）
+function speechVocab() {
+  const fix = (state.settings && state.settings.speechFix) || '';
+  const key = state.rules.length + ':' + state.rules.reduce((n, r) => n + r.keywords.length, 0) + ':' + state.caps.length + ':' + fix.length;
+  if (vocabCache.key === key) return vocabCache;
+  const words = [];
+  state.rules.forEach(r => { words.push(...r.keywords); r.name.split(/[／\/、,，（）()\s]/).forEach(s => words.push(s)); });
+  state.caps.forEach(c => words.push(c.name));
+  [RED_FLAGS, TRG_ITEMS, AIRWAY_ITEMS].forEach(list => list.forEach(x => words.push(...(x.kw || []), ...(x.need || []))));
+  parseSpeechFix(fix).forEach(x => words.push(x.to));
+  words.push(...MED_VOCAB);
+  const list = [...new Set(words.map(s => String(s || '').trim()).filter(s => /^[\u4e00-\u9fff]{2,8}$/.test(s)))].sort((a, b) => b.length - a.length);
+  vocabCache = { key, list, set: new Set(list), folded: new Map(list.map(w => [w, [...w].map(foldCh)])) };
+  return vocabCache;
+}
+// 主要校正：回傳 { text, fixes: [{ from, to, how }] }
+function speechCorrect(raw, fixText) {
+  let t = String(raw || '').normalize('NFKC');
+  const fixes = [];
+  parseSpeechFix(fixText != null ? fixText : state.settings && state.settings.speechFix).forEach(({ from, to }) => {
+    if (t.includes(from)) { t = t.split(from).join(to); fixes.push({ from, to, how: 'table' }); }
+  });
+  t = fixSpeech(t);
+  const V = speechVocab();
+  const chars = [...t], folded = chars.map(foldCh), locked = new Array(chars.length).fill(false);
+  const lockExact = w => { const L = w.length; for (let i = 0; i + L <= chars.length; i++) if (chars.slice(i, i + L).join('') === w) for (let k = 0; k < L; k++) locked[i + k] = true; };
+  V.list.forEach(w => { if (w.length >= 3) lockExact(w); });   // 已經正確的詞不再動
+  for (const w of V.list) {
+    const L = w.length; if (L < 3) continue;
+    const wf = V.folded.get(w);
+    for (let i = 0; i + L <= chars.length; i++) {
+      let ident = 0, mism = 0, ok = true;
+      for (let k = 0; k < L; k++) {
+        const c = chars[i + k];
+        if (locked[i + k] || !isHan(c)) { ok = false; break; }
+        if (c === w[k]) ident++;
+        else if (folded[i + k] && folded[i + k] === wf[k]) { /* 同音（含口音） */ }
+        else if (++mism > 1) { ok = false; break; }
+      }
+      if (!ok || ident === L) continue;
+      if (mism === 1 && !(L >= 4 && ident >= 2)) continue;
+      const win = chars.slice(i, i + L).join('');
+      if (V.set.has(win)) continue;   // 本身就是另一個醫療詞
+      for (let k = 0; k < L; k++) { chars[i + k] = w[k]; folded[i + k] = wf[k]; locked[i + k] = true; }
+      fixes.push({ from: win, to: w, how: 'sound' });
+      i += L - 1;
+    }
+  }
+  return { text: chars.join(''), fixes };
+}
+const vocabHits = s => { const V = speechVocab(); return V.list.reduce((n, w) => n + (s.includes(w) ? 1 : 0), 0); };
+
+/* ----- 回傳給管理者的內容一律去識別：數字、地址、稱謂前的姓氏、身分證、電話 ----- */
+function redactCase(raw) {
+  let t = String(raw || '').normalize('NFKC').replace(/\s+/g, ' ').trim();
+  t = t.replace(/[A-Za-z]\s?\d{6,}/g, '〔編號〕');
+  t = t.replace(/[\u4e00-\u9fffA-Za-z0-9#一二三四五六七八九十百]{0,10}?(?:路|街|大道)(?:[一二三四五六七八九十0-9]+段)?(?:[0-9一二三四五六七八九十百]+(?:巷|弄|號|樓|之[0-9一二三四五六七八九十]+))*/g, '〔地址〕');
+  t = t.replace(/[0-9一二三四五六七八九十百]+(?:巷|弄|號|樓|鄰)/g, '〔地址〕');
+  t = t.replace(/([\u4e00-\u9fff]{1,3})里(?![程數長])/g, (m, a) => /公$/.test(a) ? m : '〔地址〕');
+  t = t.replace(/[\u4e00-\u9fff]{2}(?:區|鄉|鎮)/g, m => /急診|災區|社區|病區|區域/.test(m) ? m : '〔地區〕');
+  t = t.replace(/[\u4e00-\u9fff](?=先生|小姐|太太|女士|伯伯|阿伯|阿姨|阿嬤|阿公|奶奶|爺爺|老師)/g, '');
+  t = t.replace(/\d+/g, '#');
+  t = t.replace(/(〔地址〕\s*)+/g, '〔地址〕');
+  return t.slice(0, 80);
+}
+
+/* ----- 從救護員的修正中學習：語音結果 vs 送出查詢時的文字，找出「聽錯 → 改成」 ----- */
+function diffHunks(a, b) {
+  const A = [...a], B = [...b], n = A.length, m = B.length;
+  if (n * m > 160000) return [];
+  const dp = Array.from({ length: n + 1 }, () => new Uint16Array(m + 1));
+  for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) dp[i][j] = A[i] === B[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
+  const hunks = []; let i = 0, j = 0, cur = null;
+  while (i < n || j < m) {
+    if (i < n && j < m && A[i] === B[j]) { if (cur) { hunks.push(cur); cur = null; } i++; j++; continue; }
+    if (!cur) cur = { a0: i, a1: i, b0: j, b1: j };
+    if (j < m && (i >= n || dp[i][j + 1] >= dp[i + 1][j])) { j++; cur.b1 = j; } else { i++; cur.a1 = i; }
+  }
+  if (cur) hunks.push(cur);
+  return hunks.map(h => ({ ...h, A, B }));
+}
+// 兩段文字有多像（最長共同子序列 ÷ 較長的長度）：打字改成完全不同的案件時，就不再當作語音結果的修正
+function lcsRatio(a, b) {
+  const A = [...String(a || '')], B = [...String(b || '')], n = A.length, m = B.length;
+  if (!n || !m) return 0;
+  if (n * m > 160000) return 0;
+  let prev = new Uint16Array(m + 1), cur = new Uint16Array(m + 1);
+  for (let i = 1; i <= n; i++) { for (let j = 1; j <= m; j++) cur[j] = A[i - 1] === B[j - 1] ? prev[j - 1] + 1 : Math.max(prev[j], cur[j - 1]); [prev, cur] = [cur, prev]; }
+  return prev[m] / Math.max(n, m);
+}
+function learnPairs(voiceOut, finalText) {
+  if (!voiceOut || !finalText || voiceOut === finalText) return [];
+  const V = speechVocab(), out = [];
+  diffHunks(voiceOut, finalText).forEach(h => {
+    if (h.b1 === h.b0) return;
+    const B = h.B.join('');
+    for (const w of V.list) {
+      let s = B.indexOf(w);
+      while (s >= 0) {
+        const e = s + w.length;
+        if (s < h.b1 && e > h.b0) {   // 這個醫療詞和修改的地方重疊
+          const left = Math.max(0, h.b0 - s), right = Math.max(0, e - h.b1);
+          const a0 = h.a0 - left, a1 = h.a1 + right;
+          if (a0 >= 0 && a1 <= h.A.length) {
+            const wrong = h.A.slice(a0, a1).join('');
+            const share = [...wrong].some(c => w.includes(c)) || [...wrong].some((c, k) => foldCh(c) && foldCh(c) === foldCh(w[k] || ''));
+            if (wrong && wrong !== w && wrong.length <= w.length + 3 && wrong.length <= 12 && share && /^[\u4e00-\u9fffA-Za-z]+$/.test(wrong)) out.push({ wrong, right: w });
+          }
+          return;
+        }
+        s = B.indexOf(w, s + 1);
+      }
+    }
+  });
+  return out.filter((x, k) => out.findIndex(y => y.wrong === x.wrong && y.right === x.right) === k);
+}
+const SpeechLearn = {
+  sent: new Set(),
+  enabled() { return localCfg.helpImprove !== false; },
+  send(evt) {
+    const key = JSON.stringify([evt.type, evt.text || '', evt.wrong || '', evt.right || '', evt.ruleId || '']);
+    if (this.sent.has(key)) return; this.sent.add(key);
+    const doc = { ...evt, at: Date.now(), uid: Store.uid() || '', status: 'new' };
+    Object.keys(doc).forEach(k => { if (doc[k] === '' || doc[k] == null) delete doc[k]; });
+    doc.uid = Store.uid() || '';
+    Promise.resolve().then(() => Store.addSpeechQ(doc)).catch(err => console.warn('辨識回饋失敗', err));
+  },
+  timer: null,
+  // 查詢後才改選求救原因：等幾秒（可能還在換）再記
+  later() { clearTimeout(this.timer); this.timer = setTimeout(() => this.onSearch(), 4000); },
+  // 按「查詢」時：比對語音結果與送出的文字、記下辨識不到或判錯的主訴
+  onSearch() {
+    clearTimeout(this.timer);
+    if (!this.enabled() || state.tab !== 'patient') return;
+    const text = state.caseText.trim(); if (!text) return;
+    const src = state.voice && state.voice.out ? 'voice' : 'text';
+    if (src === 'voice') learnPairs(state.voice.out.trim(), text).forEach(p => this.send({ type: 'fix', src, wrong: p.wrong, right: p.right }));
+    const kw = parseCase(text), ar = activeRule();
+    if (!kw.ruleId) this.send({ type: 'miss', src, text: redactCase(text), ruleId: ar ? ar.id : '', ruleName: ar ? ar.name.slice(0, 40) : '' });
+    else if (ar && ar.id !== kw.ruleId) {
+      const kr = state.rules.find(r => r.id === kw.ruleId);
+      this.send({ type: 'wrong', src, text: redactCase(text), ruleId: ar.id, ruleName: ar.name.slice(0, 40), kwRuleId: kw.ruleId, kwRuleName: kr ? kr.name.slice(0, 40) : '' });
+    }
+  }
+};
 function cnNum(s) {
   const D = { 零: 0, 〇: 0, 一: 1, 二: 2, 兩: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9 };
   let total = 0, num = 0;
@@ -3013,7 +3248,7 @@ function onCaseInput() {
   const text = state.caseText.trim();
   const kw = parseCase(state.caseText);
   state.kwParsed = kw;
-  if (!text) { AI.cancel(); state.ai = { state: 'idle' }; applyParsed(EMPTY_P, 'kw'); renderAi(); return; }
+  if (!text) { state.voice = null; AI.cancel(); state.ai = { state: 'idle' }; applyParsed(EMPTY_P, 'kw'); renderAi(); return; }
   // AI 已經接手過這個案件：等 AI 新結果，避免關鍵字和 AI 結果來回跳
   if (!(aiAuto() && state.ai.result)) applyParsed(kw, 'kw');
   else renderParse();
@@ -3041,7 +3276,8 @@ function renderParse() {
     item(pt.age, p.age, fmtAge(pt.age), '未辨識年齡') +
     item(rule ? rule.id : '', p.ruleId, rule ? rule.name : '', '未辨識主訴') +
     (alts.length ? `<div class="alt">摘要也提到：${alts.map(r => esc(r.name)).join('、')}（紫色虛線框，點一下可切換）</div>` : '') +
-    (flags.length ? `<div class="flags">${flags.map(f => `<span class="flag">${ic('alert', 'sm')}${esc(f)}</span>`).join('')}</div>` : '');
+    (flags.length ? `<div class="flags">${flags.map(f => `<span class="flag">${ic('alert', 'sm')}${esc(f)}</span>`).join('')}</div>` : '') +
+    (state.voice && state.voice.fixes.length ? `<div class="vfix">${ic('mic', 'sm')}語音自動校正：${state.voice.fixes.map(f => `${esc(f.from)}→<b>${esc(f.to)}</b>`).join('、')}（不對的話直接在上面改字）</div>` : '');
 }
 
 
@@ -4523,6 +4759,7 @@ async function doSearch(opt = {}) {
     if (state.locSource === 'gps') await locate();
     if (!state.pos) throw new Error('尚未取得位置');
     state.searched = true;
+    SpeechLearn.onSearch();
     state.eta = {}; state.etaState = ''; state.etaKey = ''; // 每次查詢都重算車程，避免沿用上一個位置的結果
     { const r = activeRule(); logEvent({ type: 'search', tab: state.tab, ruleId: r ? r.id : '', ruleName: r ? r.name : '',
         caps: state.tab === 'quick' ? [...state.quickCaps] : [], onset: state.clock.onsetAt != null }); }
@@ -4724,12 +4961,26 @@ const Speech = {
     if (!this.supported()) throw new Error('這個瀏覽器不支援語音輸入。iPhone 請用 Safari，或用鍵盤上的麥克風聽寫');
     const R = window.SpeechRecognition || window.webkitSpeechRecognition;
     const rec = this.rec = new R();
-    rec.lang = 'zh-TW'; rec.interimResults = true; rec.continuous = true;
+    rec.lang = 'zh-TW'; rec.interimResults = true; rec.continuous = true; rec.maxAlternatives = 3;
     this.base = state.caseText ? state.caseText.replace(/\s*$/, '') + ' ' : '';
+    const prevFixes = state.voice && state.voice.fixes ? state.voice.fixes : [];
     rec.onresult = ev => {
       let txt = '';
-      for (let i = 0; i < ev.results.length; i++) txt += ev.results[i][0].transcript;
-      setCaseText(fixSpeech(this.base + txt));
+      for (let i = 0; i < ev.results.length; i++) {
+        const r = ev.results[i];
+        let best = r[0].transcript;
+        // 有多個候選時（部分瀏覽器），挑校正後命中最多醫療詞的
+        if (r.isFinal && r.length > 1) {
+          let bs = -1;
+          for (let k = 0; k < r.length; k++) { const sc = vocabHits(speechCorrect(r[k].transcript).text); if (sc > bs) { bs = sc; best = r[k].transcript; } }
+        }
+        txt += best;
+      }
+      const c = speechCorrect(this.base + txt);
+      setCaseText(c.text, true);
+      const fx = prevFixes.concat(c.fixes);
+      state.voice = { out: c.text, fixes: fx.filter((x, k) => fx.findIndex(y => y.from === x.from && y.to === x.to) === k).slice(-8) };
+      renderParse();
     };
     rec.onerror = ev => { toast(ev.error === 'not-allowed' ? '麥克風權限被拒絕，請到設定允許' : '語音辨識中斷：' + ev.error); this.stop(); };
     rec.onend = () => { if (this.on) { this.on = false; renderMic(); } };
@@ -5782,6 +6033,7 @@ function dataStatusHtml() {
   ];
   if (demoAllowed()) rows.push(['sim', '模擬', `救護車位置在沒有 GPS 時為模擬路線；隨機情境的地點與時間；數據分析的示範數據`]);
   if (demo) rows.push(['sim', '本機資料', '尚未接上雲端，資料只存在這台裝置；醫院端頁面只在這台裝置示範']);
+  rows.push(['est', '改進辨識', '查詢時辨識不到求救原因、或語音聽錯被改字，會回傳去除數字、地址與稱謂後的內容給管理者，用來補關鍵字與易錯詞（本機設定可以關閉）']);
   rows.push(['est', '不自動傳送', '「交班」摘要與大量傷病患的分流結果只在手機上整理，不會自動傳給醫院或勤務中心']);
   return `<div class="ds-list">${rows.map(([k, t, d]) => `<div class="${k}"><b>${esc(t)}</b><span>${esc(d)}</span></div>`).join('')}</div>`;
 }
@@ -6017,6 +6269,8 @@ function renderAdminPanel() {
     renderUsersPanel();
   } else if (state.adminTab === 'stats') {
     renderStats();
+  } else if (state.adminTab === 'speech') {
+    renderSpeechPanel();
   } else {
     if (!state.presetDraft) state.presetDraft = plain(state.settings.presets);
     const empty = Store.cloudEmpty || (!state.hospitals.length && !state.caps.length && !state.rules.length);
@@ -6726,7 +6980,7 @@ async function saveSettingsForm() {
     disclaimer: $('#s_disc').value, notice: $('#s_notice').value, credit: $('#s_credit').value, team: $('#s_team').value, stations: $('#s_stations').value,
     tableSrc: $('#s_tsrc').value, tableSrcTpe: $('#s_tsrc2').value,
     feedbackEmail: $('#s_fbmail').value, feedbackUrl: $('#s_fburl').value,
-    traffic: Object.fromEntries(TRAFFIC_SLOTS.map(([k]) => [k, $('#s_tf_' + k).value])), demoOn: $('#s_demo') ? $('#s_demo').checked : state.settings.demoOn });
+    traffic: Object.fromEntries(TRAFFIC_SLOTS.map(([k]) => [k, $('#s_tf_' + k).value])), demoOn: $('#s_demo') ? $('#s_demo').checked : state.settings.demoOn, speechFix: state.settings.speechFix });
   const fm = $('#s_fbmail').value.trim(), fu = $('#s_fburl').value.trim();
   { const bad = fm.split(/[\s,;，；、]+/).filter(x => x && !EMAIL_RE.test(x)); if (bad.length) throw new Error('Email 格式不對：' + bad.join('、')); }
   if (fu && !/^https:\/\/\S+$/i.test(fu)) throw new Error('意見表單連結要用 https:// 開頭');
@@ -6737,6 +6991,110 @@ async function saveSettingsForm() {
   if (state.locSource[0] === 'p') { state.locSource = 'gps'; state.pos = null; state.searched = false; }
   if (!demoAllowed()) endScenario();
   toast('設定已儲存'); renderAdminPanel(); renderFoots();
+}
+
+/* ----- 後台：語音辨識（易錯詞對照表、救護員修正、辨識不到的內容） ----- */
+const fmtMD = t => { const d = new Date(t); return `${d.getMonth() + 1}/${d.getDate()} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`; };
+function sfixTestHtml(q, fixText) {
+  if (!q.trim()) return '';
+  const r = speechCorrect(q, fixText), kw = parseCase(r.text), rule = state.rules.find(x => x.id === kw.ruleId);
+  return `校正後：<b>${esc(r.text)}</b><br>${r.fixes.length ? '改了：' + r.fixes.map(f => `${esc(f.from)}→${esc(f.to)}（${f.how === 'table' ? '對照表' : '同音／口音'}）`).join('、') : '沒有需要校正的詞'}<br>辨識的求救原因：${rule ? esc(rule.name) : '<span class="warn">辨識不到</span>'}`;
+}
+async function renderSpeechPanel() {
+  const p = $('#adminPanel');
+  const n = parseSpeechFix(state.settings.speechFix).length;
+  p.innerHTML = `<section class="card form">
+      <div class="sec-title">易錯詞對照表</div>
+      <div class="hint" style="margin:0 0 8px">語音常聽錯的詞，一行一組：「聽錯的寫法 → 正確寫法」，聽錯的寫法可以好幾個，用「、」分開（目前 ${n} 個）。存檔後全隊手機馬上套用。3 個字以上的醫療關鍵字另外會自動比對同音字與台灣口音（ㄓㄗ、ㄔㄘ、ㄕㄙ、ㄖㄌ、ㄋㄌ、ㄈㄏ、ㄣㄥ、ㄧㄣㄧㄥ），不用全部列出；2 個字的詞（例如中風）請列在這裡。</div>
+      <textarea id="s_sfix" rows="8" spellcheck="false" placeholder="中瘋、中鋒 → 中風">${esc(state.settings.speechFix)}</textarea>
+      <div class="btn-wrap"><button class="btn ghost" data-act="sfixDefault">恢復預設</button><button class="btn primary" data-act="sfixSave">儲存對照表</button></div>
+      <label for="sfixTest" style="margin-top:14px">試試看（輸入聽錯的句子，看校正結果；用上面還沒存檔的內容，不會存檔）</label>
+      <input id="sfixTest" placeholder="例：阿嬤突然中瘋，講話口齒不輕" autocomplete="off">
+      <div id="sfixOut" class="hint sfix-out"></div>
+    </section>
+    <div id="sqBox"><div class="empty">載入回饋中…</div></div>`;
+  try { state.sq = await Store.loadSpeechQ(); }
+  catch (e) { const b = $('#sqBox'); if (b) b.innerHTML = `<div class="notice">${esc(e.message)}</div>`; return; }
+  if (state.adminTab !== 'speech') return;
+  renderSqBox();
+}
+function sqMissHtml(x) {
+  const opts = state.rules.map(r => `<option value="${esc(r.id)}" ${r.id === x.ruleId ? 'selected' : ''}>${esc(r.name)}</option>`).join('');
+  const who = x.type === 'wrong' ? `App 判為「${esc(x.kwRuleName || '？')}」，救護員改選「${esc(x.ruleName || '？')}」`
+    : x.ruleName ? `救護員選了「${esc(x.ruleName)}」` : '救護員沒有選求救原因';
+  return `<div class="sq-item" data-sq="${esc(x.id)}">
+      <div class="sq-meta"><span class="tagx">${x.src === 'voice' ? '語音' : '文字'}</span><span class="tagx ${x.type === 'wrong' ? 'warn' : ''}">${x.type === 'wrong' ? '判斷錯' : '辨識不到'}</span><small>${fmtMD(x.at)}</small></div>
+      <div class="sq-text">${esc(x.text || '')}</div>
+      <div class="sq-who">${who}</div>
+      <div class="sq-act"><input class="sq-kw" maxlength="30" placeholder="要加的關鍵字（可以先反白上面的字）" autocomplete="off">
+        <select class="sq-rule" aria-label="求救原因"><option value="">選擇求救原因</option>${opts}</select></div>
+      <div class="sq-btns"><button class="btn sm primary" data-act="sqAddKw" data-id="${esc(x.id)}">加入關鍵字</button>
+        <button class="btn sm" data-act="sqDone" data-id="${esc(x.id)}">已處理</button><button class="btn sm ghost" data-act="sqIgnore" data-id="${esc(x.id)}">忽略</button></div>
+    </div>`;
+}
+function renderSqBox() {
+  const box = $('#sqBox'); if (!box) return;
+  const all = (state.sq || []).slice().sort((a, b) => b.at - a.at);
+  const open = all.filter(x => (x.status || 'new') === 'new');
+  const groups = new Map();
+  open.filter(x => x.type === 'fix' && x.wrong && x.right).forEach(x => {
+    const k = x.wrong + '\u0000' + x.right;
+    const g = groups.get(k) || { wrong: x.wrong, right: x.right, n: 0, at: 0, ids: [] };
+    g.n++; g.at = Math.max(g.at, x.at); g.ids.push(x.id); groups.set(k, g);
+  });
+  state.sqFix = [...groups.values()].sort((a, b) => b.n - a.n || b.at - a.at);
+  const misses = open.filter(x => x.type === 'miss' || x.type === 'wrong');
+  const done = all.length - open.length;
+  box.innerHTML = `<section class="card">
+      <div class="sec-title">救護員的修正（候選校正）<span class="sq-cnt">${state.sqFix.length}</span></div>
+      <div class="hint" style="margin:0 0 8px">用語音輸入後，救護員把字改掉才查詢，App 會記下「聽成什麼 → 改成什麼」（只記醫療關鍵字，不記其他內容）。同一組出現越多次越可信，按「採用」就加進上面的對照表。</div>
+      ${state.sqFix.length ? state.sqFix.map((g, i) => `<div class="sq-row"><div class="main"><b>${esc(g.wrong)} → ${esc(g.right)}</b><small>${g.n} 次・最近 ${fmtMD(g.at)}</small></div>
+        <button class="btn sm primary" data-act="sqAdopt" data-i="${i}">採用</button><button class="btn sm ghost" data-act="sqIgnoreFix" data-i="${i}">忽略</button></div>`).join('') : '<div class="empty">目前沒有</div>'}
+    </section>
+    <section class="card">
+      <div class="sec-title">辨識不到／判斷錯的派遣內容<span class="sq-cnt">${misses.length}</span></div>
+      <div class="hint" style="margin:0 0 8px">救護員查詢時，App 沒辨識出求救原因、或救護員改選了別的，就會記在這裡（近 90 天）。內容在手機上就已去除數字、地址與稱謂。從內容挑出代表這個狀況的詞，加進對應求救原因的關鍵字，下次就認得；聽錯的字請加到上面的對照表。</div>
+      ${misses.length ? misses.map(sqMissHtml).join('') : '<div class="empty">目前沒有</div>'}
+    </section>
+    ${done ? `<div class="btn-wrap"><button class="btn ghost" data-act="sqPurge">清除已處理／忽略的 ${done} 筆</button></div>` : ''}`;
+}
+async function sqMark(ids, status) {
+  await Store.updateSpeechQ(ids, { status });
+  (state.sq || []).forEach(x => { if (ids.includes(x.id)) x.status = status; });
+  renderSqBox();
+}
+async function saveSpeechFix(text) {
+  const t = String(text).slice(0, 8000);
+  await Store.saveSettings(normSettings({ ...state.settings, speechFix: t }));
+  vocabCache.key = '';
+}
+async function sqAdopt(i) {
+  const g = state.sqFix[i]; if (!g) return;
+  const ta = $('#s_sfix');
+  let cur = ta ? ta.value : state.settings.speechFix;
+  if (!parseSpeechFix(cur).some(x => x.from === g.wrong && x.to === g.right)) cur = cur.replace(/\s*$/, '') + `\n${g.wrong} → ${g.right}`;
+  await saveSpeechFix(cur.replace(/^\n+/, ''));
+  if (ta) ta.value = state.settings.speechFix;
+  await sqMark(g.ids, 'done');
+  toast(`已加入對照表：${g.wrong} → ${g.right}`);
+}
+async function sqAddKw(el) {
+  const item = el.closest('.sq-item'); if (!item) return;
+  const id = el.dataset.id;
+  let kw = item.querySelector('.sq-kw').value.trim();
+  if (!kw) { const sel = String(window.getSelection ? window.getSelection() : '').trim(); if (sel && item.querySelector('.sq-text').textContent.includes(sel)) kw = sel; }
+  const rule = state.rules.find(r => r.id === item.querySelector('.sq-rule').value);
+  if (!kw) throw new Error('請先填要加的關鍵字（或反白內容裡的字）');
+  if (/[〔〕#]/.test(kw)) throw new Error('關鍵字不能包含去識別的符號（〔〕或 #）');
+  if (normText(kw).length < 2) throw new Error('關鍵字至少 2 個字，太短容易誤判');
+  if (!rule) throw new Error('請選擇要加到哪個求救原因');
+  if (ruleKeywords(rule).includes(normText(kw))) { await sqMark([id], 'done'); toast(`「${rule.name}」已經有這個關鍵字`); return; }
+  const other = state.rules.find(r => r.id !== rule.id && ruleKeywords(r).includes(normText(kw)));
+  if (other && !confirm(`「${kw}」已經是「${other.name}」的關鍵字，還要加到「${rule.name}」嗎？`)) return;
+  await Store.save('rules', normRule({ ...rule, keywords: [...rule.keywords, kw] }));
+  vocabCache.key = '';
+  await sqMark([id], 'done');
+  toast(`已把「${kw}」加進「${rule.name}」的關鍵字`);
 }
 
 /* ----- 本機設定 ----- */
@@ -6760,6 +7118,7 @@ function openLocalSettings() {
         ${demoAllowed() ? `<label class="chk"><input type="checkbox" id="ls_sim" ${localCfg.sim ? 'checked' : ''}>示範：模擬救護車行進（沒有 GPS 時，醫院端看板顯示救護車沿路線前進）</label>
         <label class="chk"><input type="checkbox" id="ls_demo" ${isDemoUI() ? 'checked' : ''}>示範模式（展開派遣內容、顯示示範案例與隨機情境；出勤時關掉比較快）</label>` : ''}
         <label class="chk"><input type="checkbox" id="ls_auto" ${localCfg.autoSearch ? 'checked' : ''}>辨識出求救原因後自動查詢</label>
+        <label class="chk"><input type="checkbox" id="ls_help" ${localCfg.helpImprove !== false ? 'checked' : ''}>協助改進辨識：辨識不到求救原因、或語音聽錯被改字時，回傳給管理者（已去除數字、地址與稱謂）</label>
         
       </div>`,
     buttons: [{ text: '取消', cls: 'ghost', onClick: () => closeModal() }, { text: '儲存', cls: 'primary', onClick: saveLocalSettings }]
@@ -6769,7 +7128,7 @@ function readLocalForm() {
   return {
     unit: $('#ls_unit').value.trim(), geminiKey: $('#ls_key') ? $('#ls_key').value.trim() : localCfg.geminiKey,
     geminiModel: $('#ls_model') ? ($('#ls_model').value.trim() || DEFAULT_GEMINI_MODEL) : localCfg.geminiModel, aiAuto: $('#ls_aiAuto') ? $('#ls_aiAuto').checked : localCfg.aiAuto,
-    sim: $('#ls_sim') ? $('#ls_sim').checked : localCfg.sim, uiMode: $('#ls_demo') ? ($('#ls_demo').checked ? 'demo' : 'formal') : localCfg.uiMode, autoSearch: $('#ls_auto').checked,
+    sim: $('#ls_sim') ? $('#ls_sim').checked : localCfg.sim, uiMode: $('#ls_demo') ? ($('#ls_demo').checked ? 'demo' : 'formal') : localCfg.uiMode, autoSearch: $('#ls_auto').checked, helpImprove: $('#ls_help') ? $('#ls_help').checked : localCfg.helpImprove !== false,
     theme: ($('#ls_theme button.on') || {}).dataset ? $('#ls_theme button.on').dataset.v : localCfg.theme
   };
 }
@@ -6892,7 +7251,7 @@ function pickFile(inputSel) {
 }
 
 /* ========== 事件 ========== */
-function setCaseText(t) { $('#caseText').value = t; state.caseText = t; state.caseOpen = true; renderCaseCard(); onCaseInput(); }
+function setCaseText(t, fromVoice) { if (!fromVoice) state.voice = null; $('#caseText').value = t; state.caseText = t; state.caseOpen = true; renderCaseCard(); onCaseInput(); }
 const ACTIONS = {
   menu: () => { $('#mUiMode').hidden = !demoAllowed(); $('#mUiMode').lastChild.textContent = isDemoUI() ? '切換到正式模式（出勤）' : '切換到示範模式'; $('#menu').hidden = !$('#menu').hidden; },
   toggleUiMode: () => {
@@ -6930,7 +7289,7 @@ const ACTIONS = {
     toast(caps.length ? `已帶入「${r.name}」需要的：${caps.map(capName).join('、')}\n再勾第二個問題需要的能力，醫院需同時具備` : '請勾選兩個問題各自需要的處置能力，醫院需同時具備', 5000);
   },
   sex: el => { state.patient.sex = state.patient.sex === el.dataset.v ? '' : el.dataset.v; renderPatient(); renderParse(); renderResults(); },
-  complaint: el => { state.patient.ruleId = state.patient.ruleId === el.dataset.id ? '' : el.dataset.id; renderPatient(); renderParse(); renderResults(); maybeAutoSearch(); },
+  complaint: el => { state.patient.ruleId = state.patient.ruleId === el.dataset.id ? '' : el.dataset.id; renderPatient(); renderParse(); renderResults(); maybeAutoSearch(); if (state.searched) SpeechLearn.later(); },
   jump: () => jumpToResults(),
   // 示範案例 = 新案件：清掉上一個案件的欄位
   demoCase: el => {
@@ -7163,6 +7522,18 @@ const ACTIONS = {
   seed: async () => { if (!confirm('把內建的醫院、能力、主訴與設定寫入雲端？\n寫入後全隊都會讀到雲端這份資料。')) return; await Store.replaceAll(seedData()); state.presetDraft = null; renderNet(); toast('已寫入雲端'); renderAdminPanel(); },
   resetDemo: async () => { if (!confirm('清除此裝置上的修改，恢復預設測試資料？')) return; await Store.replaceAll(seedData()); state.presetDraft = null; if (localCfg.sim) { Sim.stop(); Sim.start(); } toast('已重設'); renderAdminPanel(); },
   modalClose: () => closeModal(),
+  sfixSave: async () => { const v = $('#s_sfix').value; await saveSpeechFix(v); toast(`對照表已儲存（${parseSpeechFix(v).length} 個詞）`); },
+  sfixDefault: () => { $('#s_sfix').value = DEFAULT_SPEECH_FIX; const o = $('#sfixOut'), q = $('#sfixTest'); if (o && q) o.innerHTML = sfixTestHtml(q.value, DEFAULT_SPEECH_FIX); toast('已填入預設，按「儲存對照表」才會生效'); },
+  sqAdopt: el => sqAdopt(Number(el.dataset.i)),
+  sqIgnoreFix: el => { const g = state.sqFix[Number(el.dataset.i)]; if (g) return sqMark(g.ids, 'ignored'); },
+  sqAddKw: el => sqAddKw(el),
+  sqDone: el => sqMark([el.dataset.id], 'done'),
+  sqIgnore: el => sqMark([el.dataset.id], 'ignored'),
+  sqPurge: async () => {
+    const ids = (state.sq || []).filter(x => (x.status || 'new') !== 'new').map(x => x.id);
+    if (!ids.length || !confirm(`刪除已處理／忽略的 ${ids.length} 筆回饋？`)) return;
+    await Store.removeSpeechQ(ids); state.sq = state.sq.filter(x => !ids.includes(x.id)); renderSqBox(); toast('已清除');
+  },
   addrSearch: () => runAddrSearch(),
   addrPick: el => pickAddr(Number(el.dataset.i)),
   modalBtn: el => { const b = state.modalBtns[Number(el.dataset.i)]; if (b) return b.onClick(); }
@@ -7219,7 +7590,8 @@ document.addEventListener('input', e => {
   const t = e.target;
   if (t.id === 'ageInput') { state.patient.age = t.value; renderParse(); renderResults(); }
   if (t.dataset && t.dataset.trg) { state.trg.vs[t.dataset.trg] = t.value; renderResults(); }
-  if (t.id === 'caseText') { state.caseText = t.value; onCaseInput(); }
+  if (t.id === 'caseText') { state.caseText = t.value; if (state.voice && lcsRatio(state.voice.out, t.value) < 0.5) state.voice = null; onCaseInput(); }
+  if ((t.id === 'sfixTest' || t.id === 's_sfix') && $('#sfixOut')) $('#sfixOut').innerHTML = sfixTestHtml($('#sfixTest').value, $('#s_sfix').value);
   if (t.id === 'hSearch') { state.hSearch = t.value; renderHospList(); }
   if (t.id === 'hpNote' && state.hp.draft) { state.hp.draft.note = t.value; hpChanged(false); }
   if (t.id === 'mciNote') { state.mci.note = t.value; if (state.mci.active) saveMci(); }
