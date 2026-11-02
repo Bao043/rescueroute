@@ -133,6 +133,27 @@ body{min-height:100vh;padding-bottom:calc(36px + env(safe-area-inset-bottom))}
 .run-stat{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;padding:10px 12px;border-radius:12px;background:var(--field);font-size:13px;margin-bottom:12px}
 .run-stat.bad{background:var(--red-soft)}.run-stat.bad>b{color:var(--red);font-size:15px}.run-stat .warn b{color:var(--amber)}.run-stat .ok{color:var(--green)}
 .run-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.cpr{margin:0 0 12px;padding:12px;border-radius:16px;background:var(--red-soft);border:1px solid rgba(229,57,45,.35)}
+.cpr-top{display:grid;grid-template-columns:1fr 1.2fr;gap:10px;align-items:stretch}
+.cpr-top small{display:block;font-size:12px;color:var(--muted);font-weight:700}.cpr-top b{font-size:30px;font-weight:900;line-height:1.1}
+.cpr-top>div:first-child b{color:var(--red)}
+.cpr-cyc{position:relative;padding:6px 10px 10px;border-radius:12px;background:var(--surface);overflow:hidden}
+.cpr-cyc i{position:absolute;left:0;bottom:0;height:5px;background:var(--green)}.cpr-cyc.over{background:var(--amber-soft)}.cpr-cyc.over b,.cpr-cyc.over small{color:var(--amber)}.cpr-cyc.over i{background:var(--amber)}
+.cpr-ctl{display:flex;gap:8px;align-items:stretch;margin-top:10px;flex-wrap:wrap}
+.cpr-btn{flex:1;min-width:130px;min-height:52px;border-radius:14px;border:2px solid var(--red);background:var(--surface);color:var(--red);font-weight:900;font-size:16px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.cpr-btn small{font-size:11px;font-weight:700;opacity:.8}.cpr-btn.on{background:var(--red);color:#fff}
+.cpr-btn.sm{flex:0 0 auto;min-width:0;padding:0 12px;font-size:13px;border-color:var(--line2);color:var(--muted)}.cpr-btn.sm.on{background:var(--ink);color:var(--on-ink);border-color:var(--ink)}
+.cpr-bpm{display:flex;border:1px solid var(--line2);border-radius:12px;overflow:hidden}
+.cpr-bpm button{border:0;background:var(--surface);color:var(--muted);font-weight:800;padding:0 10px;font-size:13px}.cpr-bpm .on{background:var(--ink);color:var(--on-ink)}
+.cpr-vol{margin-top:6px;font-size:12px;color:var(--amber);font-weight:700}
+.acls{margin-top:10px;padding:10px;border-radius:12px;background:var(--surface)}
+.acls-h{font-weight:900;font-size:14px;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}.acls-h span{font-size:11.5px;color:var(--muted);font-weight:700}
+.acls-t{margin-top:8px;font-size:14px;line-height:1.5}.acls-t.info{color:var(--muted)}
+.acls-t.due{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:10px;background:var(--red-soft);font-weight:800;color:var(--red)}
+.acls-t.due .btn{flex:none}
+.acls-rh{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:10px;font-size:12.5px;color:var(--muted)}
+.acls-n{margin-top:8px;font-size:11px;color:var(--dim)}
+.cpr-drugs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}.cpr-drugs .run-b{min-height:46px;font-size:13px}
 .run-b{min-height:52px;border-radius:14px;border:1px solid var(--line2);background:var(--card);color:var(--ink);font-weight:750;font-size:15px}
 .run-b.bad{border-color:var(--red);color:var(--red)}.run-b.ok{border-color:var(--green);color:var(--green)}.run-b.warn{border-color:var(--amber);color:var(--amber)}
 .run-b.on{background:var(--ink);color:var(--on-ink)}
@@ -761,6 +782,7 @@ b.ok,span.ok{color:var(--green)}b.warn,span.warn{color:var(--amber)}b.bad,span.b
 
 /* ---------- 語音輸入／交班 ---------- */
 #micBtn.rec{background:var(--red);border-color:var(--red);color:#fff;animation:fade .9s ease-in-out infinite alternate}
+#micBtn.rec.wait{background:var(--amber);border-color:var(--amber);color:#1a1a1a;animation:none}
 .ho-h{display:flex;align-items:flex-end;justify-content:space-between;gap:8px}
 .ho-h label{margin-bottom:5px}
 .ho{margin-top:8px;padding:10px 12px;border-radius:12px;background:var(--surface);border:1px solid var(--line);font-size:14px;line-height:1.6;white-space:pre-wrap}
@@ -1287,10 +1309,21 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "653252329719",
   appId: "1:653252329719:web:c3c9ca0891de64c69b13f2"
 };
-const APP_VERSION = 'v3.35.0';
+const APP_VERSION = 'v3.36.0';
 /* 更新紀錄：登入後台的人第一次打開新版本，會跳出「上次看過的版本之後」每一版改了什麼（可能一次上傳好幾版）
  * 每次改版請在最上面加一筆（版本號要和 APP_VERSION 一致） */
 const CHANGELOG = [
+  { v: 'v3.36.0', d: '2026-11-02', items: [
+    '途中紀錄新增「CPR 輔助」（按心跳停止後出現）：CPR 總時間、每 2 分鐘換手／判讀心律倒數',
+    'CPR 節拍器（100／110／120 次／分，靜音鍵開著也有聲音，CPR 中螢幕不會關）',
+    '語音播報：按下電擊、給藥、ROSC 等會念出「時間＋處置」，例如「15 點 30 分，Epinephrine 1 毫克」；2 分鐘、Epinephrine 3／5 分鐘也會語音提醒',
+    '依照 ACLS（AHA 2025）提示下一步：不可電擊盡快給 Epinephrine、可電擊第 2 次電擊後給 Epinephrine、第 3 次後 Amiodarone 300 mg、之後 150 mg；一鍵記錄給藥'] },
+  { v: 'v3.35.1', d: '2026-11-01', items: [
+    '修正 iPhone 語音輸入偶爾開了麥克風卻沒有辨識結果：改成一句一句聽、自動接著聽，並在麥克風沒啟動或很久沒有文字時自動重開',
+    '語音按鈕顯示「啟動中…」→「停止」，輸入框提示「聆聽中…」；語音中點輸入框改打字會自動停止語音',
+    '語音錯誤改成清楚的處理方式（權限、聽寫沒開、沒有網路、麥克風被占用），不再跳出「aborted」',
+    '辨識回饋不用再按「查詢」：自動查詢之後才改字或改選求救原因，停手 8 秒、清除案件或離開 App 時就會記下',
+    '後台「語音辨識」加「送一筆測試回饋」按鈕，可檢查 Firestore 規則是否已加入'] },
   { v: 'v3.35.0', d: '2026-10-31', items: [
     '語音校正：後台新增「語音辨識」分頁，可編輯易錯詞對照表（全隊共用），並可輸入句子試看校正結果',
     '語音結果自動比對同音字與台灣口音（ㄓㄗ、ㄔㄘ、ㄕㄙ、ㄖㄌ、ㄋㄌ、ㄈㄏ、ㄣㄥ、ㄧㄣㄧㄥ），3 個字以上的醫療關鍵字聽錯會自動改正；畫面會顯示改了哪些字',
@@ -3126,12 +3159,14 @@ const SpeechLearn = {
     doc.uid = Store.uid() || '';
     Promise.resolve().then(() => Store.addSpeechQ(doc)).catch(err => console.warn('辨識回饋失敗', err));
   },
-  timer: null,
-  // 查詢後才改選求救原因：等幾秒（可能還在換）再記
-  later() { clearTimeout(this.timer); this.timer = setTimeout(() => this.onSearch(), 4000); },
-  // 按「查詢」時：比對語音結果與送出的文字、記下辨識不到或判錯的主訴
+  timer: null, pending: false,
+  // 已經查詢（含自動查詢）後才改字或改選求救原因：等使用者停手幾秒再記
+  later(ms = 4000) { clearTimeout(this.timer); this.pending = true; this.timer = setTimeout(() => this.onSearch(), ms); },
+  // 離開頁面、清除案件前：把還在等的那一筆先記下來
+  flush() { if (this.pending) this.onSearch(); },
+  // 查詢（按鈕或自動查詢）時：比對語音結果與送出的文字、記下辨識不到或判錯的主訴
   onSearch() {
-    clearTimeout(this.timer);
+    clearTimeout(this.timer); this.pending = false;
     if (!this.enabled() || state.tab !== 'patient') return;
     const text = state.caseText.trim(); if (!text) return;
     const src = state.voice && state.voice.out ? 'voice' : 'text';
@@ -3253,6 +3288,7 @@ function onCaseInput() {
   if (!(aiAuto() && state.ai.result)) applyParsed(kw, 'kw');
   else renderParse();
   if (aiAuto()) AI.schedule(); else renderAi();
+  if (state.searched && !Speech.on) SpeechLearn.later(8000);   // 自動查詢之後才改字：停手 8 秒後記下
 }
 function fmtAge(a) {
   const n = Number(a);
@@ -4415,7 +4451,7 @@ const RUN_KEY = 'hf_run_v1';
 const RUN_TYPES = {
   arrest: { t: '心跳停止', cls: 'bad' }, shock: { t: '電擊', cls: 'bad' }, rosc: { t: 'ROSC', cls: 'ok' },
   drug: { t: '給藥', cls: 'info' }, airway: { t: '呼吸道', cls: 'info' }, tp: { t: 'TP 體外心律調節', cls: 'info' },
-  ams: { t: '意識改變', cls: 'warn' }, trauma: { t: '創傷處置', cls: 'info' }, note: { t: '備註', cls: '' }
+  ams: { t: '意識改變', cls: 'warn' }, trauma: { t: '創傷處置', cls: 'info' }, note: { t: '備註', cls: '' }, rhythm: { t: '心律判讀', cls: 'warn' }
 };
 const RUN_TRAUMA = ['止血帶', '傷口填塞', '骨盆固定帶', '頸圈／脊椎限制', '胸部針刺減壓', '保暖'];
 const RUN_DRUGS = ['Epinephrine 1 mg', 'Amiodarone 300 mg', 'Amiodarone 150 mg', 'Atropine', 'Adenosine', 'NTG', 'Aspirin', '葡萄糖（D50）', 'Naloxone', 'Midazolam', 'TXA 1 g'];
@@ -4425,7 +4461,7 @@ function loadRun() {
   return r && Array.isArray(r.events) && Date.now() - (r.at || 0) < 12 * 3600e3 ? { events: r.events, dest: r.dest || '' } : { events: [], dest: '' };
 }
 function saveRun() { writeLS(RUN_KEY, { ...state.run, at: Date.now() }); }
-function clearRun() { state.run = { events: [], dest: '' }; state.reroute = null; state.trg = { on: [], off: [], vs: {} }; state.ecpr = { on: [], off: [] }; state.airway = { on: [], off: [] }; try { localStorage.removeItem(RUN_KEY); } catch (e) {} renderRunFab(); renderRunBar(); if (isRoute('')) renderHint(); }
+function clearRun() { Metro.stop(); CprCue.reset(); state.run = { events: [], dest: '' }; state.reroute = null; state.trg = { on: [], off: [], vs: {} }; state.ecpr = { on: [], off: [] }; state.airway = { on: [], off: [] }; try { localStorage.removeItem(RUN_KEY); } catch (e) {} renderRunFab(); renderRunBar(); if (isRoute('')) renderHint(); }
 const fmcSec = ts => new Date(ts).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
 const mmss = ms => { const t = Math.max(0, Math.floor(ms / 1000)); return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`; };
 function runLabel(e) { return e.text ? (['drug', 'airway', 'trauma', 'note'].includes(e.type) ? e.text : `${RUN_TYPES[e.type].t}（${e.text}）`) : RUN_TYPES[e.type].t; }
@@ -4448,7 +4484,7 @@ function renderRunFab() {
   const n = state.run.events.length, st = runStats();
   b.hidden = !(isRoute('') && (state.searched || n));
   b.classList.toggle('alarm', st.inArrest);
-  b.innerHTML = `${ic('list', 'sm')}<span>${st.inArrest ? 'CPR 中' : '途中紀錄'}</span>${n ? `<em>${n}</em>` : ''}`;
+  b.innerHTML = `${ic('list', 'sm')}<span>${st.inArrest ? (Metro.on ? `CPR 中・♪${Metro.bpm()}` : 'CPR 中') : '途中紀錄'}</span>${n ? `<em>${n}</em>` : ''}`;
 }
 function runStatHtml() {
   const st = runStats(), now = Date.now();
@@ -4463,6 +4499,7 @@ function runBodyHtml() {
   const list = state.run.events.map((e, i) => ({ e, i })).reverse();
   const pick = state.runPick === 'drug' ? RUN_DRUGS : state.runPick === 'airway' ? RUN_AIRWAY : state.runPick === 'trauma' ? RUN_TRAUMA : null;
   return `<div id="runStat">${runStatHtml()}</div>
+    <div id="cprBox">${cprPanelHtml()}</div>
     <div class="run-grid">
       <button class="run-b bad" data-act="runEv" data-t="arrest">心跳停止</button>
       <button class="run-b bad" data-act="runEv" data-t="shock">電擊</button>
@@ -4489,8 +4526,151 @@ function renderRunModal() { const b = $('#runBody'); if (b && !$('#modal').hidde
 function runAdd(type, text = '') {
   const e = { t: Date.now(), type, text: String(text).slice(0, 60) };
   state.run.events.push(e); saveRun(); renderRunFab(); renderRunModal();
+  announceRun(e);
   return e;
 }
+/* ========== CPR 輔助（心跳停止後在途中紀錄出現）：節拍器、語音播報、2 分鐘循環、依 ACLS 的給藥提示 ==========
+ * 依 AHA 2025 成人心跳停止流程：
+ *   可電擊（VF/pVT）：電擊 → CPR 2 分 → 第 2 次電擊後 Epinephrine 1 mg（每 3–5 分）→ 第 3 次電擊後 Amiodarone 300 mg → 之後 150 mg
+ *   不可電擊（PEA／Asystole）：盡快給 Epinephrine 1 mg，之後每 3–5 分
+ *   按壓 100–120 次／分、每 2 分鐘換手並判讀心律
+ * 只是提醒，實際給藥依線上醫療指導與單位預立醫囑。
+ */
+const CPR_CYCLE = 120e3, EPI_MIN = 180e3, EPI_MAX = 300e3;
+const QUICK_DRUGS = ['Epinephrine 1 mg', 'Amiodarone 300 mg', 'Amiodarone 150 mg'];
+// 語音播報：時間＋處置，例如「15 點 30 分，Epinephrine 1 毫克」
+const Voice = {
+  ok() { return 'speechSynthesis' in window && localCfg.cprVoice !== false; },
+  voice() {
+    const vs = speechSynthesis.getVoices();
+    return vs.find(v => /zh[-_]TW/i.test(v.lang)) || vs.find(v => /zh[-_](HK|Hant)/i.test(v.lang)) || vs.find(v => /^zh/i.test(v.lang)) || null;
+  },
+  spoken(text) {
+    return String(text).replace(/(\d+(?:\.\d+)?)\s*mg\b/gi, '$1 毫克').replace(/(\d+(?:\.\d+)?)\s*g\b/g, '$1 公克').replace(/（[^）]*）/g, '').replace(/／/g, ' ');
+  },
+  clock(ts) { const d = new Date(ts), m = d.getMinutes(); return `${d.getHours()}點${m ? m + '分' : '整'}`; },
+  say(text, opt = {}) {
+    if (!this.ok() || !text) return;
+    try {
+      if (opt.flush !== false) speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(this.spoken(text));
+      u.lang = 'zh-TW'; const v = this.voice(); if (v) try { u.voice = v; } catch (e) { /* 用預設聲音 */ }
+      u.rate = 1.2; u.pitch = 1; u.volume = 1;
+      speechSynthesis.speak(u);
+    } catch (e) { /* 不支援就略過 */ }
+  }
+};
+// 節拍器：Web Audio 排程（不會因為畫面更新而走拍）；iPhone 靜音鍵開著也照樣出聲
+const Metro = {
+  ctx: null, on: false, timer: null, next: 0, beat: 0, wake: null,
+  bpm() { return [100, 110, 120].includes(Number(localCfg.metroBpm)) ? Number(localCfg.metroBpm) : 110; },
+  start() {
+    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) { /* 舊版 */ }
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) throw new Error('這個瀏覽器不支援節拍器');
+    if (!this.ctx) {
+      this.ctx = new AC();
+      const comp = this.ctx.createDynamicsCompressor(); comp.threshold.value = -6; comp.ratio.value = 8;
+      this.out = this.ctx.createGain(); this.out.gain.value = 1;
+      this.out.connect(comp); comp.connect(this.ctx.destination);
+    }
+    if (this.ctx.state === 'suspended') this.ctx.resume();
+    this.on = true; this.beat = 0; this.next = this.ctx.currentTime + .08;
+    clearInterval(this.timer); this.timer = setInterval(() => this.pump(), 25);
+    this.keepAwake(true);
+  },
+  pump() {
+    if (!this.on || !this.ctx) return;
+    const gap = 60 / this.bpm();
+    while (this.next < this.ctx.currentTime + .12) { this.click(this.next, this.beat % 30 === 0); this.next += gap; this.beat++; }
+  },
+  // 清脆的「答」：方波＋快速衰減；每 30 下稍微高一點（30:2 時方便數）
+  click(at, accent) {
+    const c = this.ctx, o = c.createOscillator(), g = c.createGain();
+    o.type = 'square'; o.frequency.value = accent ? 1760 : 1320;
+    g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(1, at + .002); g.gain.exponentialRampToValueAtTime(0.0001, at + .05);
+    o.connect(g); g.connect(this.out); o.start(at); o.stop(at + .06);
+  },
+  stop() { this.on = false; clearInterval(this.timer); this.timer = null; this.keepAwake(false); renderRunFab(); },
+  toggle() { if (this.on) this.stop(); else this.start(); renderRunModal(); renderRunFab(); },
+  // CPR 中保持螢幕不關
+  async keepAwake(on) {
+    try {
+      if (on && !this.wake && navigator.wakeLock) { this.wake = await navigator.wakeLock.request('screen'); this.wake.addEventListener('release', () => { this.wake = null; }); }
+      else if (!on && this.wake) { await this.wake.release(); this.wake = null; }
+    } catch (e) { /* 不支援就略過 */ }
+  }
+};
+// 目前在哪一條路徑、下一步建議什麼
+function aclsState(now = Date.now()) {
+  const st = runStats(); if (!st.inArrest) return null;
+  const ev = state.run.events.filter(e => e.t >= st.arrestAt);
+  const shocks = ev.filter(e => e.type === 'shock'), rhythms = ev.filter(e => e.type === 'rhythm');
+  const drug = re => ev.filter(e => e.type === 'drug' && re.test(e.text));
+  const epis = drug(/^epinephrine/i), a300 = drug(/^amiodarone\s*300/i), a150 = drug(/^amiodarone\s*150/i);
+  const lastRhythm = rhythms.slice(-1)[0];
+  const path = lastRhythm ? (/^可電擊/.test(lastRhythm.text) ? 'vf' : 'ns') : shocks.length ? 'vf' : '';
+  const cycleFrom = Math.max(st.arrestAt, ...shocks.map(e => e.t), ...rhythms.map(e => e.t));
+  const lastEpi = epis.length ? epis[epis.length - 1].t : null, sinceEpi = lastEpi ? now - lastEpi : null;
+  const tips = [];
+  const epiTip = first => ({ x: 'Epinephrine 1 mg', text: first ? '給予 Epinephrine 1 mg' : `給予 Epinephrine 1 mg（距上次 ${mmss(sinceEpi)}，每 3–5 分）`, due: true });
+  if (!path) tips.push({ text: '先判讀心律（AED 分析）：可電擊就電擊，不可電擊就盡快給 Epinephrine', info: true });
+  else if (path === 'ns') {
+    if (!epis.length) tips.push(epiTip(true));
+    else if (sinceEpi >= EPI_MIN) tips.push(epiTip(false));
+  } else {
+    if (shocks.length >= 2 && !epis.length) tips.push(epiTip(true));
+    else if (epis.length && sinceEpi >= EPI_MIN) tips.push(epiTip(false));
+    if (shocks.length >= 3 && !a300.length) tips.push({ x: 'Amiodarone 300 mg', text: '給予 Amiodarone 300 mg（第 3 次電擊後）', due: true });
+    else if (a300.length && !a150.length && shocks.length >= 5) tips.push({ x: 'Amiodarone 150 mg', text: '給予 Amiodarone 150 mg（第二劑）', due: true });
+    if (shocks.length === 1 && !tips.length) tips.push({ text: 'CPR 2 分鐘後再判讀心律；第 2 次電擊後給 Epinephrine', info: true });
+  }
+  const next = lastEpi && sinceEpi < EPI_MIN ? EPI_MIN - sinceEpi : null;
+  return { st, path, shocks: shocks.length, epis: epis.length, a300: a300.length, a150: a150.length, cycleFrom, cycleMs: now - cycleFrom, sinceEpi, nextEpiIn: next, tips };
+}
+function cprPanelHtml() {
+  const a = aclsState(); if (!a) return '';
+  const cyc = a.cycleMs, over = cyc >= CPR_CYCLE, pct = Math.min(100, cyc / CPR_CYCLE * 100);
+  const pathTxt = a.path === 'vf' ? '可電擊（VF/pVT）' : a.path === 'ns' ? '不可電擊（PEA／Asystole）' : '尚未判讀';
+  return `<div class="cpr" id="cprPanel">
+    <div class="cpr-top"><div><small>CPR 已</small><b class="num">${mmss(Date.now() - a.st.arrestAt)}</b></div>
+      <div class="cpr-cyc ${over ? 'over' : ''}"><small>${over ? '換手・判讀心律' : '本輪 2 分鐘'}</small><b class="num">${mmss(cyc)}</b><i style="width:${pct}%"></i></div></div>
+    <div class="cpr-ctl">
+      <button class="cpr-btn ${Metro.on ? 'on' : ''}" data-act="metro">${Metro.on ? '■ 停止節拍器' : '▶ 節拍器'}<small>${Metro.bpm()} 次／分</small></button>
+      <div class="cpr-bpm">${[100, 110, 120].map(b => `<button class="${Metro.bpm() === b ? 'on' : ''}" data-act="metroBpm" data-v="${b}">${b}</button>`).join('')}</div>
+      <button class="cpr-btn sm ${localCfg.cprVoice !== false ? 'on' : ''}" data-act="cprVoice">${localCfg.cprVoice !== false ? '語音播報 開' : '語音播報 關'}</button>
+    </div>
+    ${Metro.on ? '<div class="cpr-vol">請把手機音量調到最大（網頁無法自動調整系統音量）</div>' : ''}
+    <div class="acls"><div class="acls-h">依照 ACLS<span>${pathTxt}・電擊 ${a.shocks}・Epi ${a.epis}${a.a300 || a.a150 ? `・Amio ${a.a300 ? '300' : ''}${a.a150 ? '+150' : ''}` : ''}</span></div>
+      ${a.tips.map(t => t.info ? `<div class="acls-t info">${esc(t.text)}</div>`
+        : `<div class="acls-t due"><span>建議：${esc(t.text)}</span><button class="btn sm primary" data-act="runEv" data-t="drug" data-x="${esc(t.x)}">記錄給藥</button></div>`).join('')}
+      ${a.nextEpiIn != null ? `<div class="acls-t">下一劑 Epinephrine：<b class="num">${mmss(a.nextEpiIn)}</b> 後（每 3–5 分）</div>` : ''}
+      <div class="acls-rh"><span>判讀心律：</span><button class="chip" data-act="runEv" data-t="rhythm" data-x="可電擊（VF/pVT）">可電擊</button><button class="chip" data-act="runEv" data-t="rhythm" data-x="不可電擊（PEA／Asystole）">不可電擊</button></div>
+      <div class="acls-n">依 AHA 2025 成人心跳停止流程提示；實際給藥依線上醫療指導與單位預立醫囑。</div>
+    </div>
+    <div class="cpr-drugs">${QUICK_DRUGS.map(d => `<button class="run-b" data-act="runEv" data-t="drug" data-x="${esc(d)}">${esc(d.replace(' mg', ' mg'))}</button>`).join('')}</div>
+  </div>`;
+}
+// 每秒：更新面板、到點時語音提醒（每件事只提醒一次）
+const CprCue = {
+  said: new Set(),
+  reset() { this.said.clear(); },
+  once(key, text) { if (this.said.has(key)) return; this.said.add(key); Voice.say(text, { flush: false }); },
+  tick() {
+    const a = aclsState(); if (!a) return;
+    const n = Math.floor(a.cycleMs / CPR_CYCLE);
+    if (n >= 1) this.once(`cyc:${a.cycleFrom}:${n}`, n === 1 ? '兩分鐘，換手，判讀心律' : `已經${n * 2}分鐘，判讀心律`);
+    if (a.sinceEpi != null && a.sinceEpi >= EPI_MIN) this.once(`epi3:${a.epis}`, '距上次 Epinephrine 三分鐘');
+    if (a.sinceEpi != null && a.sinceEpi >= EPI_MAX) this.once(`epi5:${a.epis}`, 'Epinephrine 已經五分鐘');
+    if (a.path === 'vf' && a.shocks >= 3 && !a.a300) this.once('a300', '可考慮 Amiodarone 300 毫克');
+  }
+};
+function announceRun(e) {
+  const nShock = state.run.events.filter(x => x.type === 'shock').length;
+  const what = e.type === 'arrest' ? '心跳停止，開始 CPR' : e.type === 'rosc' ? 'ROSC，恢復自發循環' : e.type === 'shock' ? `第${nShock}次電擊` : runLabel(e);
+  Voice.say(`${Voice.clock(e.t)}，${what}`);
+}
+
 function findRule(id, proto) { return state.rules.find(r => r.id === id) || state.rules.find(r => proto && r.protocol === proto) || null; }
 const TRAUMA_IDS = ['r05', 'r06', 'r14', 'r26', 'r08'];
 // 途中心跳停止：改用 OHCA（內科／外傷）重新建議醫院；外傷 OHCA 會開始復甦性開胸計時
@@ -4588,6 +4768,8 @@ const REFS = [
     { c: 'Moore EE, Knudson MM, Burlew CC, et al. Defining the limits of resuscitative emergency department thoracotomy: a contemporary Western Trauma Association perspective. J Trauma. 2011;70(2):334–339.', doi: '10.1097/TA.0b013e3182077c35', use: '18 家創傷中心前瞻性研究：鈍傷存活者 CPR 最長 9 分、穿刺傷最長 15 分（10／15 分的數據來源）' },
     { c: 'Burlew CC, et al. Western Trauma Association critical decisions in trauma: resuscitative thoracotomy. J Trauma Acute Care Surg. 2012;73(6):1359–1363.', doi: '10.1097/TA.0b013e318270d2df', use: '穿刺傷 CPR ≤15 分、鈍傷 ≤10 分' }] },
   { k: 'OHCA', t: '到院前心跳停止（ECPR）', items: [
+    { c: 'American Heart Association. 2025 Adult Cardiac Arrest Algorithm（ACLS）. 2025.', url: 'https://cpr.heart.org/-/media/CPR-Files/CPR-Guidelines-Files/2025-Algorithms/Algorithm-ACLS-CA-250527.pdf',
+      use: '途中紀錄「CPR 輔助」的提示：按壓 100–120 次／分、每 2 分鐘判讀心律；Epinephrine 1 mg 每 3–5 分（不可電擊盡快給、可電擊在第 2 次電擊後）；Amiodarone 300 mg（第 3 次電擊後）、第二劑 150 mg' },
     { c: 'American Heart Association. 2025 American Heart Association Guidelines for Cardiopulmonary Resuscitation and Emergency Cardiovascular Care（Highlights；含 Part 9 Adult Advanced Life Support. Circulation. 2025）', url: 'https://cpr.heart.org/en/resuscitation-science/cpr-and-ecc-guidelines/adult-advanced-life-support',
       use: 'ECPR 用於經過篩選的病人、區域化轉送；到院前為了 ECPR 快速轉送只適用於少數高度篩選的病人' },
     { c: 'Yannopoulos D, et al. Advanced reperfusion strategies for patients with out-of-hospital cardiac arrest and refractory ventricular fibrillation (ARREST): a phase 2, single centre, open-label, randomised controlled trial. Lancet. 2020;396:1807–1816.', doi: '10.1016/S0140-6736(20)32338-2',
@@ -4952,19 +5134,46 @@ async function makeHandover(hid) {
   finally { if (document.body.contains(btn)) { btn.innerHTML = old; btn.disabled = false; } }
 }
 
-/* ========== 語音輸入 ========== */
+/* ========== 語音輸入 ==========
+ * iPhone（Safari／加入主畫面）的語音辨識用「連續模式」時，偶爾會開了麥克風卻一直沒有結果、或被系統中斷。
+ * 所以 iPhone 改成「一句一句聽」：每句結束就把文字收下來、自動接著聽；另外有看門狗：
+ *   麥克風 3.5 秒內沒啟動 → 自動重開一次；有收音但 8 秒都沒有結果 → 自動重開（最多 3 次）。
+ * 使用者按「停止」、或改用鍵盤打字時才真正結束。
+ */
+const IS_IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const SPEECH_ERR = {
+  'not-allowed': '麥克風權限被拒絕：iPhone 請到「設定 › Safari › 麥克風」允許，或在網址列「aA › 網站設定」允許麥克風',
+  'service-not-allowed': '這支手機的語音辨識沒有開啟：iPhone 請到「設定 › 一般 › 鍵盤」打開「啟用聽寫」，或改用鍵盤上的麥克風',
+  'audio-capture': '抓不到麥克風：可能正在通話或被其他 App 使用，請關掉後再試',
+  'network': '語音辨識需要網路，請確認連線後再按一次「說話」',
+  'language-not-supported': '這支手機不支援中文語音辨識，請改用鍵盤上的麥克風聽寫'
+};
 const Speech = {
-  rec: null, on: false, base: '',
+  rec: null, on: false, base: '', gen: 0, live: false, sessionTxt: '', lastHeard: 0, startedAt: 0, timer: null,
+  retries: 0, empties: 0, sessions: 0, prevFixes: [],
   supported() { return !!(window.SpeechRecognition || window.webkitSpeechRecognition); },
-  toggle() {
-    if (this.on) { this.stop(); return; }
+  toggle() { if (this.on) { this.stop(); return; } this.start(); },
+  start() {
     if (!this.supported()) throw new Error('這個瀏覽器不支援語音輸入。iPhone 請用 Safari，或用鍵盤上的麥克風聽寫');
-    const R = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const rec = this.rec = new R();
-    rec.lang = 'zh-TW'; rec.interimResults = true; rec.continuous = true; rec.maxAlternatives = 3;
-    this.base = state.caseText ? state.caseText.replace(/\s*$/, '') + ' ' : '';
-    const prevFixes = state.voice && state.voice.fixes ? state.voice.fixes : [];
+    if (document.activeElement && document.activeElement.id === 'caseText') document.activeElement.blur();   // 鍵盤開著會讓 iPhone 中斷辨識
+    this.on = true; this.retries = 0; this.empties = 0; this.sessions = 0; this.startedAt = Date.now();
+    this.prevFixes = state.voice && state.voice.fixes ? state.voice.fixes : [];
+    this.takeBase();
+    this.open();
+  },
+  takeBase() { this.base = state.caseText.trim() ? state.caseText.replace(/\s*$/, '') + ' ' : ''; },
+  open() {
+    const R = window.SpeechRecognition || window.webkitSpeechRecognition, gen = ++this.gen;
+    this.drop();
+    let rec;
+    try { rec = this.rec = new R(); } catch (e) { this.fail('語音辨識無法啟動，請再按一次「說話」'); return; }
+    rec.lang = 'zh-TW'; rec.interimResults = true; rec.continuous = !IS_IOS; rec.maxAlternatives = IS_IOS ? 1 : 3;
+    this.live = false; this.sessionTxt = ''; this.lastHeard = Date.now(); this.sessions++;
+    const mine = () => gen === this.gen && this.on;
+    rec.onstart = rec.onaudiostart = () => { if (mine()) { this.live = true; renderMic(); } };
     rec.onresult = ev => {
+      if (!mine()) return;
+      this.live = true; this.lastHeard = Date.now(); this.empties = 0;
       let txt = '';
       for (let i = 0; i < ev.results.length; i++) {
         const r = ev.results[i];
@@ -4976,23 +5185,68 @@ const Speech = {
         }
         txt += best;
       }
+      this.sessionTxt = txt;
       const c = speechCorrect(this.base + txt);
       setCaseText(c.text, true);
-      const fx = prevFixes.concat(c.fixes);
+      const fx = this.prevFixes.concat(c.fixes);
       state.voice = { out: c.text, fixes: fx.filter((x, k) => fx.findIndex(y => y.from === x.from && y.to === x.to) === k).slice(-8) };
-      renderParse();
+      this.prevFixes = state.voice.fixes;
+      renderParse(); renderMic();
     };
-    rec.onerror = ev => { toast(ev.error === 'not-allowed' ? '麥克風權限被拒絕，請到設定允許' : '語音辨識中斷：' + ev.error); this.stop(); };
-    rec.onend = () => { if (this.on) { this.on = false; renderMic(); } };
-    rec.start(); this.on = true; renderMic();
+    rec.onerror = ev => {
+      if (gen !== this.gen) return;
+      const msg = SPEECH_ERR[ev.error];
+      if (msg) this.fail(msg);   // 其他（no-speech、aborted）交給 onend 自動接著聽
+    };
+    rec.onend = () => {
+      if (!mine()) return;
+      // 這一句收下來，自動接著聽（iPhone 每句結束就會停）
+      if (this.sessionTxt) this.takeBase(); else this.empties++;
+      if (this.empties >= 4) { this.stop(); toast('沒有聽到說話聲，語音輸入已停止；要再說請按「說話」'); return; }
+      if (Date.now() - this.startedAt > 180000 || this.sessions > 60) { this.stop(); toast('語音輸入已自動停止（超過 3 分鐘）'); return; }
+      setTimeout(() => { if (mine()) this.open(); }, 200);
+    };
+    try { rec.start(); }
+    catch (e) { setTimeout(() => { if (mine()) { if (this.retries++ < 2) this.open(); else this.fail('語音辨識無法啟動，請再按一次「說話」'); } }, 400); return; }
+    renderMic();
+    clearTimeout(this.timer); this.timer = setTimeout(() => this.watch(gen), 3500);
   },
-  stop() { try { if (this.rec) this.rec.stop(); } catch (e) { /* ignore */ } this.on = false; renderMic(); }
+  // 看門狗：麥克風沒啟動、或有收音卻一直沒有文字 → 重開
+  watch(gen) {
+    if (!this.on || gen !== this.gen) return;
+    if (!this.live) {
+      if (this.retries++ < 2) { this.open(); return; }
+      this.fail('麥克風沒有啟動：請再按一次「說話」，或改用鍵盤上的麥克風聽寫'); return;
+    }
+    if (Date.now() - this.lastHeard > 8000) {
+      if (this.sessionTxt) this.takeBase();
+      if (++this.empties >= 4) { this.stop(); toast('沒有聽到說話聲，語音輸入已停止；要再說請按「說話」'); return; }
+      this.open(); return;
+    }
+    this.timer = setTimeout(() => this.watch(gen), 1500);
+  },
+  drop() {
+    const r = this.rec; this.rec = null;
+    if (r) { r.onresult = r.onend = r.onerror = r.onstart = r.onaudiostart = null; try { r.abort ? r.abort() : r.stop(); } catch (e) { /* ignore */ } }
+  },
+  fail(msg) { this.stop(); toast(msg, 6000); },
+  stop() {
+    if (this.on && state.searched) SpeechLearn.later(8000);
+    this.on = false; this.live = false; this.gen++; clearTimeout(this.timer);
+    const r = this.rec; this.rec = null;
+    if (r) { r.onresult = r.onend = r.onerror = r.onstart = r.onaudiostart = null; try { r.stop(); } catch (e) { /* ignore */ } }
+    renderMic();
+  }
 };
 function renderMic() {
   const b = $('#micBtn'); if (!b) return;
+  const listening = Speech.on && Speech.live;
   b.classList.toggle('rec', Speech.on);
-  b.innerHTML = `${ic('mic', 'sm')}${Speech.on ? '停止' : '說話'}`;
+  b.classList.toggle('wait', Speech.on && !Speech.live);
+  b.innerHTML = `${ic('mic', 'sm')}${!Speech.on ? '說話' : listening ? '停止' : '啟動中…'}`;
   b.setAttribute('aria-pressed', Speech.on ? 'true' : 'false');
+  const ta = $('#caseText');
+  if (ta) ta.placeholder = Speech.on ? (listening ? '聆聽中…請直接說出派遣內容（說完按「停止」）' : '麥克風啟動中…') : '貼上勤務中心的案件摘要，例如：急病 一名男性年約35歲 主訴內科OHCA';
 }
 
 
@@ -7047,16 +7301,16 @@ function renderSqBox() {
   const done = all.length - open.length;
   box.innerHTML = `<section class="card">
       <div class="sec-title">救護員的修正（候選校正）<span class="sq-cnt">${state.sqFix.length}</span></div>
-      <div class="hint" style="margin:0 0 8px">用語音輸入後，救護員把字改掉才查詢，App 會記下「聽成什麼 → 改成什麼」（只記醫療關鍵字，不記其他內容）。同一組出現越多次越可信，按「採用」就加進上面的對照表。</div>
+      <div class="hint" style="margin:0 0 8px">用語音輸入派遣內容後，救護員手動把聽錯的醫療詞改掉（改完 8 秒、按查詢、清除案件或離開 App 時記下），App 會記「聽成什麼 → 改成什麼」，只記醫療關鍵字，不記其他內容。同一組出現越多次越可信，按「採用」就加進上面的對照表。</div>
       ${state.sqFix.length ? state.sqFix.map((g, i) => `<div class="sq-row"><div class="main"><b>${esc(g.wrong)} → ${esc(g.right)}</b><small>${g.n} 次・最近 ${fmtMD(g.at)}</small></div>
         <button class="btn sm primary" data-act="sqAdopt" data-i="${i}">採用</button><button class="btn sm ghost" data-act="sqIgnoreFix" data-i="${i}">忽略</button></div>`).join('') : '<div class="empty">目前沒有</div>'}
     </section>
     <section class="card">
       <div class="sec-title">辨識不到／判斷錯的派遣內容<span class="sq-cnt">${misses.length}</span></div>
-      <div class="hint" style="margin:0 0 8px">救護員查詢時，App 沒辨識出求救原因、或救護員改選了別的，就會記在這裡（近 90 天）。內容在手機上就已去除數字、地址與稱謂。從內容挑出代表這個狀況的詞，加進對應求救原因的關鍵字，下次就認得；聽錯的字請加到上面的對照表。</div>
+      <div class="hint" style="margin:0 0 8px">「派遣內容」有文字，但 App 沒辨識出求救原因、救護員自己點選了求救原因；或 App 辨識成 A、救護員改點 B。查詢（自動查詢也算）之後就會記在這裡（近 90 天）。只點求救原因、沒有輸入派遣內容的不會記。內容在手機上就已去除數字、地址與稱謂。從內容挑出代表這個狀況的詞，加進對應求救原因的關鍵字，下次就認得；聽錯的字請加到上面的對照表。</div>
       ${misses.length ? misses.map(sqMissHtml).join('') : '<div class="empty">目前沒有</div>'}
     </section>
-    ${done ? `<div class="btn-wrap"><button class="btn ghost" data-act="sqPurge">清除已處理／忽略的 ${done} 筆</button></div>` : ''}`;
+    <div class="btn-wrap"><button class="btn ghost" data-act="sqTest">送一筆測試回饋（檢查雲端規則）</button>${done ? `<button class="btn ghost" data-act="sqPurge">清除已處理／忽略的 ${done} 筆</button>` : ''}</div>`;
 }
 async function sqMark(ids, status) {
   await Store.updateSpeechQ(ids, { status });
@@ -7308,6 +7562,7 @@ const ACTIONS = {
     setCaseText(t);
   },
   clearCase: () => {
+    SpeechLearn.flush();
     AI.cancel(); if (Speech.on) Speech.stop();
     state.caseText = ''; state.lastParsed = null; state.parsed = null; state.kwParsed = null; state.ai = { state: 'idle' };
     state.patient = { sex: '', age: '', ruleId: '' }; state.trg = { on: [], off: [], vs: {} }; state.ecpr = { on: [], off: [] }; state.airway = { on: [], off: [] };
@@ -7425,6 +7680,9 @@ const ACTIONS = {
   },
   trgClear: () => { state.trg = { on: [], off: [], vs: {} }; renderResults(); toast('已清除檢傷勾選與生命徵象（派遣內容帶入的仍會保留）'); },
   runPick: el => { state.runPick = state.runPick === el.dataset.k ? '' : el.dataset.k; renderRunModal(); },
+  metro: () => Metro.toggle(),
+  metroBpm: el => { localCfg.metroBpm = Number(el.dataset.v); saveLocalCfg(); renderRunModal(); renderRunFab(); },
+  cprVoice: () => { localCfg.cprVoice = localCfg.cprVoice === false; saveLocalCfg(); if (localCfg.cprVoice) Voice.say('語音播報開啟'); else try { speechSynthesis.cancel(); } catch (e) {} renderRunModal(); },
   runEv: el => {
     const t = el.dataset.t, e = runAdd(t, el.dataset.x || '');
     if (t === 'drug' || t === 'airway' || t === 'trauma') { state.runPick = ''; renderRunModal(); }
@@ -7432,7 +7690,7 @@ const ACTIONS = {
     if (t === 'trauma' && isRoute('')) renderHint();
     if (t === 'arrest' && isRoute('')) onArrest(e.t);
     else if (t === 'ams' && isRoute('')) onAms(e.t);
-    else if (t === 'rosc') toast(`ROSC ${fmtClock(e.t)}：12 導程心電圖若為 STEMI，考慮送可做心導管的醫院`, 4500);
+    else if (t === 'rosc') { if (Metro.on) Metro.stop(); toast(`ROSC ${fmtClock(e.t)}：12 導程心電圖若為 STEMI，考慮送可做心導管的醫院`, 4500); }
   },
   runNote: () => { const t = prompt('備註（不要輸入病患個資）', ''); if (t && t.trim()) runAdd('note', t.trim()); },
   runDel: el => { const i = Number(el.dataset.i); if (state.run.events[i] && confirm(`刪除「${runLabel(state.run.events[i])}」這筆？`)) { state.run.events.splice(i, 1); saveRun(); renderRunFab(); renderRunModal(); } },
@@ -7529,6 +7787,17 @@ const ACTIONS = {
   sqAddKw: el => sqAddKw(el),
   sqDone: el => sqMark([el.dataset.id], 'done'),
   sqIgnore: el => sqMark([el.dataset.id], 'ignored'),
+  sqTest: async () => {
+    if (Store.mode !== 'demo' && !Store.uid()) throw new Error('還沒連上雲端（匿名登入失敗），請重新整理後再試');
+    try {
+      await Store.addSpeechQ({ type: 'miss', src: 'text', text: '（後台測試）病人覺得怪怪的', at: Date.now(), uid: Store.uid() || '', status: 'new' });
+    } catch (e) {
+      const denied = /permission|insufficient/i.test(String(e && (e.code || e.message)));
+      throw new Error(denied ? '雲端拒絕寫入：Firestore 規則還沒有「辨識回饋（speechq）」那一段，或還沒按「發布」' : '送出失敗：' + (e.message || e));
+    }
+    state.sq = await Store.loadSpeechQ(); renderSqBox();
+    toast('測試回饋已寫入雲端，規則正常；這筆可以按「忽略」');
+  },
   sqPurge: async () => {
     const ids = (state.sq || []).filter(x => (x.status || 'new') !== 'new').map(x => x.id);
     if (!ids.length || !confirm(`刪除已處理／忽略的 ${ids.length} 筆回饋？`)) return;
@@ -7586,6 +7855,11 @@ document.addEventListener('change', e => {
     startHpNoticeWatch(); loadHpDraft(); renderHospital();
   }
 });
+// 切到別的 App 或關閉頁面前，把還沒送出的辨識回饋送出去
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') SpeechLearn.flush(); });
+window.addEventListener('pagehide', () => SpeechLearn.flush());
+// 語音輸入中點了輸入框（要打字）：先停掉語音，避免 iPhone 中斷辨識後卡住
+document.addEventListener('focusin', e => { if (e.target && e.target.id === 'caseText' && Speech.on) { Speech.stop(); toast('已停止語音，改用打字'); } });
 document.addEventListener('input', e => {
   const t = e.target;
   if (t.id === 'ageInput') { state.patient.age = t.value; renderParse(); renderResults(); }
@@ -7614,7 +7888,7 @@ setInterval(renderClock, 15000);
 window.addEventListener('scroll', () => { if (isRoute('') && state.searched) renderJump(); }, { passive: true });
 // 時間窗倒數：有設定發作時間時每 20 秒更新
 // 途中紀錄開著時：CPR 時間、距上次 Epinephrine 每秒更新
-setInterval(() => { if (state.runOpen && !$('#modal').hidden) { const b = $('#runStat'); if (b) b.innerHTML = runStatHtml(); } if (runStats().inArrest) renderRunFab(); }, 1000);
+setInterval(() => { if (state.runOpen && !$('#modal').hidden) { const b = $('#runStat'); if (b) b.innerHTML = runStatHtml(); const c = $('#cprBox'); if (c) c.innerHTML = cprPanelHtml(); } const ia = runStats().inArrest; if (ia) { renderRunFab(); CprCue.tick(); } else if (Metro.on && state.run.events.length && state.run.events.slice(-1)[0].type === 'rosc') Metro.stop(); }, 1000);
 setInterval(() => { if (isRoute('') && activeProtocol() && elapsedMin() != null) { renderClockBox(); if (state.searched) renderResults(); } }, 20000);
 try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (localCfg.theme === 'auto') updateMapTiles(); }); } catch (e) { /* 舊版瀏覽器 */ }
 // 每分鐘更新「幾分鐘前」、忙碌倒數等時間顯示
